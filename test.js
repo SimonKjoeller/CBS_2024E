@@ -49,21 +49,24 @@ async function mailToUser(recipients, subjectMsg, textMsg, htmlMsg) {
 
 // Opgave 1: Send en mail til dig selv med Nodemailer via Gmail SMTP Server
 // Lav variabler og kald funktionen mailToUser() med parametre
-async function test() {
-  try {
-    console.log("hej")
-    const recipients = document.getElementById('emailInput').value
-    let subjectMsg = 'Nyhedsbrev 1'
-    let textMsg = "Velkommen ombord hos Joe"
-    let htmlMsg = "test"
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('test').addEventListener('click', async function () {
+    try {
+      console.log("hej");
+      const recipients = document.getElementById('emailInput').value;
+      let subjectMsg = 'Nyhedsbrev 1';
+      let textMsg = "Velkommen ombord hos Joe";
+      let htmlMsg = "test";
 
-    console.log(recipients, subjectMsg, textMsg, htmlMsg)
+      console.log(recipients, subjectMsg, textMsg, htmlMsg);
 
-    await mailToUser(recipients, subjectMsg, textMsg, htmlMsg)
-  } catch (error) {
-    console.error(error);
-  }
-}
+      await mailToUser(recipients, subjectMsg, textMsg, htmlMsg);
+    } catch (error) {
+      console.error(error);
+    }
+  });
+});
+
 
 
 // //// Opgave 1: Send en mail til dig selv med Nodemailer via Gmail SMTP Server
