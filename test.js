@@ -1,9 +1,4 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
-const app = express();
 
 // Dette er eksempel på at sende en email med plain text og en HTML body 
 // ved brug af Forward Email. Link: https://nodemailer.com/about/
@@ -37,6 +32,7 @@ transporter.verify(function (error, success) {
 async function mailToUser(recipients, subjectMsg, textMsg, htmlMsg) {
   const sender = "JOE <copenhagenbusinessjoe@gmail.com>";
   const recipients = document.getElementById(emailInput).value;
+  console.log("test")
   console.log(recipients)
   try {
     const info = await transporter.sendMail({
