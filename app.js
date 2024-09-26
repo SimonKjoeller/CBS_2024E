@@ -45,6 +45,15 @@ app.get("/cookie", (req, res) => {
 });
 
 // Opgave 2: Lav et POST /email asynkront endpoint der sender en email til modtageren
+app.post("/sendMail", (req, res) => {
+  const { sender } = req.body
+
+  console.log(mail)
+  res.cookie("taste", "chocolate");
+  res.send("Dette er din mail " + sender);
+});
+
+
 
 // Tag imod modtagerens emailadresse i req.body og lav try catch for at sende email
 // Brug console.log(req.body) for at se indholdet af req.body og få fat i emailadressen

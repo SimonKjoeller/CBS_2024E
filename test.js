@@ -20,30 +20,38 @@ const transporter = nodemailer.createTransport({
 // Verificer forbindelsen til Gmail SMTP serveren
 
 transporter.verify(function (error, success) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Server is ready to take our messages");
-    }
+  if (error) {
+    console.log(error);
+  } else {
+    console.log("Server is ready to take our messages");
+  }
 });
 
 // Konfiguration af mails: https://nodemailer.com/message/
 
 async function mailToUser(recipients, subjectMsg, textMsg, htmlMsg) {
-    const sender = "JOE <copenhagenbusinessjoe@gmail.com>";
-    try {
-        const info = await transporter.sendMail({
-            from: sender,
-            to: recipients,
-            subject: subjectMsg,
-            text: textMsg,
-            html: htmlMsg,
-        });
-        console.log("Message sent: %s", info.messageId);
-    } catch (error) {
-        console.error(error);
-    }
+  const sender = "JOE <copenhagenbusinessjoe@gmail.com>";
+  try {
+    const info = await transporter.sendMail({
+      from: sender,
+      to: recipients,
+      subject: subjectMsg,
+      text: textMsg,
+      html: htmlMsg,
+    });
+    console.log("Message sent: %s", info.messageId);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 // Opgave 1: Send en mail til dig selv med Nodemailer via Gmail SMTP Server
 // Lav variabler og kald funktionen mailToUser() med parametre
+async function sendEmail(email) {
+  try {
+    const recipients = document.getElementById(emailInput).value
+    console.log(recipients)
+  } catch (error) {
+
+  }
+}
