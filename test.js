@@ -1,4 +1,9 @@
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
+const app = express();
 
 // Dette er eksempel på at sende en email med plain text og en HTML body 
 // ved brug af Forward Email. Link: https://nodemailer.com/about/
