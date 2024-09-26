@@ -68,20 +68,3 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-
-
-// //// Opgave 1: Send en mail til dig selv med Nodemailer via Gmail SMTP Server
-// // Lav variabler og kald funktionen mailToUser() med parametre
-// document.getElementById('sendButton').addEventListener('click', async function sendEmail() {
-//   try {
-//     const emailInput = 'emailInputId'; // Antag at emailInputId er id'et på input feltet
-//     const recipients = document.getElementById(emailInput).value;
-//     let subjectMsg = 'Nyhedsbrev 1';
-//     let textMsg = "Velkommen ombord hos Joe";
-//     let htmlMsg = "test";
-//     console.log(recipients);
-//     await mailToUser(recipients, subjectMsg, textMsg, htmlMsg);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// });
