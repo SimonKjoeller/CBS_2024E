@@ -31,6 +31,8 @@ transporter.verify(function (error, success) {
 
 async function mailToUser(recipients, subjectMsg, textMsg, htmlMsg) {
   const sender = "JOE <copenhagenbusinessjoe@gmail.com>";
+  const recipients = document.getElementById(emailInput).value;
+  console.log(recipients)
   try {
     const info = await transporter.sendMail({
       from: sender,
@@ -47,11 +49,35 @@ async function mailToUser(recipients, subjectMsg, textMsg, htmlMsg) {
 
 // Opgave 1: Send en mail til dig selv med Nodemailer via Gmail SMTP Server
 // Lav variabler og kald funktionen mailToUser() med parametre
-async function sendEmail(email) {
+document.getElementById('test').addEventListener('click', async function () {
   try {
-    const recipients = document.getElementById(emailInput).value
-    console.log(recipients)
-  } catch (error) {
 
+    const recipients = document.getElementById('emailInput').value
+    let subjectMsg = 'Nyhedsbrev 1'
+    let textMsg = "Velkommen ombord hos Joe"
+    let htmlMsg = "test"
+
+    console.log(recipients)
+
+    await mailToUser(recipients, subjectMsg, textMsg, htmlMsg)
+  } catch (error) {
+    console.error(error);
   }
 }
+)
+
+// //// Opgave 1: Send en mail til dig selv med Nodemailer via Gmail SMTP Server
+// // Lav variabler og kald funktionen mailToUser() med parametre
+// document.getElementById('sendButton').addEventListener('click', async function sendEmail() {
+//   try {
+//     const emailInput = 'emailInputId'; // Antag at emailInputId er id'et på input feltet
+//     const recipients = document.getElementById(emailInput).value;
+//     let subjectMsg = 'Nyhedsbrev 1';
+//     let textMsg = "Velkommen ombord hos Joe";
+//     let htmlMsg = "test";
+//     console.log(recipients);
+//     await mailToUser(recipients, subjectMsg, textMsg, htmlMsg);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// });

@@ -45,13 +45,7 @@ app.get("/cookie", (req, res) => {
 });
 
 // Opgave 2: Lav et POST /email asynkront endpoint der sender en email til modtageren
-app.post("/sendMail", (req, res) => {
-  const { sender } = req.body
 
-  console.log(mail)
-  res.cookie("taste", "chocolate");
-  res.send("Dette er din mail " + sender);
-});
 
 
 

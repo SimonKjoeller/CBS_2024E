@@ -12,15 +12,15 @@ async function getResponse() {
   try {
     // fetch data fra /res endpoint og await responsen
     const response = await fetch('/res');
-    
+
     // hvis responsen ikke er ok, kast en fejl
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    
+
     // konverter responsen til tekst
-    const data = await response.text(); 
-    
+    const data = await response.text();
+
     // håndter succes
     console.log(data);
     responseDom.innerHTML = data;
@@ -33,27 +33,27 @@ async function getResponse() {
 
 // async funktion med await
 async function setCookie() {
-    // try catch blok
-    try {
-      // fetch data fra /res endpoint og await responsen
-      const response = await fetch('/cookie');
+  // try catch blok
+  try {
+    // fetch data fra /res endpoint og await responsen
+    const response = await fetch('/cookie');
 
-      // hvis responsen ikke er ok, kast en fejl
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      // konverter responsen til tekst
-      const value = await response.text();
-
-      // håndter succes
-      console.log(value);
-      cookieDom.innerHTML = value;
-    } catch (error) {
-      // håndter fejl
-      console.log(error);
-      cookieDom.innerHTML = `<p>Error: ${error.message}</p>`;
+    // hvis responsen ikke er ok, kast en fejl
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    // konverter responsen til tekst
+    const value = await response.text();
+
+    // håndter succes
+    console.log(value);
+    cookieDom.innerHTML = value;
+  } catch (error) {
+    // håndter fejl
+    console.log(error);
+    cookieDom.innerHTML = `<p>Error: ${error.message}</p>`;
+  }
 }
 
 // funktion til at hente placering
@@ -88,7 +88,7 @@ async function getLatLong(locationName) {
       await getWeather(data[0].lat, data[0].lon);
     } else {
       throw new Error('No results found');
-    } 
+    }
   } catch (error) {
     // håndter fejl
     console.log(error);
@@ -150,7 +150,7 @@ async function sendEmail() {
       emailDom.innerHTML = data.message;
     }
 
-} catch (error) {
+  } catch (error) {
     // håndter fejl
     console.log(error);
     emailDom.innerHTML = `<p>Fejl: ${error.message}</p>`;
