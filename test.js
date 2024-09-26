@@ -51,7 +51,7 @@ async function mailToUser(recipients, subjectMsg, textMsg, htmlMsg) {
 // Lav variabler og kald funktionen mailToUser() med parametre
 document.getElementById('test').addEventListener('click', async function () {
   try {
-    console
+    console.log(test)
     const recipients = document.getElementById('emailInput').value
     let subjectMsg = 'Nyhedsbrev 1'
     let textMsg = "Velkommen ombord hos Joe"
