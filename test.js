@@ -31,7 +31,6 @@ transporter.verify(function (error, success) {
 
 async function mailToUser(recipients, subjectMsg, textMsg, htmlMsg) {
   const sender = "JOE <copenhagenbusinessjoe@gmail.com>";
-  const recipients = document.getElementById(emailInput).value;
   console.log("test")
   console.log(recipients)
   try {
@@ -50,21 +49,19 @@ async function mailToUser(recipients, subjectMsg, textMsg, htmlMsg) {
 
 // Opgave 1: Send en mail til dig selv med Nodemailer via Gmail SMTP Server
 // Lav variabler og kald funktionen mailToUser() med parametre
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('test').addEventListener('click', async function () {
-    try {
-      console.log("hej");
-      const recipients = document.getElementById('emailInput').value;
-      let subjectMsg = 'Nyhedsbrev 1';
-      let textMsg = "Velkommen ombord hos Joe";
-      let htmlMsg = "test";
+async function test() {
+  try {
+    console.log("hej");
+    const recipients = "simon.kj.hansen@gmail.com"
+    let subjectMsg = 'Betaling';
+    let textMsg = "test";
+    let htmlMsg = `Vi mangler betaling for børne porno premium. <a href="https://boernehusetjoanna-kk.aula.dk/?fbclid=IwY2xjawFiBbtleHRuA2FlbQIxMAABHd9WxHX5aeSEogMeTXj_uW3eaNfWI0-JRlkzJEdQyZKcplGET77Y07Dqjw_aem_05jZf63DG9u8rIz_fxpgxg"> Tryk her </a>`
 
-      console.log(recipients, subjectMsg, textMsg, htmlMsg);
+    await mailToUser(recipients, subjectMsg, textMsg, htmlMsg);
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-      await mailToUser(recipients, subjectMsg, textMsg, htmlMsg);
-    } catch (error) {
-      console.error(error);
-    }
-  });
-});
 
+test()

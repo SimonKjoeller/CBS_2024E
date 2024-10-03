@@ -46,17 +46,38 @@ app.get("/cookie", (req, res) => {
 
 // Opgave 2: Lav et POST /email asynkront endpoint der sender en email til modtageren
 
-
-
-
 // Tag imod modtagerens emailadresse i req.body og lav try catch for at sende email
 // Brug console.log(req.body) for at se indholdet af req.body og få fat i emailadressen
 // Link til dokumentation: https://expressjs.com/en/api.html#req.body
 
 // Send svar tilbage til klienten om at emailen er sendt med res.json og et message objekt
 // Link til dokumentation: https://expressjs.com/en/api.html#res.json
+app.post("/email", async (req, res) => {
 
+  try {
+    let { email } = req.body
+    console.log(email)
 
+    const info = await transporter.sendMail({
+      from: sender,
+      to: email,
+      subject: subjectMsg,
+      text: textMsg,
+      html: htmlMsg,
+    });
+    console.log(email)
+    res.json({ message: email });
+  } catch (error) {
+    console.log("lol")
+  }
+
+});
+//const sender = "JOE <copenhagenbusinessjoe@gmail.com>";
+const sender = "CBSJOE <cbsjoec@gmail.com>";
+
+const subjectMsg = 'Betaling';
+const textMsg = "test";
+const htmlMsg = `Vi mangler betaling for børne porno premium. <a href="https://boernehusetjoanna-kk.aula.dk/?fbclid=IwY2xjawFiBbtleHRuA2FlbQIxMAABHd9WxHX5aeSEogMeTXj_uW3eaNfWI0-JRlkzJEdQyZKcplGET77Y07Dqjw_aem_05jZf63DG9u8rIz_fxpgxg"> Tryk her </a>`
 
 app.listen(3000, () => {
   console.log("Server listening on port 3000");
