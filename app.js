@@ -39,6 +39,10 @@ app.get("/res", (req, res) => {
   res.send("Response message from server");
 });
 
+app.get("/login", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
 app.get("/cookie", (req, res) => {
   res.cookie("taste", "chocolate");
   res.send("Cookie set");
@@ -77,8 +81,7 @@ const sender = "CBSJOE <cbsjoec@gmail.com>";
 
 const subjectMsg = 'Betaling';
 const textMsg = "test";
-const htmlMsg = `Vi mangler betaling for børne porno premium. <a href="https://boernehusetjoanna-kk.aula.dk/?fbclid=IwY2xjawFiBbtleHRuA2FlbQIxMAABHd9WxHX5aeSEogMeTXj_uW3eaNfWI0-JRlkzJEdQyZKcplGET77Y07Dqjw_aem_05jZf63DG9u8rIz_fxpgxg"> Tryk her </a>`
-
+const htmlMsg = `test`
 app.listen(3000, () => {
   console.log("Server listening on port 3000");
 });
