@@ -5,6 +5,7 @@ const latlongDom = document.getElementById("latlong");
 const weatherDom = document.getElementById("weather");
 const emailDom = document.getElementById("email");
 const emailInputDom = document.getElementById('emailInput');
+const passwordInputDom = document.getElementById('passwordInput');
 
 // async funktion med await
 async function getResponse() {
@@ -154,5 +155,35 @@ async function sendEmail() {
     // håndter fejl
     console.log(error);
     emailDom.innerHTML = `<p>Fejl: ${error.message}</p>`;
+  }
+}
+
+
+
+async function login() {
+  try {
+    // fetch POST request for /login endpoint og await responsen
+    const response = await fetch('/users/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: emailInputDom.value, password: passwordInputDom.value }),
+    });
+
+    // hvis responsen ikke er ok, kast en fejl
+    if (!response.ok) {
+      throw new Error(`HTTP statuskode ${response.status}`);
+    }
+
+    // håndter succes
+    if (response.ok) {
+      const data = await response.json();
+      window.location.href = `http://localhost:3000/`
+      console.log(data)
+    }
+  } catch (error) {
+    // håndter fejl
+    console.log(error);
   }
 }
