@@ -44,8 +44,8 @@ app.use(express.json());
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
-    user: "copenhagenbusinessjoe@gmail.com",
-    pass: "mzksmywihnpdjqjx",
+    user: "cbsjoec@gmail.com",
+    pass: "ozyurwjboabzrqek",
   },
 });
 
@@ -95,11 +95,21 @@ app.post("/email", async (req, res) => {
     console.log(email)
 
     const info = await transporter.sendMail({
-      from: sender,
+      from: "CBSJOE <cbsjoec@gmail.com>",
       to: email,
-      subject: subjectMsg,
-      text: textMsg,
-      html: htmlMsg,
+      subject: 'Joe & The Juice',
+      text: "Joe & The Juice",
+      html: `<div style="font-family: Arial, sans-serif; color: #333;">
+    <h1>Joe & The Juice</h1>
+    
+    <p>Tak fordi du er en del af vores fællesskab!</p>
+    <img src="https://seeklogo.com/images/J/joe-and-the-juice-logo-8D32BBD87A-seeklogo.com.png" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+    <footer style="font-size: 12px; color: #888;">
+      <p>Joe & The Juice</p>
+      <p>Adresse: Se web</p>
+      <p>Afmeld nyhedsbrevet <a href="https://joeandthejuice.com/unsubscribe">her</a></p>
+    </footer>
+  </div>`,
     });
     console.log(email)
     res.json({ message: email });
@@ -108,13 +118,6 @@ app.post("/email", async (req, res) => {
   }
 
 });
-//const sender = "JOE <copenhagenbusinessjoe@gmail.com>";
-const sender = "CBSJOE <cbsjoec@gmail.com>";
-
-const subjectMsg = 'Betaling';
-const textMsg = "test";
-const htmlMsg = `test`
-
 
 
 app.use("/users", userRoutes);
