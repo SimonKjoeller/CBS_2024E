@@ -12,7 +12,7 @@ const checkAuth = (req, res, next) => {
   console.log(req.cookies.isLoggedIn)
   console.log(req.cookies)
   if (req.cookies.isLoggedIn === "true") {
-    next(); // Brugeren er logget ind, fortsæt til næste middleware/rute
+    res.redirect('/');
   } else {
     // Redirecter til /login
     res.redirect('/login');
