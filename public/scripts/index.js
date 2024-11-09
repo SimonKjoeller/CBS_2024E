@@ -179,7 +179,7 @@ async function login() {
     // håndter succes
     if (response.ok) {
       const data = await response.json();
-      window.location.href = `http://localhost:3000/`
+      window.location.href = `http://cbsjoe.live/`
       console.log(data)
     }
   } catch (error) {
