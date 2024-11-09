@@ -1,6 +1,7 @@
 const twilio = require("twilio");
 const app = require("express")();
 const bodyParser = require("body-parser");
+require('dotenv').config();
 
 // Twilio API nøgler
 const accountSid = process.env.TWILIO_ACCOUNT_SID;

@@ -1,4 +1,6 @@
 const twilio = require("twilio");
+require('dotenv').config();
+
 
 // Twilio API nøgler
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
