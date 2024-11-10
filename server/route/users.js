@@ -10,7 +10,7 @@ userRoutes.use(express.json());
 userRoutes.use(cookieParser());
 
 // Secret key for signing the JWT
-const secretKey = process.env.SECRET_KEY;
+const secretKey = process.env.JWT_SECRET;
 
 userRoutes.post("/login", (req, res) => {
     const { email, password } = req.body;

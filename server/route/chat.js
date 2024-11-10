@@ -11,7 +11,7 @@ chatRoutes.use(express.json());
 chatRoutes.use(cookieParser());
 
 // Secret key for signing the JWT
-const secretKey = process.env.SECRET_KEY;
+const secretKey = process.env.JWT_SECRET;
 
 // Middleware to verify JWT token
 function verifyToken(req, res, next) {
