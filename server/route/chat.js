@@ -8,13 +8,13 @@ chatRoutes.use(cookieParser());
 
 
 // Main page
-chatRoutes.get("/chat", (req, res) => {
+chatRoutes.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../../public/pages/chat.html"));
 });
 
 
 
-chatRoutes.get("/chat/recipient", (req, res) => {
+chatRoutes.get("/recipient", (req, res) => {
     const { username } = req.body;
     console.log("test")
     const query = `SELECT * FROM users WHERE username = ?`
