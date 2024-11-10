@@ -2,32 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const checkAuth = require('./middlewares/checkAuth'); // Importer korrekt checkAuth middleware
 const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
 
-const checkAuth = (req, res, next) => {
-
-  console.log(req.cookies.isLoggedIn)
-  console.log(req.cookies)
-  if (req.cookies.isLoggedIn === "true") {
-    next(); // Brugeren er logget ind, fortsæt til næste middleware/rute
-  } else {
-    // Redirecter til /login
-    res.redirect('/login');
-  }
-};
-
-// Anvend checkAuth middleware på beskyttede ruter
-app.get("/protected", checkAuth, (req, res) => {
-  res.send("This is a protected route. You are logged in!");
-});
-
-
-
 app.use(cors());
-//app.use("/static", express.static("public"));
 app.use(express.static(path.join(__dirname, "../public")));
 app.use((req, res, next) => {
   console.log("----- HTTP Request -----");
@@ -49,13 +30,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
-
+// Opdaterede ruter med checkAuth middleware
 app.get("/", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/index.html"));
 });
 
-app.get("/locations", (req, res) => {
+app.get("/locations", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/locations.html"));
 });
 
@@ -72,25 +52,11 @@ app.get("/cookie", (req, res) => {
   res.send("Cookie set");
 });
 
-
-
-
-
-
-
 // Opgave 2: Lav et POST /email asynkront endpoint der sender en email til modtageren
-
-// Tag imod modtagerens emailadresse i req.body og lav try catch for at sende email
-// Brug console.log(req.body) for at se indholdet af req.body og få fat i emailadressen
-// Link til dokumentation: https://expressjs.com/en/api.html#req.body
-
-// Send svar tilbage til klienten om at emailen er sendt med res.json og et message objekt
-// Link til dokumentation: https://expressjs.com/en/api.html#res.json
 app.post("/email", async (req, res) => {
-
   try {
-    let { email } = req.body
-    console.log(email)
+    let { email } = req.body;
+    console.log(email);
 
     const info = await transporter.sendMail({
       from: "CBSJOE <cbsjoec@gmail.com>",
@@ -98,29 +64,25 @@ app.post("/email", async (req, res) => {
       subject: 'Joe & The Juice',
       text: "Joe & The Juice",
       html: `<div style="font-family: Arial, sans-serif; color: #333;">
-    <h1>Joe & The Juice</h1>
-    
-    <p>Tak fordi du er en del af vores fællesskab!</p>
-    <img src="https://seeklogo.com/images/J/joe-and-the-juice-logo-8D32BBD87A-seeklogo.com.png" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
-    <footer style="font-size: 12px; color: #888;">
-      <p>Joe & The Juice</p>
-      <p>Adresse: Se web</p>
-      <p>Afmeld nyhedsbrevet <a href="https://joeandthejuice.com/unsubscribe">her</a></p>
-    </footer>
-  </div>`,
+        <h1>Joe & The Juice</h1>
+        <p>Tak fordi du er en del af vores fællesskab!</p>
+        <img src="https://seeklogo.com/images/J/joe-and-the-juice-logo-8D32BBD87A-seeklogo.com.png" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+        <footer style="font-size: 12px; color: #888;">
+          <p>Joe & The Juice</p>
+          <p>Adresse: Se web</p>
+          <p>Afmeld nyhedsbrevet <a href="https://joeandthejuice.com/unsubscribe">her</a></p>
+        </footer>
+      </div>`,
     });
-    console.log(email)
+    console.log(email);
     res.json({ message: email });
   } catch (error) {
-    console.log("lol")
+    console.log("Error sending email", error);
   }
-
 });
-
 
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
-
 
 app.listen(3000, () => {
   console.log("Server listening on port 3000");
