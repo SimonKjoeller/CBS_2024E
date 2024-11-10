@@ -1,16 +1,20 @@
-INSERT INTO customers
+-- Customers table
+INSERT INTO users
     (username, email, password)
 VALUES
     ('anders', 'anders@gmail.com', 'anders123');
-INSERT INTO customers
+INSERT INTO users
     (username, email, password)
 VALUES
     ('hjalte', 'hjalte@gmail.com', 'hjalte123');
-INSERT INTO customers
+INSERT INTO users
     (username, email, password)
 VALUES
     ('simon', 'simon@gmail.com', 'simon123');
 
+
+
+-- Product table
 INSERT INTO products
     (productName, imgsrc)
 VALUES

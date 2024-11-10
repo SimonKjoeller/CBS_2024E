@@ -72,8 +72,8 @@ app.get("/cookie", (req, res) => {
   res.send("Cookie set");
 });
 
-app.get("/culture", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/pages/culture.html"));
+app.get("/chat", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/pages/chat.html"));
 });
 
 
@@ -121,6 +121,7 @@ app.post("/email", async (req, res) => {
 
 
 app.use("/users", userRoutes);
+app.use("/chat", userRoutes);
 
 
 app.listen(3000, () => {

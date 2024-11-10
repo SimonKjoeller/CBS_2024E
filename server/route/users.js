@@ -11,7 +11,7 @@ userRoutes.use(cookieParser());
 userRoutes.post("/login", (req, res) => {
     const { email, password } = req.body;
 
-    const query = `SELECT * FROM customers WHERE email = ? AND password = ?`
+    const query = `SELECT * FROM users WHERE email = ? AND password = ?`
     console.log(email, password)
 
     db.get(query, [email, password], (err, customer) => {
