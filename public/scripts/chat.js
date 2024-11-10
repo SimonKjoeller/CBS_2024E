@@ -24,6 +24,7 @@ async function findRecipient() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ username: recipient.value }),
+            credentials: 'same-origin', // Sørger for at cookies bliver sendt med
         });
 
         // hvis responsen ikke er ok, kast en fejl
