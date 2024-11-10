@@ -7,8 +7,14 @@ const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
 
-const checkAuth = (req, res, next) => {
+// Konfigurer CORS før ruterne
+app.use(cors({
+  origin: 'https://cbsjoe.live',  // Frontend-domænet
+  credentials: true,  // Tillader cookies
+}));
 
+
+const checkAuth = (req, res, next) => {
   console.log(req.cookies.isLoggedIn)
   console.log(req.cookies)
   if (req.cookies.isLoggedIn === "true") {
@@ -24,9 +30,6 @@ app.get("/protected", checkAuth, (req, res) => {
   res.send("This is a protected route. You are logged in!");
 });
 
-
-
-app.use(cors());
 //app.use("/static", express.static("public"));
 app.use(express.static(path.join(__dirname, "../public")));
 app.use((req, res, next) => {

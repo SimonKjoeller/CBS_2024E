@@ -1,12 +1,16 @@
 const express = require("express");
+const cors = require("cors");
 const userRoutes = express.Router();
 const cookieParser = require("cookie-parser");
 const db = require("../db");
 const path = require("path")
 
+app.use(cors({
+    origin: 'https://cbsjoe.live',  // Frontend-domænet
+    credentials: true,  // Tillader cookies
+}));
+
 userRoutes.use(express.json());
-
-
 userRoutes.use(cookieParser());
 
 userRoutes.post("/login", (req, res) => {
