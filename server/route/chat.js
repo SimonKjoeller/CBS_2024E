@@ -1,14 +1,20 @@
 const express = require("express");
-const userRoutes = express.Router();
+const chatRoutes = express.Router();
 const cookieParser = require("cookie-parser");
 const db = require("../db");
 
-userRoutes.use(express.json());
+chatRoutes.use(express.json());
+chatRoutes.use(cookieParser());
 
 
-userRoutes.use(cookieParser());
+// Main page
+app.get("/chat", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/pages/chat.html"));
+});
 
-userRoutes.get("/chat/recipient", (req, res) => {
+
+
+chatRoutes.get("/chat/recipient", (req, res) => {
     const { username } = req.body;
     console.log("test")
     const query = `SELECT * FROM users WHERE username = ?`
@@ -30,4 +36,4 @@ userRoutes.get("/chat/recipient", (req, res) => {
 });
 
 
-module.exports = userRoutes;
+module.exports = chatRoutes;
