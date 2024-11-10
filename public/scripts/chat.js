@@ -10,6 +10,7 @@ recipient.addEventListener("input", () => {
     // Sæt en ny timeout med 0,3 sekunders forsinkelse
     typingTimeout = setTimeout(findRecipient, 300);
 });
+
 // async funktion med await
 async function findRecipient() {
     // try catch blok
@@ -22,10 +23,9 @@ async function findRecipient() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ username: recipient }),
+            body: JSON.stringify({ username: recipient.value }),
         });
-        console.log(recipient)
-        console.log("test1")
+
         // hvis responsen ikke er ok, kast en fejl
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
