@@ -20,12 +20,13 @@ chatRoutes.get("/chat/recipient", (req, res) => {
     console.log("test")
     const query = `SELECT * FROM users WHERE username = ?`
     console.log(username)
+    console.log(query)
 
     db.get(query, [username, email, password], (err, customer) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        if (customer) {
+        if (user) {
             res
                 .cookie("isLoggedIn", "true", { maxAge: 3600000, httpOnly: true })
                 .status(200)

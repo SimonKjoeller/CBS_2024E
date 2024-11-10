@@ -1,4 +1,4 @@
-const recipient = document.getElementById("recipient");
+const recipient = document.getElementById("recipient").value;
 
 // Variabel til at holde styr på den sidste timeout
 let typingTimeout;
@@ -15,8 +15,14 @@ async function findRecipient() {
     // try catch blok
     try {
         // fetch data fra /res endpoint og await responsen
-        const response = await fetch('/chat/recipient');
-
+        const response = await fetch('/chat/recipient', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username: recipient }),
+        });
+        console.log(recipient)
         console.log("test1")
         // hvis responsen ikke er ok, kast en fejl
         if (!response.ok) {
