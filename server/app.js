@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
