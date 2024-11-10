@@ -1,28 +1,21 @@
 const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
-const path = require('path'); // Importer path-modulet
-
 const db = new sqlite3.Database('db/sqlite.db');
 
-// Funktion til at køre SQL script
 const runSQLScript = (filename) => {
-    // Brug absolut sti til at finde scriptfilen
-    const scriptPath = path.join(__dirname, 'scripts', filename); // Absolut sti til scriptfil
-    const script = fs.readFileSync(scriptPath, 'utf8');
-
+    const script = fs.readFileSync(filename, 'utf8');
     db.exec(script, (err) => {
         if (err) {
-            console.log("Fejl ved eksekvering af script: ", err);
+            console.log("erroer exec script: ", err);
         } else {
-            console.log(`SQL script ${filename} kørt succesfuldt`);
+            console.log(`SQL script ${filename} run successfully`);
         }
     });
 };
 
 db.serialize(() => {
-    // Kald runSQLScript med de korrekte filnavne
-    runSQLScript('schema.sql');
-    runSQLScript('dump.sql');
+    runSQLScript('scripts/schema.sql');
+    runSQLScript('scripts/dump.sql');
 });
 
 module.exports = db;
