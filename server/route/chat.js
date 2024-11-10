@@ -8,7 +8,7 @@ chatRoutes.use(cookieParser());
 
 
 // Main page
-app.get("/chat", (req, res) => {
+chatRoutes.get("/chat", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/pages/chat.html"));
 });
 
