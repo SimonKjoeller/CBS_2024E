@@ -14,8 +14,8 @@ const runSQLScript = (filename) => {
 };
 
 db.serialize(() => {
-    runSQLScript('scripts/schema.sql');
-    runSQLScript('scripts/dump.sql');
+    runSQLScript('./scripts/schema.sql');
+    runSQLScript('./scripts/dump.sql');
 });
 
 module.exports = db;
