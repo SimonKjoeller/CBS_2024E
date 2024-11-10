@@ -2,4 +2,4 @@
 .env
 
 # Ignorer sqlite
-server/db/sqlite.db
+server/db/sqlite.dbserver/db/sqlite.db
