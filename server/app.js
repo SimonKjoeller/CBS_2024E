@@ -9,7 +9,8 @@ const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
 
-console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Tjek om det er sat korrekt
+//console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Tjek om det er sat korrekt
+console.log('JWT_SECRET:', a5f6e8d4b9c8d05f9c36fd457bc1c9ab8f2e1e4f0d02bfb93e7b2b459a6a09b5);  // Tjek om det er sat korrekt
 
 
 app.use(cors());
