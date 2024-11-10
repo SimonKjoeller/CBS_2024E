@@ -2,6 +2,7 @@ const express = require("express");
 const userRoutes = express.Router();
 const cookieParser = require("cookie-parser");
 const db = require("../db");
+const path = require("path")
 
 userRoutes.use(express.json());
 

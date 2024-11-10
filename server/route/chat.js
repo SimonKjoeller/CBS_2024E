@@ -2,6 +2,7 @@ const express = require("express");
 const chatRoutes = express.Router();
 const cookieParser = require("cookie-parser");
 const db = require("../db");
+const path = require("path")
 
 chatRoutes.use(express.json());
 chatRoutes.use(cookieParser());
