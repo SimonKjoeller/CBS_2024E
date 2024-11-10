@@ -19,7 +19,7 @@ async function findRecipient() {
         console.log(recipient.value)
         // fetch data fra /res endpoint og await responsen
         const response = await fetch('/chat/recipient', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },

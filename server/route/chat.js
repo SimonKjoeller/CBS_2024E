@@ -15,7 +15,7 @@ chatRoutes.get("/", (req, res) => {
 
 
 
-chatRoutes.get("/recipient", (req, res) => {
+chatRoutes.post("/recipient", (req, res) => {
     const { username } = req.body;
     console.log("test")
     const query = `SELECT * FROM users WHERE username = ?`
