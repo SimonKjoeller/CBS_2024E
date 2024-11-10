@@ -1,4 +1,4 @@
-const recipient = document.getElementById("recipient").value;
+const recipient = document.getElementById("recipient");
 
 // Variabel til at holde styr på den sidste timeout
 let typingTimeout;
@@ -14,6 +14,8 @@ recipient.addEventListener("input", () => {
 async function findRecipient() {
     // try catch blok
     try {
+        console.log(recipient)
+        console.log(recipient.value)
         // fetch data fra /res endpoint og await responsen
         const response = await fetch('/chat/recipient', {
             method: 'GET',
