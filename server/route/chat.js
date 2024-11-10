@@ -9,7 +9,7 @@ chatRoutes.use(cookieParser());
 
 // Main page
 chatRoutes.get("/chat", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/pages/chat.html"));
+    res.sendFile(path.join(__dirname, "../../public/pages/chat.html"));
 });
 
 
