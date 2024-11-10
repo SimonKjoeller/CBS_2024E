@@ -1,2 +1,5 @@
 # Ignorer .env-filen
 .env
+
+# Ignorer sqlite
+server/db/sqlite.db
