@@ -8,6 +8,9 @@ const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
 
+console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Tjek om det er sat korrekt
+
+
 app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
 app.use((req, res, next) => {
