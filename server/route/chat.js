@@ -22,7 +22,7 @@ chatRoutes.post("/recipient", (req, res) => {
     console.log(username)
     console.log(query)
 
-    db.get(query, [username, email, password], (err, customer) => {
+    db.get(query, [username], (err, user) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
