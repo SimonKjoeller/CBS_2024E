@@ -5,6 +5,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
+const chatRoutes = require("./route/chat");
 const app = express();
 
 const checkAuth = (req, res, next) => {
@@ -72,9 +73,7 @@ app.get("/cookie", (req, res) => {
   res.send("Cookie set");
 });
 
-app.get("/chat", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/pages/chat.html"));
-});
+
 
 
 
@@ -121,7 +120,7 @@ app.post("/email", async (req, res) => {
 
 
 app.use("/users", userRoutes);
-app.use("/chat", userRoutes);
+app.use("/chat", chatRoutes);
 
 
 app.listen(3000, () => {
