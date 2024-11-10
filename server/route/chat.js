@@ -8,13 +8,13 @@ userRoutes.use(express.json());
 
 userRoutes.use(cookieParser());
 
-userRoutes.post("/login", (req, res) => {
-    const { email, password } = req.body;
+userRoutes.get("/chat/recipient", (req, res) => {
+    const { username } = req.body;
+    console.log("test")
+    const query = `SELECT * FROM users WHERE username = ?`
+    console.log(username)
 
-    const query = `SELECT * FROM customers WHERE email = ? AND password = ?`
-    console.log(email, password)
-
-    db.get(query, [email, password], (err, customer) => {
+    db.get(query, [username, email, password], (err, customer) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
