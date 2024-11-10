@@ -1,14 +1,8 @@
 const express = require("express");
-const cors = require("cors");
 const chatRoutes = express.Router();
 const cookieParser = require("cookie-parser");
 const db = require("../db");
 const path = require("path")
-
-app.use(cors({
-    origin: 'https://cbsjoe.live',  // Frontend-domænet
-    credentials: true,  // Tillader cookies
-}));
 
 chatRoutes.use(express.json());
 chatRoutes.use(cookieParser());
