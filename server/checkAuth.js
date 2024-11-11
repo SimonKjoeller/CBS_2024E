@@ -12,8 +12,7 @@ const checkAuth = (req, res, next) => {
 
     try {
         // Verificer tokenet med din hemmelige nøgle
-        //const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const decoded = jwt.verify(token, a5f6e8d4b9c8d05f9c36fd457bc1c9ab8f2e1e4f0d02bfb93e7b2b459a6a09b5);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         // Hvis token er validt, gem brugeren i req.user
         req.user = decoded;
         next();  // Fortsæt til den næste middleware/rute
