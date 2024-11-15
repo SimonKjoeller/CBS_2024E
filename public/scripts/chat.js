@@ -1,46 +1,54 @@
-const recipient = document.getElementById("recipient");
-
-// Variabel til at holde styr på den sidste timeout
+const searchInput = document.getElementById("search");
+const searchDropdown = document.getElementById("search-dropdown");
 let typingTimeout;
 
-recipient.addEventListener("input", () => {
-    // Hvis der allerede er en timeout aktiv, så ryd den
+searchInput.addEventListener("input", () => {
     clearTimeout(typingTimeout);
-
-    // Sæt en ny timeout med 0,3 sekunders forsinkelse
-    typingTimeout = setTimeout(findRecipient, 300);
+    typingTimeout = setTimeout(searchChats, 300);
 });
 
-// async funktion med await
-async function findRecipient() {
-    // try catch blok
+async function searchChats() {
+    const query = searchInput.value;
+    if (query.length === 0) {
+        searchDropdown.style.display = "none";
+        return;
+    }
+
     try {
-        console.log(recipient)
-        console.log(recipient.value)
-        // fetch data fra /res endpoint og await responsen
-        const response = await fetch('/chat/recipient', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username: recipient.value }),
-            credentials: 'same-origin', // Sørger for at cookies bliver sendt med
+        const response = await fetch("/chat/recipient", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: query }),
         });
 
-        // hvis responsen ikke er ok, kast en fejl
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`HTTP-fejl! Status: ${response.status}`);
         }
 
-        // konverter responsen til tekst
-        const data = await response.text();
-
-        // håndter succes
-        console.log(data);
+        const data = await response.json();
+        visSøgeresultater(data.slice(0, 4)); // Begræns til 4 resultater
     } catch (error) {
-        // håndter fejl
-        console.log(error);
-        responseDom.innerHTML = `<p>Error: ${error.message}</p>`;
+        console.error("Fejl ved søgning efter modtagere:", error);
     }
 }
 
+function visSøgeresultater(resultater) {
+    searchDropdown.innerHTML = "";
+    if (resultater.length === 0) {
+        searchDropdown.style.display = "none";
+        return;
+    }
+
+    resultater.forEach(resultat => {
+        const item = document.createElement("div");
+        item.textContent = resultat.username;
+        item.classList.add("dropdown-item");
+        item.onclick = () => {
+            searchInput.value = resultat.username;
+            searchDropdown.style.display = "none";
+        };
+        searchDropdown.appendChild(item);
+    });
+
+    searchDropdown.style.display = "block";
+}

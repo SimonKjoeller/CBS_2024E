@@ -6,7 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/global.css">
-    <title>JOE and The Juice</title>
+    <link rel="stylesheet" href="../styles/chat.css">
+    <title>JOE and The Juice - Chat</title>
 </head>
 
 <body>
@@ -17,14 +18,24 @@
         <li style="float:right"><a href="/locations">Locations</a></li>
         <li style="float:right"><a href="/">Menu</a></li>
     </ul>
-    <div class="chatBox">
-        <div class="chatHeader">
-            <input id="recipient"></input>
+
+    <div class="chatContainer">
+        <div class="chatSidebar">
+            <input type="text" id="search" placeholder="Søg efter chat" autocomplete="off">
+            <div id="search-dropdown"></div>
+            <ul id="chat-list">
+                <!-- Chat-navne bliver dynamisk indsat her -->
+            </ul>
+        </div>
+        <div class="chatMain">
+            <div id="chat-messages">
+                <!-- Beskeder vises her -->
+            </div>
+            <input type="text" id="new-message" placeholder="Skriv en ny besked">
         </div>
     </div>
-
-
 </body>
+
 <script src="../scripts/index.js"></script>
 <script src="../scripts/chat.js"></script>
 
