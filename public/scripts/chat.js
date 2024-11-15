@@ -1,9 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("search");
+    console.log(searchInput)
     const searchDropdown = document.getElementById("search-dropdown");
+    console.log(searchDropdown)
     const chatList = document.getElementById("chat-list");
+    console.log(chatList)
     const sendMessageButton = document.getElementById("send-message");
+    console.log(sendMessageButton)
     const chatMessages = document.getElementById("chat-messages");
+    console.log(chatMessages)
 
     // Check if elements exist before adding event listeners
     if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages) {
