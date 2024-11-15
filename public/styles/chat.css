@@ -77,6 +77,40 @@
     background-color: #f09bc1;
 }
 
+/* Styling for chatbeskeder */
+.message {
+    display: inline-block;
+    padding: 10px;
+    background-color: #f7c1d9;
+    /* Lyserød baggrund */
+    border-radius: 10px;
+    margin: 5px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.message.mine {
+    background-color: #f09bc1;
+    float: right;
+}
+
+.message.other {
+    background-color: #f7c1d9;
+    float: left;
+}
+
+#chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
 /* Styling til søgeresultater */
 #search-dropdown {
     position: absolute;
