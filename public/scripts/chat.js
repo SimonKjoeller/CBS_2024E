@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("search");
+    console.log(searchInput); // Skal vise elementet eller `null`
+
     const searchDropdown = document.getElementById("search-dropdown");
     const chatList = document.getElementById("chat-list");
     const sendMessageButton = document.getElementById("send-message");
