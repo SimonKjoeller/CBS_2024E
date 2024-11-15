@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const searchDropdown = document.getElementById("search-dropdown");
     const chatList = document.getElementById("chat-list");
+    console.log(chatList); // Skal vise elementet eller `null`
     const sendMessageButton = document.getElementById("send-message");
     const chatMessages = document.getElementById("chat-messages");
 
