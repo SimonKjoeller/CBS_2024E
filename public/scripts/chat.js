@@ -26,6 +26,7 @@ async function searchChats() {
         }
 
         const data = await response.json();
+        console.log(data)
         visSøgeresultater(data.slice(0, 4)); // Begræns til 4 resultater
     } catch (error) {
         console.error("Fejl ved søgning efter modtagere:", error);
