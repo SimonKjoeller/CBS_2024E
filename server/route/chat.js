@@ -1,29 +1,10 @@
-const socket = new WebSocket("wss://cbsjoe.live");  // WebSocket secure connection
-const searchInput = document.getElementById("search");
-const searchDropdown = document.getElementById("search-dropdown");
-const chatList = document.getElementById("chat-list");
-const sendMessageButton = document.getElementById("send-message");
-const chatMessages = document.getElementById("chat-messages");
-
-socket.addEventListener('message', function (event) {
-    const message = JSON.parse(event.data);
-    const messageElement = document.createElement("div");
-    messageElement.classList.add("message");
-
-    // If sender is 'your_username', position the message to the right
-    if (message.sender === 'your_username') { // Change 'your_username' with actual user name
-        messageElement.classList.add("mine");
-    } else {
-        messageElement.classList.add("other");
-    }
-
-    messageElement.textContent = `[${message.sent_at}] ${message.sender}: ${message.message}`;
-    chatMessages.appendChild(messageElement);
-});
-
-// Functionality for searching, sending, and receiving messages
-// More functionality (e.g., searchChats, loadConversation, etc.) is similar to your previous implementation
-
+const express = require("express");
+const chatRoutes = express.Router();
+const cookieParser = require("cookie-parser");
+const db = require("../db");
+const path = require("path");
+const checkAuth = require("../checkAuth");
+require('dotenv').config();
 
 chatRoutes.use(express.json());
 chatRoutes.use(cookieParser());
