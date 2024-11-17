@@ -1,3 +1,6 @@
+const https = require('https');
+const fs = require('fs');
+const WebSocket = require('ws');
 require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
@@ -9,8 +12,22 @@ const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
 
-console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Tjek om det er sat korrekt
+const privateKey = fs.readFileSync(process.env.SSL_PRIVATE_KEY, 'utf8');
+const certificate = fs.readFileSync(process.env.SSL_CERTIFICATE, 'utf8');
+const ca = fs.readFileSync(process.env.SSL_CA, 'utf8');
 
+const serverOptions = {
+  key: privateKey,
+  cert: certificate,
+  ca: ca
+}
+
+const server = https.createServer(serverOptions, app)
+
+console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Tjek om det er sat korrekt
+console.log(privateKey)
+console.log(certificate)
+console.log(ca)
 
 app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
@@ -88,6 +105,6 @@ app.post("/email", async (req, res) => {
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
 
-app.listen(3000, () => {
+server.listen(3000, () => {
   console.log("Server listening on port 3000");
 });

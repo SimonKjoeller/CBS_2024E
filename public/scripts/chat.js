@@ -1,8 +1,26 @@
+const socket = new WebSocket("wss://cbsjoe.live");
 const searchInput = document.getElementById("search");
 const searchDropdown = document.getElementById("search-dropdown");
 const chatList = document.getElementById("chat-list");
 const sendMessageButton = document.getElementById("send-message");
 const chatMessages = document.getElementById("chat-messages");
+
+socket.addEventListener('message', function (event) {
+    const message = JSON.parse(event.data);
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message");
+
+    // Hvis afsenderen er dig, sendes det til højre
+    if (message.sender === 'your_username') { // Skift 'your_username' til din faktiske brugernavn
+        messageElement.classList.add("mine");
+    } else {
+        messageElement.classList.add("other");
+    }
+
+    messageElement.textContent = `[${message.sent_at}] ${message.sender}: ${message.message}`;
+    chatMessages.appendChild(messageElement);
+});
+
 
 // Check if elements exist before adding event listeners
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages) {
@@ -93,9 +111,9 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
                 const messageElement = document.createElement("div");
                 messageElement.classList.add("message");
 
-                // Tilføj 'mine' eller 'other' baseret på afsenderen
+                // Tjek om afsenderen er dig eller modtageren
                 if (msg.sender === 'your_username') {
-                    messageElement.classList.add("mine"); // Erstat 'your_username' med den faktiske brugernavn
+                    messageElement.classList.add("mine"); // Erstat 'your_username' med den rigtige betingelse for din bruger
                 } else {
                     messageElement.classList.add("other");
                 }
@@ -107,6 +125,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.error("Fejl ved indlæsning af samtale:", error);
         }
     }
+
 
 
     chatList.addEventListener("click", (event) => {

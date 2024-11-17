@@ -77,27 +77,31 @@
     background-color: #f09bc1;
 }
 
-/* Styling for chatbeskeder */
+
+.message.mine {
+    background-color: #f09bc1;
+    float: right;
+    clear: both;
+}
+
+
+.message.other {
+    background-color: #f7c1d9;
+    float: left;
+    clear: both;
+}
+
+
 .message {
     display: inline-block;
     padding: 10px;
     background-color: #f7c1d9;
-    /* Lyserød baggrund */
     border-radius: 10px;
     margin: 5px;
     max-width: 80%;
     word-wrap: break-word;
 }
 
-.message.mine {
-    background-color: #f09bc1;
-    float: right;
-}
-
-.message.other {
-    background-color: #f7c1d9;
-    float: left;
-}
 
 #chat-messages {
     flex: 1;
