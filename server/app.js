@@ -9,6 +9,7 @@ const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
 
+// Middleware setup
 app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(cookieParser());
