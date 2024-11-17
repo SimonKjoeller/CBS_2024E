@@ -16,7 +16,7 @@
     "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.15",
-    "sqlite3": "^5.1.7",
+    "sqlite3": "^5.1.2",
     "ws": "^8.18.0"
   }
 }

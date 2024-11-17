@@ -1,6 +1,3 @@
-const https = require('https');
-const fs = require('fs');
-const WebSocket = require('ws');
 require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
@@ -11,39 +8,6 @@ const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
-
-// Læs SSL-certifikaterne fra .env filen
-const privateKey = fs.readFileSync(process.env.SSL_PRIVATE_KEY, 'utf8');
-const certificate = fs.readFileSync(process.env.SSL_CERTIFICATE, 'utf8');
-const ca = fs.readFileSync(process.env.SSL_CA, 'utf8');
-
-// HTTPS serverindstillinger
-const serverOptions = {
-  key: privateKey,
-  cert: certificate,
-  ca: ca
-};
-
-// Opret HTTPS server
-const server = https.createServer(serverOptions, app);
-
-// Opret WebSocket server
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', (ws) => {
-  console.log("WebSocket connection established");
-
-  // Modtag besked fra klient
-  ws.on('message', (message) => {
-    console.log(`received: ${message}`);
-    ws.send(`Hello from server: ${message}`);
-  });
-
-  // Send velkomstbesked til ny forbindelse
-  ws.send("Welcome to the WebSocket server!");
-});
-
-console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Tjek om det er sat korrekt
 
 app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
@@ -108,6 +72,6 @@ app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
 
 // Start serveren
-server.listen(3000, () => {
+app.listen(3000, () => {
   console.log("Server listening on port 3000");
 });
