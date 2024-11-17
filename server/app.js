@@ -12,34 +12,41 @@ const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
 
+// Læs SSL-certifikaterne fra .env filen
 const privateKey = fs.readFileSync(process.env.SSL_PRIVATE_KEY, 'utf8');
 const certificate = fs.readFileSync(process.env.SSL_CERTIFICATE, 'utf8');
 const ca = fs.readFileSync(process.env.SSL_CA, 'utf8');
 
+// HTTPS serverindstillinger
 const serverOptions = {
   key: privateKey,
   cert: certificate,
   ca: ca
-}
+};
 
-const server = https.createServer(serverOptions, app)
+// Opret HTTPS server
+const server = https.createServer(serverOptions, app);
+
+// Opret WebSocket server
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws) => {
+  console.log("WebSocket connection established");
+
+  // Modtag besked fra klient
+  ws.on('message', (message) => {
+    console.log(`received: ${message}`);
+    ws.send(`Hello from server: ${message}`);
+  });
+
+  // Send velkomstbesked til ny forbindelse
+  ws.send("Welcome to the WebSocket server!");
+});
 
 console.log('JWT_SECRET:', process.env.JWT_SECRET);  // Tjek om det er sat korrekt
-console.log(privateKey)
-console.log(certificate)
-console.log(ca)
 
 app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
-app.use((req, res, next) => {
-  console.log("----- HTTP Request -----");
-  console.log(`Method: ${req.method}`); // HTTP Method
-  console.log(`URL: ${req.originalUrl}`); // Requested URL
-  console.log("Headers:", req.headers); // Request Headers
-  console.log(`IP: ${req.ip}`); // IP Address
-  console.log("------------------------");
-  next();
-});
 app.use(cookieParser());
 app.use(express.json());
 
@@ -58,10 +65,6 @@ app.get("/", checkAuth, (req, res) => {
 
 app.get("/locations", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/locations.html"));
-});
-
-app.get("/res", (req, res) => {
-  res.send("Response message from server");
 });
 
 app.get("/login", (req, res) => {
@@ -95,7 +98,6 @@ app.post("/email", async (req, res) => {
         </footer>
       </div>`,
     });
-    console.log(email);
     res.json({ message: email });
   } catch (error) {
     console.log("Error sending email", error);
@@ -105,6 +107,7 @@ app.post("/email", async (req, res) => {
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
 
+// Start serveren
 server.listen(3000, () => {
   console.log("Server listening on port 3000");
 });
