@@ -1,4 +1,4 @@
-const socket = new WebSocket("wss://cbsjoe.live");
+const socket = new WebSocket("wss://cbsjoe.live");  // WebSocket secure connection
 const searchInput = document.getElementById("search");
 const searchDropdown = document.getElementById("search-dropdown");
 const chatList = document.getElementById("chat-list");
@@ -10,8 +10,8 @@ socket.addEventListener('message', function (event) {
     const messageElement = document.createElement("div");
     messageElement.classList.add("message");
 
-    // Hvis afsenderen er dig, sendes det til højre
-    if (message.sender === 'your_username') { // Skift 'your_username' til din faktiske brugernavn
+    // If sender is 'your_username', position the message to the right
+    if (message.sender === 'your_username') { // Change 'your_username' with actual user name
         messageElement.classList.add("mine");
     } else {
         messageElement.classList.add("other");
@@ -20,7 +20,6 @@ socket.addEventListener('message', function (event) {
     messageElement.textContent = `[${message.sent_at}] ${message.sender}: ${message.message}`;
     chatMessages.appendChild(messageElement);
 });
-
 
 // Check if elements exist before adding event listeners
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages) {
