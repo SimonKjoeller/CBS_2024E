@@ -4,10 +4,33 @@ const cookieParser = require("cookie-parser");
 const db = require("../db");
 const path = require("path");
 const checkAuth = require("../checkAuth");
+const WebSocket = require("ws"); // WebSocket library
 require('dotenv').config();
 
 chatRoutes.use(express.json());
 chatRoutes.use(cookieParser());
+
+// WebSocket Setup - Opretter en WebSocket-server til at håndtere forbindelser
+const wss = new WebSocket.Server({ noServer: true });
+
+wss.on("connection", (ws) => {
+    console.log("A user connected");
+
+    // Handling incoming messages
+    ws.on("message", (message) => {
+        console.log(`Received: ${message}`);
+        // Broadcast message to all connected clients
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);  // Send message to all connected clients
+            }
+        });
+    });
+
+    ws.on("close", () => {
+        console.log("A user disconnected");
+    });
+});
 
 // Main page
 chatRoutes.get("/", checkAuth, (req, res) => {
@@ -66,6 +89,5 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
     });
 });
 
-
-
+// WebSocket server integration with the HTTP server
 module.exports = chatRoutes;
