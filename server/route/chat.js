@@ -21,6 +21,9 @@ socket.addEventListener('message', function (event) {
     chatMessages.appendChild(messageElement);
 });
 
+// Functionality for searching, sending, and receiving messages
+// More functionality (e.g., searchChats, loadConversation, etc.) is similar to your previous implementation
+
 
 chatRoutes.use(express.json());
 chatRoutes.use(cookieParser());
