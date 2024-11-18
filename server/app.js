@@ -1,54 +1,20 @@
 require('dotenv').config();
 const express = require("express");
-const https = require("https");
-const fs = require("fs");
-const WebSocket = require("ws");  // Import WebSocket module
+const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const checkAuth = require('./checkAuth');
+const checkAuth = require('./checkAuth'); // Importer korrekt checkAuth middleware
 const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
 
-// Læs SSL-certifikaterne fra .env filen
-const serverOptions = {
-  key: fs.readFileSync(process.env.SSL_KEY_PATH),
-  cert: fs.readFileSync(process.env.SSL_CERT_PATH),
-  ca: fs.readFileSync(process.env.SSL_CA_PATH), // Hvis nødvendigt
-};
-
-// Opret HTTPS server
-const server = https.createServer(serverOptions, app);
-
-// Setup WebSocket server
-const wss = new WebSocket.Server({ server });  // Tilknyt WebSocket serveren til HTTPS serveren
-
-wss.on("connection", (ws) => {
-  console.log("A user connected");
-
-  // Handling incoming messages
-  ws.on("message", (message) => {
-    console.log(`Received: ${message}`);
-    // Broadcast message to all connected clients
-    wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);  // Send message to all connected clients
-      }
-    });
-  });
-
-  ws.on("close", () => {
-    console.log("A user disconnected");
-  });
-});
-
 // Middleware setup
-app.use(cookieParser());
+app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
+app.use(cookieParser());
 app.use(express.json());
 
-// Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
@@ -57,11 +23,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Routes
-app.use("/users", userRoutes);
-app.use("/chat", chatRoutes);
-
-// API routes
+// Opdaterede ruter med checkAuth middleware
 app.get("/", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/index.html"));
 });
@@ -72,6 +34,11 @@ app.get("/locations", checkAuth, (req, res) => {
 
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/login.html"));
+});
+
+app.get("/cookie", (req, res) => {
+  res.cookie("taste", "chocolate");
+  res.send("Cookie set");
 });
 
 // Opgave 2: Lav et POST /email asynkront endpoint der sender en email til modtageren
@@ -102,7 +69,10 @@ app.post("/email", async (req, res) => {
   }
 });
 
-// Start HTTPS server
-server.listen(3000, () => {
+app.use("/users", userRoutes);
+app.use("/chat", chatRoutes);
+
+// Start serveren
+app.listen(3000, () => {
   console.log("Server listening on port 3000");
 });

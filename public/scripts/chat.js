@@ -1,26 +1,8 @@
-const socket = new WebSocket("wss://cbsjoe.live");  // WebSocket secure connection
 const searchInput = document.getElementById("search");
 const searchDropdown = document.getElementById("search-dropdown");
 const chatList = document.getElementById("chat-list");
 const sendMessageButton = document.getElementById("send-message");
 const chatMessages = document.getElementById("chat-messages");
-
-// Event listener for receiving messages from WebSocket
-socket.addEventListener('message', function (event) {
-    const message = JSON.parse(event.data);
-    const messageElement = document.createElement("div");
-    messageElement.classList.add("message");
-
-    // If sender is 'your_username', position the message to the right
-    if (message.sender === 'your_username') {
-        messageElement.classList.add("mine");
-    } else {
-        messageElement.classList.add("other");
-    }
-
-    messageElement.textContent = `[${message.sent_at}] ${message.sender}: ${message.message}`;
-    chatMessages.appendChild(messageElement);
-});
 
 // Check if elements exist before adding event listeners
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages) {
