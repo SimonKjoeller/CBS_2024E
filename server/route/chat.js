@@ -66,9 +66,23 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
     });
 });
 
-// Ny route til at hente det autentificerede brugernavn
 chatRoutes.get("/currentUser", checkAuth, (req, res) => {
-    res.status(200).json({ username: req.user.username });
+    const userId = req.user.userId; // Hent bruger-ID fra autentificeringstoken
+
+    const query = `SELECT username FROM users WHERE id = ? LIMIT 1`;
+
+    db.get(query, [userId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: "Kunne ikke hente brugernavn" });
+        }
+
+        if (!row) {
+            return res.status(404).json({ error: "Bruger ikke fundet" });
+        }
+
+        res.status(200).json({ username: row.username });
+    });
 });
+
 
 module.exports = chatRoutes;
