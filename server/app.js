@@ -85,5 +85,5 @@ app.use("/chat", chatRoutes);
 
 // Start HTTPS server med SSL
 https.createServer({ key: privateKey, cert: certificate, ca: ca }, app).listen(3000, () => {
-  console.log("HTTPS Server listening on port 443");
+  console.log("HTTPS Server listening on port 3000");
 });
