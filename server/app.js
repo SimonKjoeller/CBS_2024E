@@ -82,10 +82,19 @@ const server = http.createServer(app).listen(3000, () => {
 // Initialize Socket.IO server
 const io = socketIo(server);
 
-// Example of handling Socket.IO connections
 io.on('connection', (socket) => {
   console.log('A user connected');
+
+  // Lyt efter nye beskeder fra klienten
+  socket.on('new_message', (data) => {
+    console.log('Modtaget ny besked fra klient:', data);
+
+    // Send beskeden til alle klienter
+    io.emit('new_message', data);
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
 });
+

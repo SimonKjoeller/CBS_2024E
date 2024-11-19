@@ -6,9 +6,10 @@ const searchDropdown = document.getElementById("search-dropdown");
 const chatList = document.getElementById("chat-list");
 const sendMessageButton = document.getElementById("send-message");
 const chatMessages = document.getElementById("chat-messages");
+const messageInput = document.getElementById("new-message");
 
 // Check if elements exist before adding event listeners
-if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages) {
+if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
     let typingTimeout;
 
     // Lytter på input og opdaterer søgning efter en timeout
@@ -87,7 +88,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
     // Funktion til at indlæse en samtale med en bruger
     async function loadConversation(recipient) {
-        console.log(`Indlæser samtale med: ${recipient}`);
         try {
             const response = await fetch(`/chat/conversation/${recipient}`);
             if (!response.ok) {
@@ -111,6 +111,9 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
                 messageElement.textContent = `[${msg.sent_at}] ${msg.sender}: ${msg.message}`;
                 chatMessages.appendChild(messageElement);
             });
+
+            // Scroll automatisk til bunden af chatten
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         } catch (error) {
             console.error("Fejl ved indlæsning af samtale:", error);
         }
@@ -136,7 +139,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
 
         const recipient = activeUser.textContent;
-        const messageInput = document.getElementById("new-message");
         const message = messageInput.value.trim();
 
         if (message === "") {
@@ -144,36 +146,40 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             return;
         }
 
-        sendMessage(recipient, message);
+        // Send beskeden til serveren via Socket.IO
+        socket.emit("new_message", {
+            sender: "your_username", // Erstat med din brugeridentitet
+            recipient,
+            message,
+            sent_at: new Date().toISOString(),
+        });
+
+        // Ryd inputfeltet
         messageInput.value = "";
     });
 
-    // Funktion til at sende beskeder via fetch
-    async function sendMessage(recipient, message) {
-        try {
-            const response = await fetch("/chat/send", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ recipientUsername: recipient, message }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP-fejl! Status: ${response.status}`);
-            }
-
-            await loadConversation(recipient);
-
-            // Send besked til serveren via socket.io, hvis du bruger det
-            socket.emit("new_message", { recipient, message });
-        } catch (error) {
-            console.error("Fejl ved afsendelse af besked:", error);
-        }
-    }
-
-    // Lyt efter beskeder fra serveren via socket.io
+    // Lyt efter beskeder fra serveren via Socket.IO
     socket.on("new_message", (data) => {
         console.log("Modtaget ny besked:", data);
-        loadConversation(data.recipient); // Opdater samtalen med den nye besked
+
+        // Hvis beskeden er fra eller til den aktive bruger, tilføj den til chatten
+        const activeUser = document.querySelector("#chat-list .active");
+        if (activeUser && (data.sender === activeUser.textContent || data.recipient === activeUser.textContent)) {
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+
+            if (data.sender === 'your_username') {
+                messageElement.classList.add("mine");
+            } else {
+                messageElement.classList.add("other");
+            }
+
+            messageElement.textContent = `[${data.sent_at}] ${data.sender}: ${data.message}`;
+            chatMessages.appendChild(messageElement);
+
+            // Scroll til bunden af chatten
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
     });
 
 } else {
