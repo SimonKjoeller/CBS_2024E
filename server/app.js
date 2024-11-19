@@ -87,10 +87,10 @@ io.on('connection', (socket) => {
 
   // Lyt efter nye beskeder fra klienten
   socket.on('new_message', (data) => {
-    console.log('Modtaget ny besked fra klient:', data);
-
-    // Send beskeden til alle klienter
-    io.emit('new_message', data);
+    const recipientSocketId = getRecipientSocketId(data.recipient); // Implementér denne funktion
+    if (recipientSocketId) {
+      socket.to(recipientSocketId).emit('new_message', data);
+    }
   });
 
   socket.on('disconnect', () => {

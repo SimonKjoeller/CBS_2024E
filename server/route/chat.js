@@ -66,4 +66,9 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
     });
 });
 
+// Ny route til at hente det autentificerede brugernavn
+chatRoutes.get("/currentUser", checkAuth, (req, res) => {
+    res.status(200).json({ username: req.user.username });
+});
+
 module.exports = chatRoutes;
