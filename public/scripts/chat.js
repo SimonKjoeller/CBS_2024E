@@ -42,7 +42,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
     async function searchChats() {
-        const query = searchInput.value;
+        const query = searchInput.value.trim();
         if (query.length === 0) {
             searchDropdown.style.display = "none";
             return;
@@ -60,7 +60,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             }
 
             const data = await response.json();
-            displaySearchResults(data.slice(0, 4));
+            displaySearchResults(data);
         } catch (error) {
             console.error("Fejl ved søgning efter modtagere:", error);
         }
@@ -111,9 +111,10 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             if (!response.ok) {
                 throw new Error(`HTTP-fejl! Status: ${response.status}`);
             }
+
             const messages = await response.json();
 
-            chatMessages.innerHTML = "";
+            chatMessages.innerHTML = ""; // Ryd tidligere beskeder
 
             messages.forEach(msg => {
                 const messageElement = document.createElement("div");
@@ -125,11 +126,11 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
                     messageElement.classList.add("other");
                 }
 
-                messageElement.textContent = `[${msg.sent_at}] ${msg.sender}: ${msg.message}`;
+                messageElement.textContent = `[${new Date(msg.sent_at).toLocaleString()}] ${msg.sender}: ${msg.message}`;
                 chatMessages.appendChild(messageElement);
             });
 
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll automatisk til bunden
         } catch (error) {
             console.error("Fejl ved indlæsning af samtale:", error);
         }
@@ -167,10 +168,12 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             sent_at: new Date().toISOString(),
         });
 
-        messageInput.value = "";
+        messageInput.value = ""; // Ryd inputfeltet
     });
 
     socket.on("new_message", (data) => {
+        console.log("Modtaget ny besked:", data);
+
         const activeUser = document.querySelector("#chat-list .active");
         if (activeUser && (data.sender === activeUser.textContent || data.recipient === activeUser.textContent)) {
             const messageElement = document.createElement("div");
@@ -182,13 +185,12 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
                 messageElement.classList.add("other");
             }
 
-            messageElement.textContent = `[${data.sent_at}] ${data.sender}: ${data.message}`;
+            messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
             chatMessages.appendChild(messageElement);
 
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll til bunden
         }
     });
-
 } else {
     console.error("En eller flere nødvendige elementer blev ikke fundet i DOM'en.");
 }
