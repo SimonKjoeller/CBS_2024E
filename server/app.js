@@ -80,7 +80,14 @@ const server = http.createServer(app).listen(3000, () => {
 });
 
 // Initialize Socket.IO server
-const io = socketIo(server);
+const io = socketIo(server, {
+  cors: {
+    origin: "https://cbsjoe.live", // Tillad forespørgsler fra dit domæne
+    methods: ["GET", "POST"],
+  },
+  transports: ["websocket", "polling"], // Sørg for at tillade både WebSocket og polling
+});
+
 
 io.on('connection', (socket) => {
   console.log('A user connected');
