@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require("express");
+const https = require("https");
+const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
@@ -8,6 +10,11 @@ const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const app = express();
+
+// Læs SSL-certifikater fra .env
+const privateKey = fs.readFileSync(process.env.SSL_KEY_PATH, 'utf8');
+const certificate = fs.readFileSync(process.env.SSL_CERT_PATH, 'utf8');
+const ca = fs.readFileSync(process.env.SSL_CA_PATH, 'utf8');
 
 // Middleware setup
 app.use(cors());
@@ -72,7 +79,7 @@ app.post("/email", async (req, res) => {
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
 
-// Start serveren
-app.listen(3000, () => {
-  console.log("Server listening on port 3000");
+// Start HTTPS server med SSL
+https.createServer({ key: privateKey, cert: certificate, ca: ca }, app).listen(443, () => {
+  console.log("HTTPS Server listening on port 443");
 });

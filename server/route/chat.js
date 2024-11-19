@@ -66,6 +66,4 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
     });
 });
 
-
-
 module.exports = chatRoutes;

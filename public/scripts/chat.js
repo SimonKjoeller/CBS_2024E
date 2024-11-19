@@ -1,3 +1,6 @@
+// Forbind til Socket.io over HTTPS
+const socket = io.connect('https://cbsjoe.live'); // Sørg for, at URL bruger HTTPS
+
 const searchInput = document.getElementById("search");
 const searchDropdown = document.getElementById("search-dropdown");
 const chatList = document.getElementById("chat-list");
@@ -8,11 +11,13 @@ const chatMessages = document.getElementById("chat-messages");
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages) {
     let typingTimeout;
 
+    // Lytter på input og opdaterer søgning efter en timeout
     searchInput.addEventListener("input", () => {
         clearTimeout(typingTimeout);
         typingTimeout = setTimeout(searchChats, 300);
     });
 
+    // Funktion til at søge efter brugere
     async function searchChats() {
         const query = searchInput.value;
         if (query.length === 0) {
@@ -38,6 +43,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     }
 
+    // Funktion til at vise søgeresultater
     function displaySearchResults(results) {
         searchDropdown.innerHTML = "";
         if (results.length === 0) {
@@ -62,6 +68,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         searchDropdown.style.display = "block";
     }
 
+    // Funktion til at tilføje chat-brugere til listen
     function addChatUser(username) {
         const existingUser = Array.from(chatList.children).find(li => li.textContent === username);
         if (!existingUser) {
@@ -71,12 +78,14 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     }
 
+    // Funktion til at fremhæve den aktive bruger
     function highlightUser(username) {
         Array.from(chatList.children).forEach(user => {
             user.classList.toggle("active", user.textContent === username);
         });
     }
 
+    // Funktion til at indlæse en samtale med en bruger
     async function loadConversation(recipient) {
         console.log(`Indlæser samtale med: ${recipient}`);
         try {
@@ -86,7 +95,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             }
             const messages = await response.json();
 
-            const chatMessages = document.getElementById("chat-messages");
             chatMessages.innerHTML = ""; // Ryd tidligere beskeder
 
             messages.forEach(msg => {
@@ -94,8 +102,8 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
                 messageElement.classList.add("message");
 
                 // Tjek om afsenderen er dig eller modtageren
-                if (msg.sender === 'your_username') {
-                    messageElement.classList.add("mine"); // Erstat 'your_username' med den rigtige betingelse for din bruger
+                if (msg.sender === 'your_username') {  // Erstat 'your_username' med den rigtige betingelse for din bruger
+                    messageElement.classList.add("mine");
                 } else {
                     messageElement.classList.add("other");
                 }
@@ -108,8 +116,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     }
 
-
-
+    // Lytter efter klik på en bruger for at vise deres samtale
     chatList.addEventListener("click", (event) => {
         const listItem = event.target.closest("li");
 
@@ -120,6 +127,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     });
 
+    // Sender en besked til en valgt bruger
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
         if (!activeUser) {
@@ -140,6 +148,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         messageInput.value = "";
     });
 
+    // Funktion til at sende beskeder via fetch
     async function sendMessage(recipient, message) {
         try {
             const response = await fetch("/chat/send", {
@@ -153,10 +162,20 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             }
 
             await loadConversation(recipient);
+
+            // Send besked til serveren via socket.io, hvis du bruger det
+            socket.emit("new_message", { recipient, message });
         } catch (error) {
             console.error("Fejl ved afsendelse af besked:", error);
         }
     }
+
+    // Lyt efter beskeder fra serveren via socket.io
+    socket.on("new_message", (data) => {
+        console.log("Modtaget ny besked:", data);
+        loadConversation(data.recipient); // Opdater samtalen med den nye besked
+    });
+
 } else {
     console.error("En eller flere nødvendige elementer blev ikke fundet i DOM'en.");
 }
