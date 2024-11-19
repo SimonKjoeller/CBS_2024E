@@ -161,11 +161,14 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             return;
         }
 
+        const sent_at = new Date().toISOString();
+
+        // Gem besked og send via Socket.IO
         socket.emit("new_message", {
             sender: currentUsername,
             recipient,
             message,
-            sent_at: new Date().toISOString(),
+            sent_at,
         });
 
         messageInput.value = ""; // Ryd inputfeltet

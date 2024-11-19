@@ -85,16 +85,28 @@ const io = socketIo(server);
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Lyt efter nye beskeder fra klienten
   socket.on('new_message', (data) => {
-    const recipientSocketId = getRecipientSocketId(data.recipient); // Implementér denne funktion
-    if (recipientSocketId) {
-      socket.to(recipientSocketId).emit('new_message', data);
-    }
+    const { sender, recipient, message, sent_at } = data;
+
+    // Gem beskeden i databasen
+    const query = `INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+                     VALUES ((SELECT id FROM users WHERE username = ?), 
+                             (SELECT id FROM users WHERE username = ?), ?, ?)`;
+
+    db.run(query, [sender, recipient, message, sent_at], function (err) {
+      if (err) {
+        console.error('Database error:', err);
+        return;
+      }
+
+      // Send beskeden til modtageren via Socket.IO
+      io.emit('new_message', data);
+    });
   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
 });
+
 
