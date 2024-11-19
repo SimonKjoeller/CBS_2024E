@@ -98,10 +98,12 @@ io.on('connection', (socket) => {
         console.error('Database error:', err);
         return;
       }
+      console.log('Besked gemt i databasen med ID:', this.lastID);
 
       // Send beskeden til modtageren via Socket.IO
       io.emit('new_message', data);
     });
+
   });
 
   socket.on('disconnect', () => {
