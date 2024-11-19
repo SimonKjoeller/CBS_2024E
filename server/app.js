@@ -16,6 +16,10 @@ const privateKey = fs.readFileSync(process.env.SSL_KEY_PATH, 'utf8');
 const certificate = fs.readFileSync(process.env.SSL_CERT_PATH, 'utf8');
 const ca = fs.readFileSync(process.env.SSL_CA_PATH, 'utf8');
 
+console.log("privKey:", privateKey)
+console.log("cert:", certificate)
+console.log("ca:", ca)
+
 // Middleware setup
 app.use(cors());
 app.use(express.static(path.join(__dirname, "../public")));
