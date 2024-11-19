@@ -10,6 +10,7 @@ const chatRoutes = require("./route/chat");
 const socketIo = require("socket.io"); // Importer socket.io
 const http = require("http"); // Brug HTTP i stedet for HTTPS
 const app = express();
+const db = require("/db");
 
 // Middleware setup
 app.use(cors());
