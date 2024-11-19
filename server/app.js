@@ -9,6 +9,7 @@ const checkAuth = require('./checkAuth'); // Importer korrekt checkAuth middlewa
 const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
+const socketIo = require("socket.io"); // Importer socket.io
 const app = express();
 
 // Læs SSL-certifikater fra .env
@@ -16,9 +17,9 @@ const privateKey = fs.readFileSync(process.env.SSL_KEY_PATH, 'utf8');
 const certificate = fs.readFileSync(process.env.SSL_CERT_PATH, 'utf8');
 const ca = fs.readFileSync(process.env.SSL_CA_PATH, 'utf8');
 
-console.log("privKey:", privateKey)
-console.log("cert:", certificate)
-console.log("ca:", ca)
+console.log("privKey:", privateKey);
+console.log("cert:", certificate);
+console.log("ca:", ca);
 
 // Middleware setup
 app.use(cors());
@@ -84,6 +85,17 @@ app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
 
 // Start HTTPS server med SSL
-https.createServer({ key: privateKey, cert: certificate, ca: ca }, app).listen(3000, () => {
+const server = https.createServer({ key: privateKey, cert: certificate, ca: ca }, app).listen(3000, () => {
   console.log("HTTPS Server listening on port 3000");
+});
+
+// Initialize Socket.IO server
+const io = socketIo(server); // Here we pass the HTTPS server to Socket.IO
+
+// Example of handling Socket.IO connections
+io.on('connection', (socket) => {
+  console.log('A user connected');
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
 });
