@@ -1,7 +1,5 @@
 require('dotenv').config();
 const express = require("express");
-const https = require("https");
-const fs = require("fs");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
@@ -10,16 +8,8 @@ const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
 const socketIo = require("socket.io"); // Importer socket.io
+const http = require("http"); // Brug HTTP i stedet for HTTPS
 const app = express();
-
-// Læs SSL-certifikater fra .env
-const privateKey = fs.readFileSync(process.env.SSL_KEY_PATH, 'utf8');
-const certificate = fs.readFileSync(process.env.SSL_CERT_PATH, 'utf8');
-const ca = fs.readFileSync(process.env.SSL_CA_PATH, 'utf8');
-
-console.log("privKey:", privateKey);
-console.log("cert:", certificate);
-console.log("ca:", ca);
 
 // Middleware setup
 app.use(cors());
@@ -84,13 +74,13 @@ app.post("/email", async (req, res) => {
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
 
-// Start HTTPS server med SSL
-const server = https.createServer({ key: privateKey, cert: certificate, ca: ca }, app).listen(3000, () => {
-  console.log("HTTPS Server listening on port 3000");
+// Start HTTP-server
+const server = http.createServer(app).listen(3000, () => {
+  console.log("HTTP Server listening on port 3000");
 });
 
 // Initialize Socket.IO server
-const io = socketIo(server); // Here we pass the HTTPS server to Socket.IO
+const io = socketIo(server);
 
 // Example of handling Socket.IO connections
 io.on('connection', (socket) => {
