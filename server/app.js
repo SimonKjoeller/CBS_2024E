@@ -93,25 +93,28 @@ const io = socketIo(server, {
 io.on('connection', (socket) => {
   console.log('A user connected');
 
+  socket.on('join_room', (room) => {
+    socket.join(room);
+    console.log(`User joined room: ${room}`);
+  });
+
   socket.on('new_message', (data) => {
     const { sender, recipient, message, sent_at } = data;
 
-    // Gem beskeden i databasen
+    const room = [sender, recipient].sort().join('_');
+    io.to(room).emit('new_message', data);
+
     const query = `INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-                     VALUES ((SELECT id FROM users WHERE username = ?), 
-                             (SELECT id FROM users WHERE username = ?), ?, ?)`;
+                   VALUES ((SELECT id FROM users WHERE username = ?), 
+                           (SELECT id FROM users WHERE username = ?), ?, ?)`;
 
     db.run(query, [sender, recipient, message, sent_at], function (err) {
       if (err) {
         console.error('Database error:', err);
         return;
       }
-      console.log('Besked gemt i databasen med ID:', this.lastID);
-
-      // Send beskeden til modtageren via Socket.IO
-      io.emit('new_message', data);
+      console.log('Message saved in DB with ID:', this.lastID);
     });
-
   });
 
   socket.on('disconnect', () => {

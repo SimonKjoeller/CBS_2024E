@@ -1,6 +1,4 @@
-// Forbind til Socket.io over HTTPS
-const socket = io.connect('https://cbsjoe.live'); // Sørg for, at URL bruger HTTPS
-
+const socket = io.connect('https://cbsjoe.live');
 const searchInput = document.getElementById("search");
 const searchDropdown = document.getElementById("search-dropdown");
 const chatList = document.getElementById("chat-list");
@@ -10,7 +8,6 @@ const messageInput = document.getElementById("new-message");
 
 let currentUsername;
 
-// Funktion til at hente det autentificerede brugernavn
 async function fetchCurrentUsername() {
     try {
         const response = await fetch("/chat/currentUser", {
@@ -19,18 +16,17 @@ async function fetchCurrentUsername() {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP-fejl! Status: ${response.status}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
         currentUsername = data.username;
-        console.log("Autentificeret brugernavn:", currentUsername);
+        console.log("Authenticated username:", currentUsername);
     } catch (error) {
-        console.error("Fejl ved hentning af brugernavn:", error);
+        console.error("Error fetching username:", error);
     }
 }
 
-// Hent brugernavnet, når applikationen starter
 fetchCurrentUsername();
 
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
@@ -56,13 +52,13 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP-fejl! Status: ${response.status}`);
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const data = await response.json();
             displaySearchResults(data);
         } catch (error) {
-            console.error("Fejl ved søgning efter modtagere:", error);
+            console.error("Error searching recipients:", error);
         }
     }
 
@@ -106,15 +102,17 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     }
 
     async function loadConversation(recipient) {
+        const room = [currentUsername, recipient].sort().join('_');
+        socket.emit('join_room', room);
+
         try {
             const response = await fetch(`/chat/conversation/${recipient}`);
             if (!response.ok) {
-                throw new Error(`HTTP-fejl! Status: ${response.status}`);
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
             const messages = await response.json();
-
-            chatMessages.innerHTML = ""; // Ryd tidligere beskeder
+            chatMessages.innerHTML = "";
 
             messages.forEach(msg => {
                 const messageElement = document.createElement("div");
@@ -130,9 +128,9 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
                 chatMessages.appendChild(messageElement);
             });
 
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll automatisk til bunden
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         } catch (error) {
-            console.error("Fejl ved indlæsning af samtale:", error);
+            console.error("Error loading conversation:", error);
         }
     }
 
@@ -149,7 +147,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
         if (!activeUser) {
-            alert("Vælg en bruger fra listen, før du sender en besked.");
+            alert("Select a user from the list before sending a message.");
             return;
         }
 
@@ -157,13 +155,12 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         const message = messageInput.value.trim();
 
         if (message === "") {
-            alert("Beskeden må ikke være tom.");
+            alert("Message cannot be empty.");
             return;
         }
 
         const sent_at = new Date().toISOString();
 
-        // Gem besked og send via Socket.IO
         socket.emit("new_message", {
             sender: currentUsername,
             recipient,
@@ -171,14 +168,14 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             sent_at,
         });
 
-        messageInput.value = ""; // Ryd inputfeltet
+        messageInput.value = "";
     });
 
     socket.on("new_message", (data) => {
-        console.log("Modtaget ny besked:", data);
-
         const activeUser = document.querySelector("#chat-list .active");
-        if (activeUser && (data.sender === activeUser.textContent || data.recipient === activeUser.textContent)) {
+        const room = [currentUsername, data.recipient].sort().join('_');
+
+        if (activeUser && room === [currentUsername, activeUser.textContent].sort().join('_')) {
             const messageElement = document.createElement("div");
             messageElement.classList.add("message");
 
@@ -191,9 +188,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
             chatMessages.appendChild(messageElement);
 
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll til bunden
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     });
-} else {
-    console.error("En eller flere nødvendige elementer blev ikke fundet i DOM'en.");
 }
