@@ -1,0 +1,235 @@
+/* Reset margins */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* Light gray background */
+    padding: 20px; /* Add some spacing around the content */
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: rgb(41, 41, 41);
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li img {
+    display: block;
+    width: 65px;
+}
+
+.active {
+    background-color: #f09bc1;
+    font-weight: bolder;
+}
+
+li a:hover {
+    background-color: #f088b7;
+    font-weight: bolder;
+}
+
+/* Header styling: Make h1 like h2 */
+h1 {
+    color: #f09bc1; /* Light pink */
+    font-size: 2em; /* Same size as h2 */
+    border-bottom: 2px solid #f09bc1; /* Add the border */
+    display: inline-block; /* Fit content */
+    margin-bottom: 10px; /* Same margin as h2 */
+    text-align: center; /* Center alignment */
+    width: 100%; /* Full width */
+}
+h2 {
+    color: #f27db2; /* Light pink */
+    font-size: 20px; /* Same size as h2 */
+    border-bottom: 2px solid #f09bc1; /* Add the border */
+    display: inline-block; /* Fit content */
+    margin-bottom: 10px; /* Same margin as h2 */
+    text-align: center; /* Center alignment */
+    width: 100%; /* Full width */
+}
+
+
+/* Menu section styling */
+.menu-section {
+    margin: 20px 0;
+}
+
+.menu-item {
+    margin: 10px 0;
+    font-size: 1.2em;
+    color: #555; /* Medium gray */
+    padding: 5px;
+}
+
+/* Highlight menu items on hover */
+.menu-item:hover {
+    background-color: #f7c1d9; /* Light pink */
+    border-radius: 5px;
+    padding-left: 10px;
+    transition: 0.3s ease-in-out;
+}
+
+/* Navigation list styling */
+ul {
+    font-family: Calibri, sans-serif;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f7c1d9; /* Pink background */
+    font-size: 1.2em;
+    text-align: center;
+    border-radius: 8px;
+}
+
+li {
+    display: inline-block;
+    margin: 10px;
+}
+
+li a {
+    color: #292929; /* Dark text color */
+    text-decoration: none;
+    padding: 10px 15px;
+    display: inline-block;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+li a:hover {
+    background-color: #f09bc1; /* Slightly darker pink on hover */
+}
+
+li img {
+    display: inline-block;
+    width: 50px;
+    vertical-align: middle;
+}
+
+.active {
+    background-color: #f09bc1;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+/* Dropdown button for macros */
+.dropdown-btn {
+    background-color: #f7c1d9;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.dropdown-btn:hover {
+    background-color: #f09bc1;
+}
+
+/* Dropdown content */
+.dropdown-content {
+    display: none; /* Hidden by default */
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+    text-align: left;
+    font-size: 0.9em;
+    color: #555;
+    width: 100%; /* Full width within card */
+    position: relative;
+}
+
+.dropdown-content p {
+    margin: 5px 0;
+}
+
+/* Show dropdown content */
+.show {
+    display: block;
+}
+
+.coffee-card {
+    background-color: white;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    position: relative;
+}
+/* Shake card styling */
+.shake-card {
+    background-color: white;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    position: relative;
+}
+
+.shake-card h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.order-btn {
+    background-color: #f8b8c6; /* Light pink background */
+    color: #ffffff; /* White text */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    display: inline-block; /* Makes it align neatly */
+}
+
+.order-btn:hover {
+    background-color: #f194a1; /* Slightly darker pink on hover */
+    transform: scale(1.05); /* Subtle zoom effect */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Shadow effect */
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em; /* Adjust size for smaller screens */
+    }
+
+    ul {
+        font-size: 1em;
+    }
+
+    .shake-card {
+        max-width: 90%;
+    }
+
+    .dropdown-content {
+        width: 100%;
+        margin-top: 5px;
+    }
+}
