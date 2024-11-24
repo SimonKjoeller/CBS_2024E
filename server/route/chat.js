@@ -70,11 +70,11 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
 
 // Hent bruger
 chatRoutes.get("/currentUser", checkAuth, (req, res) => {
-    const userId = req.user.userId;
+    const user_id = req.user.user_id;
     console.log(req.user)
 
     const query = "SELECT username FROM users WHERE user_id = ? LIMIT 1";
-    db.get(query, [userId], (err, row) => {
+    db.get(query, [user_id], (err, row) => {
         if (err) {
             return res.status(500).json({ error: "Error fetching username" });
         }
