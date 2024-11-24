@@ -172,6 +172,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
     socket.on("new_message", (data) => {
+        console.log("New message received:", data);
         const room = [currentUsername, data.recipient].sort().join("_");
         const activeUser = document.querySelector("#chat-list .active");
         const activeRoom = [currentUsername, activeUser?.textContent].sort().join("_");
