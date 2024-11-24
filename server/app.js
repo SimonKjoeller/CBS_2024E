@@ -114,38 +114,26 @@ io.on("connection", (socket) => {
         const room = [ids.senderId, ids.recipientId].sort().join("_");
         console.log(`Server sending message to room: ${room}`);
         io.to(room).emit("new_message", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
+
+        // Save message in database
+        const insertQuery = `
+          INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+          VALUES (?, ?, ?, ?)
+        `;
+        db.run(insertQuery, [ids.senderId, ids.recipientId, data.message, data.sent_at], (err) => {
+          if (err) {
+            console.error("Database save error:", err);
+          } else {
+            console.log("Message saved to database.");
+          }
+        });
       } else {
         console.warn("No IDs found for sender and recipient.");
       }
     });
   });
 
-
   socket.on("disconnect", () => {
     console.log("User disconnected");
-  });
-});
-
-
-
-//Laver et POST /order endpoint der opretter en ny ordre i databasen
-app.post('/order', (req, res) => {
-  const { product_id, quantity } = req.body;
-
-  if (!product_id || !quantity) {
-    return res.status(400).json({ error: 'Product ID and quantity are required' });
-  }
-
-  const query = `
-      INSERT INTO orders (product_id, quantity, total_price) 
-      VALUES (?, ?, (SELECT price FROM products WHERE product_id = ?) * ?)
-  `;
-
-  db.run(query, [product_id, quantity, product_id, quantity], function (err) {
-    if (err) {
-      console.error('Database error:', err);
-      return res.status(500).json({ error: 'Failed to create order' });
-    }
-    res.json({ message: 'Order created successfully', order_id: this.lastID });
   });
 });

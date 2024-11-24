@@ -194,10 +194,11 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     socket.on("new_message", (data) => {
         console.log("New message received on client:", data);
 
+        // Join room format check
         const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
-        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
+        console.log(`Active room: ${activeRoom}, Incoming room: ${room}`);
 
         if (room === activeRoom) {
             console.log("Displaying message in active chat.");
@@ -210,6 +211,5 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
-
 
 }
