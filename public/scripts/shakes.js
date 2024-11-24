@@ -24,3 +24,5 @@ window.addEventListener('click', function (event) {
         });
     }
 });
+
+// Close the dropdown if the user presses the "Escape" key
