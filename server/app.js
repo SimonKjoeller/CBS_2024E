@@ -96,26 +96,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new_message", (data) => {
-    const { sender, recipient, message, sent_at } = data;
-
-    // Generer rumnavnet ensartet baseret på sender og modtager
-    const room = [sender, recipient].sort().join("_");
+    const { senderId, recipientId, message, sent_at } = data; // Bruger senderId og recipientId
+    const room = [senderId, recipientId].sort((a, b) => a - b).join("_"); // Sorterer numerisk efter user_id
 
     console.log(`Broadcasting message to room: ${room}`);
 
-    // Send beskeden til alle klienter i rummet
+    // Send beskeden til alle i rummet
     io.to(room).emit("new_message", data);
 
     // Gem beskeden i databasen
     const query = `
         INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-        VALUES (
-            (SELECT user_id FROM users WHERE username = ?),
-            (SELECT user_id FROM users WHERE username = ?),
-            ?, ?
-        )`;
+        VALUES (?, ?, ?, ?)
+    `;
 
-    db.run(query, [sender, recipient, message, sent_at], function (err) {
+    db.run(query, [senderId, recipientId, message, sent_at], function (err) {
       if (err) {
         console.error("Database error:", err);
         return;
@@ -123,6 +118,7 @@ io.on("connection", (socket) => {
       console.log(`Message saved in DB with ID: ${this.lastID}`);
     });
   });
+
 
 
   socket.on("disconnect", () => {
