@@ -200,6 +200,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
 
         if (room === activeRoom) {
+            console.log("Displaying message in active chat.");
             const messageElement = document.createElement("div");
             messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
@@ -209,5 +210,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
+
 
 }
