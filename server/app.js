@@ -3,12 +3,12 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const checkAuth = require('./checkAuth'); // Importer korrekt checkAuth middleware
+const checkAuth = require('./checkAuth');
 const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
-const socketIo = require("socket.io"); // Importer socket.io
-const http = require("http"); // Brug HTTP i stedet for HTTPS
+const socketIo = require("socket.io");
+const http = require("http");
 const app = express();
 const db = require("./db");
 
@@ -18,6 +18,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.use(cookieParser());
 app.use(express.json());
 
+// Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
@@ -26,7 +27,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Opdaterede ruter med checkAuth middleware
+// Routes
 app.get("/", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/index.html"));
 });
@@ -44,12 +45,9 @@ app.get("/cookie", (req, res) => {
   res.send("Cookie set");
 });
 
-// Opgave 2: Lav et POST /email asynkront endpoint der sender en email til modtageren
 app.post("/email", async (req, res) => {
   try {
     let { email } = req.body;
-    console.log(email);
-
     const info = await transporter.sendMail({
       from: "CBSJOE <cbsjoec@gmail.com>",
       to: email,
@@ -75,7 +73,7 @@ app.post("/email", async (req, res) => {
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
 
-// Start HTTP-server
+// HTTP server setup
 const server = http.createServer(app).listen(3000, () => {
   console.log("HTTP Server listening on port 3000");
 });
@@ -83,7 +81,7 @@ const server = http.createServer(app).listen(3000, () => {
 // Socket.IO setup
 const io = socketIo(server, {
   cors: {
-    origin: "*", // Sørg for, at domænet passer
+    origin: "*",
     methods: ["GET", "POST"],
   },
   transports: ["websocket", "polling"],
@@ -92,28 +90,31 @@ const io = socketIo(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
+  // Join room
   socket.on("join_room", (room) => {
     socket.join(room);
-    console.log(`User joined room: ${room}`);
+    console.log(`Socket joined room: ${room}`);
   });
 
+  // Handle new message
   socket.on("new_message", (data) => {
     const { sender, recipient, message, sent_at } = data;
 
-    // Rumnavnet genereres konsekvent
+    // Generate consistent room name
     const room = [sender, recipient].sort().join("_");
+    console.log(`Sending message to room: ${room}`);
 
-    // Send beskeden til alle i rummet
+    // Emit message to all sockets in the room
     io.to(room).emit("new_message", data);
 
-    // Gem beskeden i databasen
+    // Save message to database
     const query = `
-        INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-        VALUES (
-            (SELECT user_id FROM users WHERE username = ?),
-            (SELECT user_id FROM users WHERE username = ?),
-            ?, ?
-        )`;
+      INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+      VALUES (
+        (SELECT user_id FROM users WHERE username = ?),
+        (SELECT user_id FROM users WHERE username = ?),
+        ?, ?
+      )`;
 
     db.run(query, [sender, recipient, message, sent_at], function (err) {
       if (err) {
@@ -124,11 +125,12 @@ io.on("connection", (socket) => {
     });
   });
 
-
+  // Handle disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
 });
+
 
 
 //Laver et POST /order endpoint der opretter en ny ordre i databasen
