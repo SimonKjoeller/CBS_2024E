@@ -138,6 +138,12 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     });
 
+    // Join the correct chat room
+    function joinRoom(recipient) {
+        const room = [currentUsername, recipient].sort().join('_');
+        socket.emit('join_room', room);
+    }
+
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
         if (!activeUser) {
