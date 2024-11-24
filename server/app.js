@@ -99,7 +99,9 @@ io.on("connection", (socket) => {
     const { sender, recipient, message, sent_at } = data;
 
     const room = [sender, recipient].sort().join("_");
-    io.to(room).emit("new_message", data); // Sørg for at sende beskeden til alle i rummet
+    console.log(`Broadcasting message to room: ${room}`, data);
+
+    io.to(room).emit("new_message", data);
 
     const query = `
         INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
