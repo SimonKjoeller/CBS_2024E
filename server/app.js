@@ -97,10 +97,16 @@ io.on("connection", (socket) => {
 
   socket.on("new_message", (data) => {
     const { sender, recipient, message, sent_at } = data;
-    const room = [sender, recipient].sort().join("_"); // Ensartet rumnavn
 
+    // Generer rumnavnet ensartet baseret på sender og modtager
+    const room = [sender, recipient].sort().join("_");
+
+    console.log(`Broadcasting message to room: ${room}`);
+
+    // Send beskeden til alle klienter i rummet
     io.to(room).emit("new_message", data);
 
+    // Gem beskeden i databasen
     const query = `
         INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
         VALUES (
@@ -117,6 +123,7 @@ io.on("connection", (socket) => {
       console.log(`Message saved in DB with ID: ${this.lastID}`);
     });
   });
+
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
