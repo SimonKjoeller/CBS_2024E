@@ -156,15 +156,25 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
 
         const sent_at = new Date().toISOString();
+
+        // Emit the message via socket
         socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
 
+        // Add the message to the chat window immediately
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message", "mine");
+        messageElement.textContent = `[${new Date(sent_at).toLocaleString()}] ${currentUsername}: ${message}`;
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Clear input field
         messageInput.value = "";
     });
 
     socket.on("new_message", (data) => {
-        const room = [currentUsername, data.recipient].sort().join('_');
+        const room = [currentUsername, data.recipient].sort().join("_");
         const activeUser = document.querySelector("#chat-list .active");
-        const activeRoom = [currentUsername, activeUser?.textContent].sort().join('_');
+        const activeRoom = [currentUsername, activeUser?.textContent].sort().join("_");
 
         if (room === activeRoom) {
             const messageElement = document.createElement("div");

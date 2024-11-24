@@ -90,31 +90,24 @@ const io = socketIo(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Join room
   socket.on("join_room", (room) => {
     socket.join(room);
-    console.log(`Socket joined room: ${room}`);
+    console.log(`User joined room: ${room}`);
   });
 
-  // Handle new message
   socket.on("new_message", (data) => {
     const { sender, recipient, message, sent_at } = data;
 
-    // Generate consistent room name
     const room = [sender, recipient].sort().join("_");
-    console.log(`Sending message to room: ${room}`);
+    io.to(room).emit("new_message", data); // Sørg for at sende beskeden til alle i rummet
 
-    // Emit message to all sockets in the room
-    io.to(room).emit("new_message", data);
-
-    // Save message to database
     const query = `
-      INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-      VALUES (
-        (SELECT user_id FROM users WHERE username = ?),
-        (SELECT user_id FROM users WHERE username = ?),
-        ?, ?
-      )`;
+        INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+        VALUES (
+            (SELECT user_id FROM users WHERE username = ?),
+            (SELECT user_id FROM users WHERE username = ?),
+            ?, ?
+        )`;
 
     db.run(query, [sender, recipient, message, sent_at], function (err) {
       if (err) {
@@ -125,11 +118,11 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Handle disconnect
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
 });
+
 
 
 
