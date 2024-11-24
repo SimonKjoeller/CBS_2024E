@@ -96,9 +96,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new_message", (data) => {
-    const { senderId, recipientId, message, sent_at } = data;
+    console.log("Message received on server:", data);
 
+    const { senderId, recipientId, message, sent_at } = data;
     const room = [senderId, recipientId].sort((a, b) => a - b).join("_");
+
+    console.log(`Emitting message to room: ${room}`);
+
     io.to(room).emit("new_message", { senderId, recipientId, sender: data.sender, message, sent_at });
 
     const query = `
@@ -113,6 +117,7 @@ io.on("connection", (socket) => {
       console.log(`Message saved in DB with ID: ${this.lastID}`);
     });
   });
+
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
