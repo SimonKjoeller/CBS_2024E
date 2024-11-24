@@ -145,6 +145,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     function joinRoom(recipient) {
         const room = [currentUsername, recipient].sort().join('_');
         socket.emit('join_room', room);
+        console.log(room)
     }
 
     sendMessageButton.addEventListener("click", () => {
