@@ -71,6 +71,7 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
 // Hent bruger
 chatRoutes.get("/currentUser", checkAuth, (req, res) => {
     const userId = req.user.userId;
+    console.log(req.user)
 
     const query = "SELECT username FROM users WHERE user_id = ? LIMIT 1";
     db.get(query, [userId], (err, row) => {
