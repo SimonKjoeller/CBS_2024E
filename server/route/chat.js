@@ -52,17 +52,22 @@ chatRoutes.get("/conversation/:recipient", checkAuth, (req, res) => {
 
 // Sender ny besked
 chatRoutes.post("/send", checkAuth, (req, res) => {
-    const { recipientUsername, message } = req.body; // Modtagerens brugernavn og besked
-    const senderId = req.user.userId; // Afsenderens bruger-ID fra token
+    const { recipientUsername, message } = req.body;
+    const senderId = req.user.userId;
 
-    const query = `INSERT INTO chat (sender_id, recipient_id, message) 
-                   VALUES (?, (SELECT id FROM users WHERE username = ?), ?)`;
+    const query = `
+      INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+      VALUES (
+        ?, 
+        (SELECT id FROM users WHERE username = ?), 
+        ?, datetime('now')
+      )`;
 
     db.run(query, [senderId, recipientUsername, message], function (err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.status(200).json({ chat_id: this.lastID, message: "Besked sendt!" }); // Bekræftelse
+        res.status(200).json({ chat_id: this.lastID, message: "Message sent successfully!" });
     });
 });
 

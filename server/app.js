@@ -104,11 +104,15 @@ io.on('connection', (socket) => {
     const room = [sender, recipient].sort().join('_');
     io.to(room).emit('new_message', data);
 
-    const query = `INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-                   VALUES ((SELECT id FROM users WHERE username = ?), 
-                           (SELECT id FROM users WHERE username = ?), ?, ?)`;
+    const query = `
+      INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+      VALUES (
+        (SELECT id FROM users WHERE username = ?), 
+        (SELECT id FROM users WHERE username = ?), ?, ?
+      )`;
 
-    db.run(query, [sender, recipient, message, sent_at], function (err) {
+    const formattedTime = new Date(sent_at).toISOString();
+    db.run(query, [sender, recipient, message, formattedTime], function (err) {
       if (err) {
         console.error('Database error:', err);
         return;
@@ -122,12 +126,12 @@ io.on('connection', (socket) => {
   });
 });
 
- //Laver et POST /order endpoint der opretter en ny ordre i databasen
+//Laver et POST /order endpoint der opretter en ny ordre i databasen
 app.post('/order', (req, res) => {
   const { product_id, quantity } = req.body;
 
   if (!product_id || !quantity) {
-      return res.status(400).json({ error: 'Product ID and quantity are required' });
+    return res.status(400).json({ error: 'Product ID and quantity are required' });
   }
 
   const query = `
@@ -136,10 +140,10 @@ app.post('/order', (req, res) => {
   `;
 
   db.run(query, [product_id, quantity, product_id, quantity], function (err) {
-      if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({ error: 'Failed to create order' });
-      }
-      res.json({ message: 'Order created successfully', order_id: this.lastID });
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ error: 'Failed to create order' });
+    }
+    res.json({ message: 'Order created successfully', order_id: this.lastID });
   });
 });
