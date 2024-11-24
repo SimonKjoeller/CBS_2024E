@@ -7,16 +7,16 @@ const chatMessages = document.getElementById("chat-messages");
 const messageInput = document.getElementById("new-message");
 let currentUsername;
 
-// Fetch current user
+// Fetch current username
 async function fetchCurrentUsername() {
     try {
         const response = await fetch("/chat/currentUser", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         });
-
         const data = await response.json();
         currentUsername = data.username;
+        console.log("Current username set to:", currentUsername);
     } catch (error) {
         console.error("Error fetching username:", error);
     }
@@ -24,7 +24,6 @@ async function fetchCurrentUsername() {
 
 fetchCurrentUsername();
 
-// Load chat
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
     let typingTimeout;
 
@@ -160,23 +159,16 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         // Emit the message via socket
         socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
 
-        // Add the message to the chat window immediately
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message", "mine");
-        messageElement.textContent = `[${new Date(sent_at).toLocaleString()}] ${currentUsername}: ${message}`;
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
         // Clear input field
         messageInput.value = "";
     });
 
     socket.on("new_message", (data) => {
-        console.log("New message received:", data);
+        const room = [data.sender, data.recipient].sort().join('_');
+        const activeRoom = [currentUsername, document.querySelector("#chat-list .active")?.textContent].sort().join('_');
 
-        const room = [currentUsername, data.recipient].sort().join('_');
-        const activeUser = document.querySelector("#chat-list .active");
-        const activeRoom = [currentUsername, activeUser?.textContent].sort().join('_');
+        console.log(`New message received:`, data);
+        console.log(`Room for message: ${room}, Active room: ${activeRoom}`);
 
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
@@ -185,8 +177,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         } else {
-            console.log("Message received, but not for the active room:", room);
+            console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
-
 }
