@@ -96,7 +96,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new_message", (data) => {
-    const { sender, recipient, message, sent_at } = data;
+    console.log("Server received message:", data);
 
     const query = `
         SELECT u1.user_id AS senderId, u2.user_id AS recipientId
@@ -104,26 +104,22 @@ io.on("connection", (socket) => {
         WHERE u1.username = ? AND u2.username = ?
     `;
 
-    db.get(query, [sender, recipient], (err, ids) => {
+    db.get(query, [data.sender, data.recipient], (err, ids) => {
       if (err) {
-        console.error("Database error:", err);
+        console.error("Database query error:", err);
         return;
       }
 
       if (ids) {
-        const room = [ids.senderId, ids.recipientId].sort((a, b) => a - b).join("_");
-        console.log(`Server: Generated room: ${room}, Enriched data:`, data);
-
-        const enrichedData = {
-          ...data,
-          senderId: ids.senderId,
-          recipientId: ids.recipientId,
-        };
-
-        io.to(room).emit("new_message", enrichedData);
+        const room = [ids.senderId, ids.recipientId].sort().join("_");
+        console.log(`Server sending message to room: ${room}`);
+        io.to(room).emit("new_message", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
+      } else {
+        console.warn("No IDs found for sender and recipient.");
       }
     });
   });
+
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
