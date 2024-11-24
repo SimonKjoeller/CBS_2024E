@@ -99,6 +99,9 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         const room = [currentUsername, recipient].sort().join('_');
         socket.emit('join_room', room);
 
+        console.log(room)
+
+        // Hent tidligere beskeder
         try {
             const response = await fetch(`/chat/conversation/${recipient}`);
             if (!response.ok) {
@@ -164,16 +167,11 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         // Emit the message via socket
         socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
 
-        // Add the message to the chat window immediately
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message", "mine");
-        messageElement.textContent = `[${new Date(sent_at).toLocaleString()}] ${currentUsername}: ${message}`;
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        // Clear input field
+        // Clear input field (men lad socket håndtere visningen)
         messageInput.value = "";
     });
+
+
 
     socket.on("new_message", (data) => {
         const room = [currentUsername, data.recipient].sort().join('_');
