@@ -163,13 +163,14 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         messageInput.value = "";
     });
 
+    // Når en besked modtages via Socket.IO
     socket.on("new_message", (data) => {
-        const room = [data.sender, data.recipient].sort().join('_');
+        const room = [data.sender, data.recipient].sort().join('_'); // Ensartet rumnavn
         const activeRoom = [currentUsername, document.querySelector("#chat-list .active")?.textContent].sort().join('_');
 
-        console.log(`New message received:`, data);
-        console.log(`Room for message: ${room}, Active room: ${activeRoom}`);
+        console.log(`New message received for room: ${room}, Active room: ${activeRoom}`);
 
+        // Kontroller, om beskeden tilhører det aktive rum
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
             messageElement.classList.add(data.sender === currentUsername ? "mine" : "other");
@@ -177,7 +178,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         } else {
-            console.warn("Message not displayed because it doesn't belong to the active room.");
+            console.warn(`Message not displayed because it doesn't belong to the active room.`);
         }
     });
 }
