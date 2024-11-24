@@ -173,9 +173,10 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
     socket.on("new_message", (data) => {
         console.log("New message received:", data);
-        const room = [currentUsername, data.recipient].sort().join("_");
+
+        const room = [currentUsername, data.recipient].sort().join('_');
         const activeUser = document.querySelector("#chat-list .active");
-        const activeRoom = [currentUsername, activeUser?.textContent].sort().join("_");
+        const activeRoom = [currentUsername, activeUser?.textContent].sort().join('_');
 
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
@@ -183,6 +184,9 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else {
+            console.log("Message received, but not for the active room:", room);
         }
     });
+
 }
