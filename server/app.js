@@ -97,9 +97,7 @@ io.on("connection", (socket) => {
 
   socket.on("new_message", (data) => {
     const { sender, recipient, message, sent_at } = data;
-
-    const room = [sender, recipient].sort().join("_");
-    console.log(`Broadcasting message to room: ${room}`, data);
+    const room = [sender, recipient].sort().join("_"); // Ensartet rumnavn
 
     io.to(room).emit("new_message", data);
 
@@ -124,8 +122,6 @@ io.on("connection", (socket) => {
     console.log("User disconnected");
   });
 });
-
-
 
 
 //Laver et POST /order endpoint der opretter en ny ordre i databasen
