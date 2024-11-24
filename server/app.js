@@ -112,7 +112,7 @@ io.on("connection", (socket) => {
 
       if (ids) {
         const room = [ids.senderId, ids.recipientId].sort((a, b) => a - b).join("_");
-        console.log(`Server generated room: ${room}`);
+        console.log(`Server: Generated room: ${room}, Enriched data:`, data);
 
         const enrichedData = {
           ...data,
@@ -120,13 +120,10 @@ io.on("connection", (socket) => {
           recipientId: ids.recipientId,
         };
 
-        // Send beskeden til rummet
         io.to(room).emit("new_message", enrichedData);
       }
     });
   });
-
-
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
