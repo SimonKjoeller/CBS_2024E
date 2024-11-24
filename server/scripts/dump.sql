@@ -16,26 +16,26 @@ VALUES
 
 -- Product table
 INSERT INTO products
-    (productName, imgsrc)
+    (name, price, imgsrc)
 VALUES
-    ('Orange Juice', 'orange_juice.jpg');
+    ('Orange Juice', 45, 'orange_juice.jpg');
 INSERT INTO products
-    (productName, imgsrc)
+    (name, price, imgsrc)
 VALUES
-    ('Apple Juice', 'apple_juice.jpg');
+    ('Apple Juice', 45, 'apple_juice.jpg');
 INSERT INTO products
-    (productName, imgsrc)
+    (name, price, imgsrc)
 VALUES
-    ('Grape Juice', 'grapes.jpg');
+    ('Grape Juice', 45, 'grapes.jpg');
 INSERT INTO products
-    (productName, imgsrc)
+    (name, price, imgsrc)
 VALUES
-    ('Pineapple Juice', 'pineapple_juice.jpg');
+    ('Pineapple Juice', 45, 'pineapple_juice.jpg');
 INSERT INTO products
-    (productName, imgsrc)
+    (name, price, imgsrc)
 VALUES
-    ('Espresso', 'espresso.jpg');
+    ('Espresso', 35, 'espresso.jpg');
 INSERT INTO products
-    (productName, imgsrc)
+    (name, price, imgsrc)
 VALUES
-    ('Cappuccino', 'cappuccino.jpg');
+    ('Cappuccino', 35,'cappuccino.jpg');
