@@ -147,9 +147,9 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         const listItem = event.target.closest("li");
 
         if (listItem) {
-            const recipientId = listItem.dataset.userId; // Hent user_id fra data-attributten
+            const recipientId = listItem.dataset.userId;
             activeRecipientId = recipientId; // Opdater den aktive modtager
-            console.log("Updated activeRecipientId:", activeRecipientId);
+            console.log("Client: Updated activeRecipientId:", activeRecipientId);
 
             highlightUser(listItem.textContent);
             joinRoom(recipientId); // Brug recipientId til at oprette rummet
@@ -197,7 +197,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
-        console.log(`Active room: ${activeRoom}, Incoming room: ${room}`);
+        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
 
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
@@ -209,7 +209,5 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
-
-
 
 }
