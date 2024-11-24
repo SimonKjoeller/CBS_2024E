@@ -167,6 +167,14 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
         const sent_at = new Date().toISOString();
 
+        // Log før afsendelse
+        console.log("Sending message:", {
+            sender: currentUsername,
+            recipient,
+            message,
+            sent_at
+        });
+
         // Emit the message via socket
         socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
 
@@ -175,10 +183,12 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
     socket.on("new_message", (data) => {
+        console.log("New message received:", data);
+
         const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
-        console.log(`New message received for room: ${room}, Active room: ${activeRoom}`);
+        console.log(`Active room: ${activeRoom}, Incoming room: ${room}`);
 
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
@@ -187,9 +197,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         } else {
-            console.warn(`Message not displayed because it doesn't belong to the active room.`);
+            console.warn("Message does not match the active room.");
         }
     });
-
-
 }
