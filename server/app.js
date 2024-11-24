@@ -98,7 +98,6 @@ io.on("connection", (socket) => {
   socket.on("new_message", (data) => {
     const { sender, recipient, message, sent_at } = data;
 
-    // Find senderId og recipientId fra databasen
     const query = `
         SELECT u1.user_id AS senderId, u2.user_id AS recipientId
         FROM users u1, users u2
@@ -113,31 +112,20 @@ io.on("connection", (socket) => {
 
       if (ids) {
         const room = [ids.senderId, ids.recipientId].sort((a, b) => a - b).join("_");
+        console.log(`Server generated room: ${room}`);
+
         const enrichedData = {
           ...data,
           senderId: ids.senderId,
-          recipientId: ids.recipientId
+          recipientId: ids.recipientId,
         };
 
         // Send beskeden til rummet
         io.to(room).emit("new_message", enrichedData);
-
-        // Gem beskeden i databasen
-        const insertQuery = `
-                INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-                VALUES (?, ?, ?, ?)
-            `;
-
-        db.run(insertQuery, [ids.senderId, ids.recipientId, message, sent_at], function (err) {
-          if (err) {
-            console.error("Database error:", err);
-          } else {
-            console.log(`Message saved in DB with ID: ${this.lastID}`);
-          }
-        });
       }
     });
   });
+
 
 
   socket.on("disconnect", () => {
