@@ -26,12 +26,12 @@ async function fetchCurrentUserInfo() {
 
 fetchCurrentUserInfo();
 
-// Join a room based on recipientId
 function joinRoom(recipientId) {
     const room = [currentUserId, recipientId].sort((a, b) => a - b).join("_");
     socket.emit("join_room", room);
     console.log(`Joined room: ${room}`);
 }
+
 
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
     let typingTimeout;
@@ -180,7 +180,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
         console.log(`New message received for room: ${room}, Active room: ${activeRoom}`);
 
-        // Vis kun beskeder, hvis de tilhører det aktive rum
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
             messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
@@ -191,5 +190,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn(`Message not displayed because it doesn't belong to the active room.`);
         }
     });
+
 
 }
