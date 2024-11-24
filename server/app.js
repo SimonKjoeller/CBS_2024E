@@ -80,52 +80,48 @@ const server = http.createServer(app).listen(3000, () => {
   console.log("HTTP Server listening on port 3000");
 });
 
-// Initialize Socket.IO server
+// Socket.IO setup
 const io = socketIo(server, {
   cors: {
-    origin: "https://cbsjoe.live", // Tillad forespørgsler fra dit domæne
+    origin: "*", // Sørg for, at domænet passer
     methods: ["GET", "POST"],
   },
-  transports: ["websocket", "polling"], // Sørg for at tillade både WebSocket og polling
+  transports: ["websocket", "polling"],
 });
 
+io.on("connection", (socket) => {
+  console.log("A user connected");
 
-io.on('connection', (socket) => {
-  console.log('A user connected');
-
-  socket.on('join_room', (room) => {
+  socket.on("join_room", (room) => {
     socket.join(room);
     console.log(`User joined room: ${room}`);
   });
 
-  socket.on('new_message', (data) => {
+  socket.on("new_message", (data) => {
     const { sender, recipient, message, sent_at } = data;
 
-    // Sort the sender and recipient to create a consistent room name
-    const room = [sender, recipient].sort().join('_');
+    const room = [sender, recipient].sort().join("_");
+    io.to(room).emit("new_message", data);
 
-    // Emit the message to everyone in the room
-    io.to(room).emit('new_message', data);
-
-    // Save the message in the database
     const query = `
-      INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-      VALUES (
-        (SELECT id FROM users WHERE username = ?), 
-        (SELECT id FROM users WHERE username = ?), ?, ?
-      )`;
+          INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+          VALUES (
+              (SELECT user_id FROM users WHERE username = ?),
+              (SELECT user_id FROM users WHERE username = ?),
+              ?, ?
+          )`;
 
     db.run(query, [sender, recipient, message, sent_at], function (err) {
       if (err) {
-        console.error('Database error:', err);
+        console.error("Database error:", err);
         return;
       }
       console.log(`Message saved in DB with ID: ${this.lastID}`);
     });
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
   });
 });
 
