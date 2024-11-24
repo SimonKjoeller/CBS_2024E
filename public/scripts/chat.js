@@ -150,14 +150,20 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             const recipientId = listItem.dataset.userId; // Hent user_id fra data-attributten
             activeRecipientId = recipientId; // Opdater den aktive modtager
             console.log("Updated activeRecipientId:", activeRecipientId);
+
             highlightUser(listItem.textContent);
             joinRoom(recipientId); // Brug recipientId til at oprette rummet
             loadConversation(listItem.textContent); // Hent samtalen
         }
     });
 
+
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
+
+        // Når beskeden modtages
+        console.log("New message received on client:", data);
+
         if (!activeUser) {
             alert("Select a user from the list before sending a message.");
             return;
@@ -173,7 +179,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
         const sent_at = new Date().toISOString();
 
-        // Log før afsendelse
+        /// Når beskeden sendes
         console.log("Sending message:", {
             sender: currentUsername,
             recipient,
@@ -206,6 +212,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
+
 
 
 }
