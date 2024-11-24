@@ -29,7 +29,7 @@ chatRoutes.post("/recipient", checkAuth, (req, res) => {
 // Hent samtale
 chatRoutes.get("/conversation/:recipient", checkAuth, (req, res) => {
     const recipientUsername = req.params.recipient;
-    const senderId = req.user.userId;
+    const senderId = req.user.user_id;
 
     const query = `
         SELECT c.message, c.sent_at, u1.username AS sender, u2.username AS recipient
@@ -53,7 +53,7 @@ chatRoutes.get("/conversation/:recipient", checkAuth, (req, res) => {
 // Send besked
 chatRoutes.post("/send", checkAuth, (req, res) => {
     const { recipientUsername, message } = req.body;
-    const senderId = req.user.userId;
+    const senderId = req.user.user_id;
 
     const query = `
         INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
