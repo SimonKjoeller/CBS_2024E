@@ -8,6 +8,8 @@ const messageInput = document.getElementById("new-message");
 
 let currentUserId;
 let currentUsername;
+let activeRecipientId = null; // Til at holde styr på den aktive modtager
+
 
 // Hent bruger-ID og -navn fra serveren
 async function fetchCurrentUserInfo() {
@@ -77,10 +79,11 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             const item = document.createElement("div");
             item.textContent = result.username;
             item.classList.add("dropdown-item");
+            item.dataset.userId = result.user_id; // Sæt user_id som data-attribut
             item.onclick = () => {
                 searchInput.value = result.username;
                 searchDropdown.style.display = "none";
-                addChatUser(result.username);
+                addChatUser(result.username, result.user_id); // Tilføj user_id til chat-listen
                 loadConversation(result.username);
                 highlightUser(result.username);
             };
@@ -90,14 +93,16 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         searchDropdown.style.display = "block";
     }
 
-    function addChatUser(username) {
+    function addChatUser(username, userId) {
         const existingUser = Array.from(chatList.children).find(li => li.textContent === username);
         if (!existingUser) {
             const listItem = document.createElement("li");
             listItem.textContent = username;
+            listItem.dataset.userId = userId; // Sæt user_id som data-attribut
             chatList.appendChild(listItem);
         }
     }
+
 
     function highlightUser(username) {
         Array.from(chatList.children).forEach(user => {
@@ -138,17 +143,19 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     }
 
-    // Brug joinRoom-funktionen, når en samtale åbnes
     chatList.addEventListener("click", (event) => {
         const listItem = event.target.closest("li");
 
         if (listItem) {
-            const recipientId = listItem.dataset.userId; // Antag at recipientId er gemt som data-attribut
+            const recipientId = listItem.dataset.userId; // Hent user_id fra data-attributten
+            activeRecipientId = recipientId; // Opdater den aktive modtager
             highlightUser(listItem.textContent);
-            joinRoom(recipientId); // Kalder joinRoom med recipientId
-            loadConversation(listItem.textContent); // Hent samtalen for den aktive bruger
+            joinRoom(recipientId); // Brug recipientId til at oprette rummet
+            loadConversation(listItem.textContent); // Hent samtalen
         }
     });
+
+
 
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
@@ -185,14 +192,14 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     socket.on("new_message", (data) => {
         console.log("New message received on client:", data);
 
-        const room = [currentUsername, data.recipient].sort().join("_");
-        const activeRoom = [currentUsername, activeRecipientId].sort().join("_");
+        const room = [currentUserId, data.recipientId].sort((a, b) => a - b).join("_");
+        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
         console.log(`Active room: ${activeRoom}, Incoming room: ${room}`);
 
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
-            messageElement.classList.add(data.sender === currentUsername ? "mine" : "other");
+            messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -200,5 +207,4 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
-
 }

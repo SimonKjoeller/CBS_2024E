@@ -15,14 +15,15 @@ chatRoutes.get("/", checkAuth, (req, res) => {
 chatRoutes.post("/recipient", checkAuth, (req, res) => {
     const { username } = req.body;
 
-    const query = "SELECT username FROM users WHERE username LIKE ? LIMIT 4";
+    const query = "SELECT user_id, username FROM users WHERE username LIKE ? LIMIT 4";
     db.all(query, [`%${username}%`], (err, users) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        res.status(200).json(users);
+        res.status(200).json(users); // Returnerer både user_id og username
     });
 });
+
 
 chatRoutes.get("/conversation/:recipient", checkAuth, (req, res) => {
     const recipientUsername = req.params.recipient;
