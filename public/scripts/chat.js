@@ -7,6 +7,7 @@ const chatMessages = document.getElementById("chat-messages");
 const messageInput = document.getElementById("new-message");
 let currentUsername;
 
+// Fetch current user
 async function fetchCurrentUsername() {
     try {
         const response = await fetch("/chat/currentUser", {
@@ -21,8 +22,9 @@ async function fetchCurrentUsername() {
     }
 }
 
-fetchCurrentUsername()
+fetchCurrentUsername();
 
+// Load chat
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
     let typingTimeout;
 
@@ -99,9 +101,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         const room = [currentUsername, recipient].sort().join('_');
         socket.emit('join_room', room);
 
-        console.log(room)
-
-        // Hent tidligere beskeder
         try {
             const response = await fetch(`/chat/conversation/${recipient}`);
             if (!response.ok) {
@@ -141,13 +140,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     });
 
-    // Join the correct chat room
-    function joinRoom(recipient) {
-        const room = [currentUsername, recipient].sort().join('_');
-        socket.emit('join_room', room);
-        console.log(room)
-    }
-
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
         if (!activeUser) {
@@ -164,15 +156,10 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
 
         const sent_at = new Date().toISOString();
-
-        // Emit the message via socket
         socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
 
-        // Clear input field (men lad socket håndtere visningen)
         messageInput.value = "";
     });
-
-
 
     socket.on("new_message", (data) => {
         const room = [currentUsername, data.recipient].sort().join('_');
