@@ -5,24 +5,33 @@ const chatList = document.getElementById("chat-list");
 const sendMessageButton = document.getElementById("send-message");
 const chatMessages = document.getElementById("chat-messages");
 const messageInput = document.getElementById("new-message");
+
+let currentUserId;
 let currentUsername;
 
-// Fetch current username
-async function fetchCurrentUsername() {
+// Hent bruger-ID og -navn fra serveren
+async function fetchCurrentUserInfo() {
     try {
         const response = await fetch("/chat/currentUser", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         });
         const data = await response.json();
+        currentUserId = data.userId; // Antag at serveren returnerer userId
         currentUsername = data.username;
-        console.log("Current username set to:", currentUsername);
     } catch (error) {
-        console.error("Error fetching username:", error);
+        console.error("Error fetching user info:", error);
     }
 }
 
-fetchCurrentUsername();
+fetchCurrentUserInfo();
+
+// Join a room based on recipientId
+function joinRoom(recipientId) {
+    const room = [currentUserId, recipientId].sort((a, b) => a - b).join("_");
+    socket.emit("join_room", room);
+    console.log(`Joined room: ${room}`);
+}
 
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
     let typingTimeout;
@@ -129,13 +138,15 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     }
 
+    // Brug joinRoom-funktionen, når en samtale åbnes
     chatList.addEventListener("click", (event) => {
         const listItem = event.target.closest("li");
 
         if (listItem) {
-            const recipient = listItem.textContent;
-            highlightUser(recipient);
-            loadConversation(recipient);
+            const recipientId = listItem.dataset.userId; // Antag at recipientId er gemt som data-attribut
+            highlightUser(listItem.textContent);
+            joinRoom(recipientId); // Kalder joinRoom med recipientId
+            loadConversation(listItem.textContent); // Hent samtalen for den aktive bruger
         }
     });
 
@@ -163,17 +174,16 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         messageInput.value = "";
     });
 
-    // Når en besked modtages via Socket.IO
     socket.on("new_message", (data) => {
-        const room = [data.sender, data.recipient].sort().join('_'); // Ensartet rumnavn
-        const activeRoom = [currentUsername, document.querySelector("#chat-list .active")?.textContent].sort().join('_');
+        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
         console.log(`New message received for room: ${room}, Active room: ${activeRoom}`);
 
-        // Kontroller, om beskeden tilhører det aktive rum
+        // Vis kun beskeder, hvis de tilhører det aktive rum
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
-            messageElement.classList.add(data.sender === currentUsername ? "mine" : "other");
+            messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -181,4 +191,5 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn(`Message not displayed because it doesn't belong to the active room.`);
         }
     });
+
 }
