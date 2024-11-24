@@ -149,14 +149,12 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         if (listItem) {
             const recipientId = listItem.dataset.userId; // Hent user_id fra data-attributten
             activeRecipientId = recipientId; // Opdater den aktive modtager
+            console.log("Updated activeRecipientId:", activeRecipientId);
             highlightUser(listItem.textContent);
             joinRoom(recipientId); // Brug recipientId til at oprette rummet
             loadConversation(listItem.textContent); // Hent samtalen
         }
     });
-
-
-
 
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
@@ -208,5 +206,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
+
 
 }
