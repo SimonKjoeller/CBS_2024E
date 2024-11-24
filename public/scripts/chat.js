@@ -183,21 +183,22 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
     socket.on("new_message", (data) => {
-        console.log("New message received:", data);
+        console.log("New message received on client:", data);
 
-        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
-        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
+        const room = [currentUsername, data.recipient].sort().join("_");
+        const activeRoom = [currentUsername, activeRecipientId].sort().join("_");
 
         console.log(`Active room: ${activeRoom}, Incoming room: ${room}`);
 
         if (room === activeRoom) {
             const messageElement = document.createElement("div");
-            messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
+            messageElement.classList.add(data.sender === currentUsername ? "mine" : "other");
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         } else {
-            console.warn("Message does not match the active room.");
+            console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
+
 }
