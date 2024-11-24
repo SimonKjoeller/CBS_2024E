@@ -5,7 +5,6 @@ const chatList = document.getElementById("chat-list");
 const sendMessageButton = document.getElementById("send-message");
 const chatMessages = document.getElementById("chat-messages");
 const messageInput = document.getElementById("new-message");
-
 let currentUsername;
 
 async function fetchCurrentUsername() {
@@ -145,49 +144,26 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
     sendMessageButton.addEventListener("click", () => {
-        const activeUser = document.querySelector("#chat-list .active");
-        if (!activeUser) {
-            alert("Select a user from the list before sending a message.");
-            return;
-        }
-
-        const recipient = activeUser.textContent;
+        const recipient = document.querySelector("#chat-list .active").textContent;
         const message = messageInput.value.trim();
 
-        if (message === "") {
+        if (!message) {
             alert("Message cannot be empty.");
             return;
         }
 
         const sent_at = new Date().toISOString();
 
-        socket.emit("new_message", {
-            sender: currentUsername,
-            recipient,
-            message,
-            sent_at,
-        });
-
+        socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
         messageInput.value = "";
     });
 
     socket.on("new_message", (data) => {
-        const activeUser = document.querySelector("#chat-list .active");
-        const room = [currentUsername, data.recipient].sort().join('_');
-
-        if (activeUser && room === [currentUsername, activeUser.textContent].sort().join('_')) {
+        if (data.recipient === currentUsername || data.sender === currentUsername) {
             const messageElement = document.createElement("div");
-            messageElement.classList.add("message");
-
-            if (data.sender === currentUsername) {
-                messageElement.classList.add("mine");
-            } else {
-                messageElement.classList.add("other");
-            }
-
+            messageElement.classList.add(data.sender === currentUsername ? "mine" : "other");
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
             chatMessages.appendChild(messageElement);
-
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     });
