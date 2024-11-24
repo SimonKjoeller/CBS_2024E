@@ -100,12 +100,14 @@ io.on('connection', (socket) => {
 
   socket.on('new_message', (data) => {
     const { sender, recipient, message, sent_at } = data;
+
+    // Sort the sender and recipient to create a consistent room name
     const room = [sender, recipient].sort().join('_');
 
-    // Emit to all in the room
+    // Emit the message to everyone in the room
     io.to(room).emit('new_message', data);
 
-    // Save message in database
+    // Save the message in the database
     const query = `
       INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
       VALUES (
@@ -118,7 +120,7 @@ io.on('connection', (socket) => {
         console.error('Database error:', err);
         return;
       }
-      console.log('Message saved in DB with ID:', this.lastID);
+      console.log(`Message saved in DB with ID: ${this.lastID}`);
     });
   });
 
@@ -126,6 +128,7 @@ io.on('connection', (socket) => {
     console.log('User disconnected');
   });
 });
+
 
 //Laver et POST /order endpoint der opretter en ny ordre i databasen
 app.post('/order', (req, res) => {
