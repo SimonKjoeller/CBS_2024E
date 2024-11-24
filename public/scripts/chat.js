@@ -161,9 +161,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
 
-        // Når beskeden modtages
-        console.log("New message received on client:", data);
-
         if (!activeUser) {
             alert("Select a user from the list before sending a message.");
             return;
