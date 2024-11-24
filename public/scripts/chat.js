@@ -157,6 +157,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
 
 
+
     sendMessageButton.addEventListener("click", () => {
         const activeUser = document.querySelector("#chat-list .active");
         if (!activeUser) {
@@ -192,7 +193,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     socket.on("new_message", (data) => {
         console.log("New message received on client:", data);
 
-        const room = [currentUserId, data.recipientId].sort((a, b) => a - b).join("_");
+        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
         console.log(`Active room: ${activeRoom}, Incoming room: ${room}`);
@@ -207,4 +208,5 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             console.warn("Message not displayed because it doesn't belong to the active room.");
         }
     });
+
 }

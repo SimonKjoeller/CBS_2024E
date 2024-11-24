@@ -96,31 +96,49 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new_message", (data) => {
-    console.log("Message received on server:", data);
-
     const { sender, recipient, message, sent_at } = data;
-    const room = [sender, recipient].sort().join("_");
 
-    console.log(`Emitting message to room: ${room}`);
-    io.to(room).emit("new_message", data);
-
-    // Log database handling
+    // Find senderId og recipientId fra databasen
     const query = `
-          INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-          VALUES (
-              (SELECT user_id FROM users WHERE username = ?),
-              (SELECT user_id FROM users WHERE username = ?),
-              ?, ?
-          )`;
+        SELECT u1.user_id AS senderId, u2.user_id AS recipientId
+        FROM users u1, users u2
+        WHERE u1.username = ? AND u2.username = ?
+    `;
 
-    db.run(query, [sender, recipient, message, sent_at], function (err) {
+    db.get(query, [sender, recipient], (err, ids) => {
       if (err) {
         console.error("Database error:", err);
         return;
       }
-      console.log(`Message saved in DB with ID: ${this.lastID}`);
+
+      if (ids) {
+        const room = [ids.senderId, ids.recipientId].sort((a, b) => a - b).join("_");
+        const enrichedData = {
+          ...data,
+          senderId: ids.senderId,
+          recipientId: ids.recipientId
+        };
+
+        // Send beskeden til rummet
+        io.to(room).emit("new_message", enrichedData);
+
+        // Gem beskeden i databasen
+        const insertQuery = `
+                INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+                VALUES (?, ?, ?, ?)
+            `;
+
+        db.run(insertQuery, [ids.senderId, ids.recipientId, message, sent_at], function (err) {
+          if (err) {
+            console.error("Database error:", err);
+          } else {
+            console.log(`Message saved in DB with ID: ${this.lastID}`);
+          }
+        });
+      }
     });
   });
+
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
