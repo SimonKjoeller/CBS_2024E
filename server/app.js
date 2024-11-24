@@ -98,18 +98,22 @@ io.on("connection", (socket) => {
   socket.on("new_message", (data) => {
     console.log("Message received on server:", data);
 
-    const { senderId, recipientId, message, sent_at } = data;
-    const room = [senderId, recipientId].sort((a, b) => a - b).join("_");
+    const { sender, recipient, message, sent_at } = data;
+    const room = [sender, recipient].sort().join("_");
 
     console.log(`Emitting message to room: ${room}`);
+    io.to(room).emit("new_message", data);
 
-    io.to(room).emit("new_message", { senderId, recipientId, sender: data.sender, message, sent_at });
-
+    // Log database handling
     const query = `
-        INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-        VALUES (?, ?, ?, ?)`;
+          INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+          VALUES (
+              (SELECT user_id FROM users WHERE username = ?),
+              (SELECT user_id FROM users WHERE username = ?),
+              ?, ?
+          )`;
 
-    db.run(query, [senderId, recipientId, message, sent_at], function (err) {
+    db.run(query, [sender, recipient, message, sent_at], function (err) {
       if (err) {
         console.error("Database error:", err);
         return;
@@ -118,11 +122,11 @@ io.on("connection", (socket) => {
     });
   });
 
-
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
 });
+
 
 
 //Laver et POST /order endpoint der opretter en ny ordre i databasen
