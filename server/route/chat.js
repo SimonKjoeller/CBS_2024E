@@ -72,7 +72,7 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
 });
 
 chatRoutes.get("/currentUser", checkAuth, (req, res) => {
-    const userId = req.user.userId; // Hent bruger-ID fra autentificeringstoken
+    const userId = req.user.userId;
 
     const query = `SELECT username FROM users WHERE id = ? LIMIT 1`;
 
@@ -88,6 +88,5 @@ chatRoutes.get("/currentUser", checkAuth, (req, res) => {
         res.status(200).json({ username: row.username });
     });
 });
-
 
 module.exports = chatRoutes;
