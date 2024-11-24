@@ -19,7 +19,7 @@ userRoutes.post("/login", (req, res) => {
         }
         if (user) {
             // Generer JWT token
-            const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: '1h' });
+            const token = jwt.sign({ user_id: user.user_id }, secretKey, { expiresIn: '1h' });
             // Sæt token som cookie
             res.cookie("authToken", token, { httpOnly: true, secure: true, sameSite: "None" })
                 .status(200)
