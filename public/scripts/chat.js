@@ -14,19 +14,14 @@ async function fetchCurrentUsername() {
             headers: { "Content-Type": "application/json" },
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const data = await response.json();
         currentUsername = data.username;
-        console.log("Authenticated username:", currentUsername);
     } catch (error) {
         console.error("Error fetching username:", error);
     }
 }
 
-fetchCurrentUsername();
+fetchCurrentUsername()
 
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
     let typingTimeout;
@@ -144,7 +139,13 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
     sendMessageButton.addEventListener("click", () => {
-        const recipient = document.querySelector("#chat-list .active").textContent;
+        const activeUser = document.querySelector("#chat-list .active");
+        if (!activeUser) {
+            alert("Select a user from the list before sending a message.");
+            return;
+        }
+
+        const recipient = activeUser.textContent;
         const message = messageInput.value.trim();
 
         if (!message) {
@@ -159,7 +160,11 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
     socket.on("new_message", (data) => {
-        if (data.recipient === currentUsername || data.sender === currentUsername) {
+        const room = [currentUsername, data.recipient].sort().join('_');
+        const activeUser = document.querySelector("#chat-list .active");
+        const activeRoom = [currentUsername, activeUser?.textContent].sort().join('_');
+
+        if (room === activeRoom) {
             const messageElement = document.createElement("div");
             messageElement.classList.add(data.sender === currentUsername ? "mine" : "other");
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;

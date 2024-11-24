@@ -100,10 +100,12 @@ io.on('connection', (socket) => {
 
   socket.on('new_message', (data) => {
     const { sender, recipient, message, sent_at } = data;
-
     const room = [sender, recipient].sort().join('_');
+
+    // Emit to all in the room
     io.to(room).emit('new_message', data);
 
+    // Save message in database
     const query = `
       INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
       VALUES (
@@ -111,8 +113,7 @@ io.on('connection', (socket) => {
         (SELECT id FROM users WHERE username = ?), ?, ?
       )`;
 
-    const formattedTime = new Date(sent_at).toISOString();
-    db.run(query, [sender, recipient, message, formattedTime], function (err) {
+    db.run(query, [sender, recipient, message, sent_at], function (err) {
       if (err) {
         console.error('Database error:', err);
         return;
