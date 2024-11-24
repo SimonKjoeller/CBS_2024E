@@ -8,12 +8,10 @@ const checkAuth = require("../checkAuth");
 chatRoutes.use(express.json());
 chatRoutes.use(cookieParser());
 
-// Hovedside
 chatRoutes.get("/", checkAuth, (req, res) => {
     res.sendFile(path.join(__dirname, "../../public/pages/chat.html"));
 });
 
-// Hent modtager
 chatRoutes.post("/recipient", checkAuth, (req, res) => {
     const { username } = req.body;
 
@@ -26,21 +24,19 @@ chatRoutes.post("/recipient", checkAuth, (req, res) => {
     });
 });
 
-// Hent samtale
 chatRoutes.get("/conversation/:recipient", checkAuth, (req, res) => {
     const recipientUsername = req.params.recipient;
     const senderId = req.user.user_id;
 
     const query = `
-        SELECT c.message, c.sent_at, u1.username AS sender, u2.username AS recipient
-        FROM chat c
-        JOIN users u1 ON c.sender_id = u1.user_id
-        JOIN users u2 ON c.recipient_id = u2.user_id
-        WHERE 
-            (c.sender_id = ? AND u2.username = ?) OR 
-            (c.recipient_id = ? AND u1.username = ?)
-        ORDER BY c.sent_at ASC
-    `;
+      SELECT c.message, c.sent_at, u1.username AS sender, u2.username AS recipient
+      FROM chat c
+      JOIN users u1 ON c.sender_id = u1.user_id
+      JOIN users u2 ON c.recipient_id = u2.user_id
+      WHERE 
+          (c.sender_id = ? AND u2.username = ?) OR 
+          (c.recipient_id = ? AND u1.username = ?)
+      ORDER BY c.sent_at ASC`;
 
     db.all(query, [senderId, recipientUsername, senderId, recipientUsername], (err, rows) => {
         if (err) {
@@ -50,15 +46,13 @@ chatRoutes.get("/conversation/:recipient", checkAuth, (req, res) => {
     });
 });
 
-// Send besked
 chatRoutes.post("/send", checkAuth, (req, res) => {
     const { recipientUsername, message } = req.body;
     const senderId = req.user.user_id;
 
     const query = `
-        INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-        VALUES (?, (SELECT user_id FROM users WHERE username = ?), ?, datetime('now'))
-    `;
+      INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+      VALUES (?, (SELECT user_id FROM users WHERE username = ?), ?, datetime('now'))`;
 
     db.run(query, [senderId, recipientUsername, message], function (err) {
         if (err) {
@@ -68,10 +62,9 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
     });
 });
 
-// Hent bruger
 chatRoutes.get("/currentUser", checkAuth, (req, res) => {
     const user_id = req.user.user_id;
-    console.log(req.user)
+    console.log(req.user);
 
     const query = "SELECT username FROM users WHERE user_id = ? LIMIT 1";
     db.get(query, [user_id], (err, row) => {
