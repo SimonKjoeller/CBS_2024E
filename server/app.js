@@ -87,36 +87,56 @@ const io = socketIo(server, {
   transports: ["websocket", "polling"],
 });
 
-// Når en klient forbinder
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Hent bruger-ID (f.eks. fra token eller session)
-  const userId = socket.handshake.auth.userId;
+  const user_id = req.user.user_id;
+  console.log(user_id)
 
-  // Find beskeder, der ikke er blevet leveret endnu
-  const query = `
-      SELECT * FROM chat
-      WHERE recipient_id = ? AND delivered = 0
-  `;
+  if (user_id) {
+    // Hent ulæste beskeder
+    const query = `
+          SELECT * FROM chat
+          WHERE recipient_id = ? AND delivered = 0
+      `;
+    db.all(query, [user_id], (err, messages) => {
+      if (err) {
+        console.error("Database error:", err);
+        return;
+      }
 
-  console.log(userId)
+      // Send beskeder og marker dem som leveret
+      messages.forEach((msg) => {
+        socket.emit("new_message", msg);
 
-  db.all(query, [userId], (err, messages) => {
-    if (err) {
-      console.error("Database error:", err);
-      return;
-    }
-
-    // Send alle ventende beskeder til klienten
-    messages.forEach((msg) => {
-      socket.emit("new_message", msg);
-
-      // Marker beskeden som leveret
-      const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
-      db.run(updateQuery, [msg.chat_id], (err) => {
-        if (err) console.error("Error updating message:", err);
+        const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
+        db.run(updateQuery, [msg.chat_id], (err) => {
+          if (err) console.error("Error updating message:", err);
+        });
       });
+    });
+  } else {
+    console.warn("User ID is missing in handshake auth.");
+  }
+
+  socket.on("join_room", (room) => {
+    console.log(`User joined room: ${room}`);
+    socket.join(room);
+
+    const [userId1, userId2] = room.split("_").map(Number);
+
+    // Marker beskeder som leveret for det pågældende rum
+    const updateQuery = `
+          UPDATE chat
+          SET delivered = 1
+          WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
+      `;
+    db.run(updateQuery, [userId2, userId1], (err) => {
+      if (err) {
+        console.error("Error updating delivered status:", err);
+      } else {
+        console.log(`Marked messages as delivered for room: ${room}`);
+      }
     });
   });
 
