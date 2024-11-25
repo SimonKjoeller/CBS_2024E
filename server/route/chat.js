@@ -105,7 +105,7 @@ chatRoutes.get("/currentUser", checkAuth, (req, res) => {
     const user_id = req.user.user_id;
     console.log(req.user);
 
-    const query = "SELECT username FROM users WHERE user_id = ? LIMIT 1";
+    const query = "SELECT username, user_id FROM users WHERE user_id = ? LIMIT 1";
     db.get(query, [user_id], (err, row) => {
         if (err) {
             return res.status(500).json({ error: "Error fetching username" });
@@ -113,7 +113,7 @@ chatRoutes.get("/currentUser", checkAuth, (req, res) => {
         if (!row) {
             return res.status(404).json({ error: "User not found" });
         }
-        res.status(200).json({ username: row.username });
+        res.status(200).json({ username: row.username, user_id: row.user_id });
     });
 });
 
