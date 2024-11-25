@@ -29,39 +29,76 @@ chatRoutes.get("/conversation/:recipient", checkAuth, (req, res) => {
     const recipientUsername = req.params.recipient;
     const senderId = req.user.user_id;
 
-    const query = `
-      SELECT c.message, c.sent_at, u1.username AS sender, u2.username AS recipient
-      FROM chat c
-      JOIN users u1 ON c.sender_id = u1.user_id
-      JOIN users u2 ON c.recipient_id = u2.user_id
-      WHERE 
-          (c.sender_id = ? AND u2.username = ?) OR 
-          (c.recipient_id = ? AND u1.username = ?)
-      ORDER BY c.sent_at ASC`;
-
-    db.all(query, [senderId, recipientUsername, senderId, recipientUsername], (err, rows) => {
+    // Først: Hent recipient_id fra databasen baseret på recipientUsername
+    const getRecipientIdQuery = "SELECT user_id FROM users WHERE username = ?";
+    db.get(getRecipientIdQuery, [recipientUsername], (err, row) => {
         if (err) {
-            return res.status(500).json({ error: err.message });
+            console.error("Error fetching recipient ID:", err);
+            return res.status(500).json({ error: "Error fetching recipient ID" });
         }
-        res.status(200).json(rows);
+
+        if (!row) {
+            return res.status(404).json({ error: "Recipient not found" });
+        }
+
+        const recipientId = row.user_id;
+
+        // Når recipient_id er hentet, udfør SELECT-forespørgslen for at hente samtalen
+        const query = `
+          SELECT c.message, c.sent_at, u1.username AS sender, u2.username AS recipient
+          FROM chat c
+          JOIN users u1 ON c.sender_id = u1.user_id
+          JOIN users u2 ON c.recipient_id = u2.user_id
+          WHERE 
+              (c.sender_id = ? AND c.recipient_id = ?) OR 
+              (c.sender_id = ? AND c.recipient_id = ?)
+          ORDER BY c.sent_at ASC`;
+
+        db.all(query, [senderId, recipientId, recipientId, senderId], (err, rows) => {
+            if (err) {
+                console.error("Error fetching conversation:", err);
+                return res.status(500).json({ error: "Error fetching conversation" });
+            }
+            res.status(200).json(rows);
+        });
     });
 });
+
 
 chatRoutes.post("/send", checkAuth, (req, res) => {
     const { recipientUsername, message } = req.body;
     const senderId = req.user.user_id;
 
-    const query = `
-      INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-      VALUES (?, (SELECT user_id FROM users WHERE username = ?), ?, datetime('now'))`;
-
-    db.run(query, [senderId, recipientUsername, message], function (err) {
+    // Først hentes recipient_id fra databasen
+    const getRecipientIdQuery = "SELECT user_id FROM users WHERE username = ?";
+    db.get(getRecipientIdQuery, [recipientUsername], (err, row) => {
         if (err) {
-            return res.status(500).json({ error: err.message });
+            console.error("Error fetching recipient ID:", err);
+            return res.status(500).json({ error: "Error fetching recipient ID" });
         }
-        res.status(200).json({ chat_id: this.lastID, message: "Message sent successfully!" });
+
+        if (!row) {
+            return res.status(404).json({ error: "Recipient not found" });
+        }
+
+        const recipientId = row.user_id;
+
+        // Når recipient_id er hentet, så kan vi indsætte beskeden i db
+        const insertMessageQuery = `
+          INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+          VALUES (?, ?, ?, datetime('now'))`;
+
+        db.run(insertMessageQuery, [senderId, recipientId, message], function (err) {
+            if (err) {
+                console.error("Error inserting message into database:", err);
+                return res.status(500).json({ error: "Error inserting message into database" });
+            }
+
+            res.status(200).json({ chat_id: this.lastID, message: "Message sent successfully!" });
+        });
     });
 });
+
 
 chatRoutes.get("/currentUser", checkAuth, (req, res) => {
     const user_id = req.user.user_id;
