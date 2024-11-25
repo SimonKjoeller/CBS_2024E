@@ -28,6 +28,7 @@ async function fetchCurrentUserInfo() {
 }
 
 function initializeSocket() {
+    console.log(currentUserId)
     socket = io.connect('https://cbsjoe.live', {
         auth: {
             user_id: currentUserId, // Send userId som en del af handshake auth
