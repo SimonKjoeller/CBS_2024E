@@ -79,6 +79,7 @@ sendMessageButton.addEventListener("click", async () => {
     }
 
     const recipient = activeUser.textContent;
+    const recipientId = activeUser.dataset.userId;
     const message = messageInput.value.trim();
 
     if (!message) {
@@ -89,10 +90,17 @@ sendMessageButton.addEventListener("click", async () => {
     const sent_at = new Date().toISOString();
 
     console.log(`Client: Sending message to ${recipient}: "${message}" at ${sent_at}`);
-    console.log(`Client: currentUserId: ${currentUserId}, activeRecipientId: ${activeRecipientId}`);
+    console.log(`Client: currentUserId: ${currentUserId}, activeRecipientId: ${recipientId}`);
 
     // Socket.IO: Send beskeden i realtid
-    socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
+    socket.emit("new_message", {
+        senderId: currentUserId,
+        recipientId: recipientId,
+        sender: currentUsername,
+        recipient,
+        message,
+        sent_at
+    });
 
     // HTTP: Gem beskeden i databasen
     try {
