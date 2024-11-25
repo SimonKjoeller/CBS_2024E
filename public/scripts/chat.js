@@ -8,9 +8,8 @@ const messageInput = document.getElementById("new-message");
 let currentUserId;
 let currentUsername;
 let activeRecipientId = null; // Til at holde styr på den aktive modtager
-let socket; // Socket.IO-forbindelsen
+let socket;
 
-// Hent bruger-ID og -navn fra serveren
 async function fetchCurrentUserInfo() {
     try {
         const response = await fetch("/chat/currentUser", {
@@ -18,10 +17,10 @@ async function fetchCurrentUserInfo() {
             headers: { "Content-Type": "application/json" },
         });
         const data = await response.json();
-        currentUserId = data.userId; // Antag at serveren returnerer userId
+        currentUserId = data.userId;
         currentUsername = data.username;
 
-        // Opret Socket.IO-forbindelse efter at have hentet brugeroplysninger
+        // Opret Socket.IO-forbindelsen, når brugeroplysninger er hentet
         initializeSocket();
     } catch (error) {
         console.error("Error fetching user info:", error);
@@ -31,33 +30,25 @@ async function fetchCurrentUserInfo() {
 function initializeSocket() {
     socket = io.connect('https://cbsjoe.live', {
         auth: {
-            userId: currentUserId
-        }
+            user_id: currentUserId, // Send userId som en del af handshake auth
+        },
     });
 
-    // Lyt til nye beskeder
+    socket.on("connect", () => {
+        console.log(`Client connected with userId: ${currentUserId}`);
+    });
+
     socket.on("new_message", (data) => {
         console.log("Client: New message received:", data);
+        // Håndtering af beskeder her...
+    });
 
-        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
-        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
-
-        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
-
-        if (room === activeRoom) {
-            console.log("Client: Displaying message in active chat.");
-            const messageElement = document.createElement("div");
-            messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
-            messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        } else {
-            console.warn("Client: Message not displayed because it doesn't belong to the active room.");
-        }
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
     });
 }
 
-// Start med at hente brugeroplysninger
+// Hent brugeroplysninger og start processen
 fetchCurrentUserInfo();
 
 function joinRoom(recipientId) {

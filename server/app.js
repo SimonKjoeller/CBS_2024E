@@ -91,16 +91,19 @@ io.on("connection", (socket) => {
   console.log("A user connected");
 
   // Hent bruger-ID fra klientens handshake auth
-  const user_id = socket.handshake.auth.userId;
+  const user_id = socket.handshake.auth.user_id;
 
   console.log("User ID from handshake:", user_id);
+  console.log("User ID from :", socket.handshake.auth);
+  console.log("User ID  :", socket.handshake);
+  console.log("User  :", socket);
 
   if (user_id) {
     // Hent ulæste beskeder
     const query = `
-          SELECT * FROM chat
-          WHERE recipient_id = ? AND delivered = 0
-      `;
+            SELECT * FROM chat
+            WHERE recipient_id = ? AND delivered = 0
+        `;
     db.all(query, [user_id], (err, messages) => {
       if (err) {
         console.error("Database error:", err);
@@ -129,10 +132,10 @@ io.on("connection", (socket) => {
 
     // Marker beskeder som leveret for det pågældende rum
     const updateQuery = `
-          UPDATE chat
-          SET delivered = 1
-          WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
-      `;
+            UPDATE chat
+            SET delivered = 1
+            WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
+        `;
     db.run(updateQuery, [userId2, userId1], (err) => {
       if (err) {
         console.error("Error updating delivered status:", err);
