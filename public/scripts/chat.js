@@ -30,9 +30,10 @@ fetchCurrentUserInfo();
 
 function joinRoom(recipientId) {
     const room = [currentUserId, recipientId].sort((a, b) => a - b).join("_");
+    console.log(`Client: Joining room ${room} with recipientId ${recipientId}`);
     socket.emit("join_room", room);
-    console.log(`Joined room: ${room}`);
 }
+
 
 
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
@@ -192,7 +193,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
     socket.on("new_message", (data) => {
-        console.log("New message received on client:", data);
+        console.log("Client: New message received:", data);
 
         const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
@@ -200,15 +201,16 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
 
         if (room === activeRoom) {
-            console.log("Displaying message in active chat.");
+            console.log("Client: Displaying message in active chat.");
             const messageElement = document.createElement("div");
             messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
             messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         } else {
-            console.warn("Message not displayed because it doesn't belong to the active room.");
+            console.warn("Client: Message not displayed because it doesn't belong to the active room.");
         }
     });
+
 
 }
