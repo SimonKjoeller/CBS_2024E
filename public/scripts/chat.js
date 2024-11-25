@@ -41,13 +41,65 @@ function initializeSocket() {
 
     socket.on("new_message", (data) => {
         console.log("Client: New message received:", data);
-        // Håndtering af beskeder her...
+        displayMessage(data)
     });
 
     socket.on("disconnect", () => {
         console.log("Client disconnected");
     });
 }
+
+function displayMessage(data) {
+    const messageElement = document.createElement("div");
+    messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
+    messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+sendMessageButton.addEventListener("click", async () => {
+    const activeUser = document.querySelector("#chat-list .active");
+
+    if (!activeUser) {
+        alert("Select a user from the list before sending a message.");
+        return;
+    }
+
+    const recipient = activeUser.textContent;
+    const message = messageInput.value.trim();
+
+    if (!message) {
+        alert("Message cannot be empty.");
+        return;
+    }
+
+    const sent_at = new Date().toISOString();
+
+    console.log(`Client: Sending message to ${recipient}: "${message}" at ${sent_at}`);
+
+    // Socket.IO: Send beskeden i realtid
+    socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
+
+    // HTTP: Gem beskeden i databasen
+    try {
+        const response = await fetch("/chat/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recipientUsername: recipient, message }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to save message: ${response.status}`);
+        }
+
+        console.log("Client: Message successfully saved in database.");
+    } catch (error) {
+        console.error("Client: Error saving message to database:", error);
+    }
+
+    // Clear input field
+    messageInput.value = "";
+});
 
 // Hent brugeroplysninger og start processen
 fetchCurrentUserInfo();
@@ -177,47 +229,5 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             joinRoom(recipientId); // Brug recipientId til at oprette rummet
             loadConversation(listItem.textContent); // Hent samtalen
         }
-    });
-
-    sendMessageButton.addEventListener("click", async () => {
-        const activeUser = document.querySelector("#chat-list .active");
-
-        if (!activeUser) {
-            alert("Select a user from the list before sending a message.");
-            return;
-        }
-
-        const recipient = activeUser.textContent;
-        const message = messageInput.value.trim();
-
-        if (!message) {
-            alert("Message cannot be empty.");
-            return;
-        }
-
-        const sent_at = new Date().toISOString();
-
-        // Socket.IO: Send beskeden i realtid
-        socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
-
-        // HTTP: Gem beskeden i databasen
-        try {
-            const response = await fetch("/chat/send", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ recipientUsername: recipient, message }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to save message: ${response.status}`);
-            }
-
-            console.log("Message saved to database.");
-        } catch (error) {
-            console.error("Error saving message to database:", error);
-        }
-
-        // Clear input field
-        messageInput.value = "";
     });
 }
