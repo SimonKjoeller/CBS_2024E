@@ -100,6 +100,8 @@ io.on("connection", (socket) => {
       WHERE recipient_id = ? AND delivered = 0
   `;
 
+  console.log(userId)
+
   db.all(query, [userId], (err, messages) => {
     if (err) {
       console.error("Database error:", err);
