@@ -1,4 +1,3 @@
-const socket = io.connect('https://cbsjoe.live');
 const searchInput = document.getElementById("search");
 const searchDropdown = document.getElementById("search-dropdown");
 const chatList = document.getElementById("chat-list");
@@ -9,7 +8,7 @@ const messageInput = document.getElementById("new-message");
 let currentUserId;
 let currentUsername;
 let activeRecipientId = null; // Til at holde styr på den aktive modtager
-
+let socket; // Socket.IO-forbindelsen
 
 // Hent bruger-ID og -navn fra serveren
 async function fetchCurrentUserInfo() {
@@ -21,11 +20,44 @@ async function fetchCurrentUserInfo() {
         const data = await response.json();
         currentUserId = data.userId; // Antag at serveren returnerer userId
         currentUsername = data.username;
+
+        // Opret Socket.IO-forbindelse efter at have hentet brugeroplysninger
+        initializeSocket();
     } catch (error) {
         console.error("Error fetching user info:", error);
     }
 }
 
+function initializeSocket() {
+    socket = io.connect('https://cbsjoe.live', {
+        auth: {
+            userId: currentUserId
+        }
+    });
+
+    // Lyt til nye beskeder
+    socket.on("new_message", (data) => {
+        console.log("Client: New message received:", data);
+
+        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
+
+        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
+
+        if (room === activeRoom) {
+            console.log("Client: Displaying message in active chat.");
+            const messageElement = document.createElement("div");
+            messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
+            messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        } else {
+            console.warn("Client: Message not displayed because it doesn't belong to the active room.");
+        }
+    });
+}
+
+// Start med at hente brugeroplysninger
 fetchCurrentUserInfo();
 
 function joinRoom(recipientId) {
@@ -33,8 +65,6 @@ function joinRoom(recipientId) {
     console.log(`Client: Joining room ${room} with recipientId ${recipientId}`);
     socket.emit("join_room", room);
 }
-
-
 
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
     let typingTimeout;
@@ -104,7 +134,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     }
 
-
     function highlightUser(username) {
         Array.from(chatList.children).forEach(user => {
             user.classList.toggle("active", user.textContent === username);
@@ -158,7 +187,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     });
 
-
     sendMessageButton.addEventListener("click", async () => {
         const activeUser = document.querySelector("#chat-list .active");
 
@@ -200,27 +228,4 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         // Clear input field
         messageInput.value = "";
     });
-
-
-    socket.on("new_message", (data) => {
-        console.log("Client: New message received:", data);
-
-        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
-        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
-
-        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
-
-        if (room === activeRoom) {
-            console.log("Client: Displaying message in active chat.");
-            const messageElement = document.createElement("div");
-            messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
-            messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        } else {
-            console.warn("Client: Message not displayed because it doesn't belong to the active room.");
-        }
-    });
-
-
 }
