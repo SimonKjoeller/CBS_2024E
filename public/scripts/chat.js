@@ -159,7 +159,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
     });
 
 
-    sendMessageButton.addEventListener("click", () => {
+    sendMessageButton.addEventListener("click", async () => {
         const activeUser = document.querySelector("#chat-list .active");
 
         if (!activeUser) {
@@ -177,20 +177,30 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
         const sent_at = new Date().toISOString();
 
-        /// Når beskeden sendes
-        console.log("Sending message:", {
-            sender: currentUsername,
-            recipient,
-            message,
-            sent_at
-        });
-
-        // Emit the message via socket
+        // Socket.IO: Send beskeden i realtid
         socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
+
+        // HTTP: Gem beskeden i databasen
+        try {
+            const response = await fetch("/chat/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ recipientUsername: recipient, message }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to save message: ${response.status}`);
+            }
+
+            console.log("Message saved to database.");
+        } catch (error) {
+            console.error("Error saving message to database:", error);
+        }
 
         // Clear input field
         messageInput.value = "";
     });
+
 
     socket.on("new_message", (data) => {
         console.log("Client: New message received:", data);
