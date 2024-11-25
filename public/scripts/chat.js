@@ -41,8 +41,21 @@ function initializeSocket() {
 
     socket.on("new_message", (data) => {
         console.log("Client: New message received:", data);
-        displayMessage(data)
+
+        // Tjek om beskeden tilhører det aktive rum
+        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
+
+        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
+
+        if (room === activeRoom) {
+            console.log("Client: Displaying message in active chat.");
+            displayMessage(data);
+        } else {
+            console.warn("Client: Message not displayed because it doesn't belong to the active room.");
+        }
     });
+
 
     socket.on("disconnect", () => {
         console.log("Client disconnected");
@@ -76,6 +89,7 @@ sendMessageButton.addEventListener("click", async () => {
     const sent_at = new Date().toISOString();
 
     console.log(`Client: Sending message to ${recipient}: "${message}" at ${sent_at}`);
+    console.log(`Client: currentUserId: ${currentUserId}, activeRecipientId: ${activeRecipientId}`);
 
     // Socket.IO: Send beskeden i realtid
     socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
@@ -97,8 +111,7 @@ sendMessageButton.addEventListener("click", async () => {
         console.error("Client: Error saving message to database:", error);
     }
 
-    // Clear input field
-    messageInput.value = "";
+    messageInput.value = ""; // Ryd beskedfeltet
 });
 
 // Hent brugeroplysninger og start processen
