@@ -87,65 +87,38 @@ const io = socketIo(server, {
   transports: ["websocket", "polling"],
 });
 
+// Når en klient forbinder
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("join_room", (room) => {
-    socket.join(room);
-    console.log(`User joined room: ${room}`);
+  // Hent bruger-ID (f.eks. fra token eller session)
+  const userId = socket.handshake.auth.userId;
 
-    // Check the number of sockets in the room
-    const clientsInRoom = io.sockets.adapter.rooms.get(room) || [];
-    console.log(`Clients in room (${room}):`, [...clientsInRoom]);
-  });
+  // Find beskeder, der ikke er blevet leveret endnu
+  const query = `
+      SELECT * FROM chat
+      WHERE recipient_id = ? AND delivered = 0
+  `;
 
-  socket.on("new_message", (data) => {
-    console.log("Received data:", data);
+  db.all(query, [userId], (err, messages) => {
+    if (err) {
+      console.error("Database error:", err);
+      return;
+    }
 
-    const query = `
-        SELECT u1.user_id AS senderId, u2.user_id AS recipientId
-        FROM users u1, users u2
-        WHERE u1.username = ? AND u2.username = ?
-    `;
+    // Send alle ventende beskeder til klienten
+    messages.forEach((msg) => {
+      socket.emit("new_message", msg);
 
-    db.get(query, [data.sender, data.recipient], (err, ids) => {
-      if (err) {
-        console.error("Database query error:", err);
-        return;
-      }
-
-      if (!ids) {
-        console.error("No IDs found for sender and recipient");
-        return;
-      }
-
-      console.log("Fetched IDs:", ids);
-
-      const room = [ids.senderId, ids.recipientId].sort().join("_");
-      console.log(`Room determined: ${room}`);
-
-      // Emit to room
-      io.to(room).emit("new_message", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
-
-      // Save to database
-      const insertQuery = `
-            INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-            VALUES (?, ?, ?, ?)
-        `;
-
-      db.run(insertQuery, [ids.senderId, ids.recipientId, data.message, data.sent_at], (err) => {
-        if (err) {
-          console.error("Database save error:", err);
-        } else {
-          console.log("Message successfully saved to database.");
-        }
+      // Marker beskeden som leveret
+      const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
+      db.run(updateQuery, [msg.chat_id], (err) => {
+        if (err) console.error("Error updating message:", err);
       });
     });
   });
-
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
   });
 });
-
