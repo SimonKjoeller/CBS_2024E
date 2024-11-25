@@ -113,9 +113,11 @@ io.on("connection", (socket) => {
       if (ids) {
         const room = [ids.senderId, ids.recipientId].sort().join("_");
         console.log(`Server sending message to room: ${room}`);
+        console.log("Message data being sent:", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
+
         io.to(room).emit("new_message", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
 
-        // Save message in database
+        // Gem beskeden i databasen
         const insertQuery = `
           INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
           VALUES (?, ?, ?, ?)
