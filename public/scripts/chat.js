@@ -17,7 +17,7 @@ async function fetchCurrentUserInfo() {
             headers: { "Content-Type": "application/json" },
         });
         const data = await response.json();
-        currentUserId = data.userId;
+        currentUserId = data.user_id;
         currentUsername = data.username;
 
         // Opret Socket.IO-forbindelsen, når brugeroplysninger er hentet
