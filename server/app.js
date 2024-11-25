@@ -93,11 +93,6 @@ io.on("connection", (socket) => {
   // Hent bruger-ID fra klientens handshake auth
   const user_id = socket.handshake.auth.user_id;
 
-  console.log("User ID from handshake:", user_id);
-  console.log("User ID from :", socket.handshake.auth);
-  console.log("User ID  :", socket.handshake);
-  console.log("User  :", socket);
-
   if (user_id) {
     // Hent ulæste beskeder
     const query = `
