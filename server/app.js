@@ -100,13 +100,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new_message", (data) => {
-    console.log("Server received message:", data);
+    console.log("Received data:", data);
 
     const query = `
-          SELECT u1.user_id AS senderId, u2.user_id AS recipientId
-          FROM users u1, users u2
-          WHERE u1.username = ? AND u2.username = ?
-      `;
+        SELECT u1.user_id AS senderId, u2.user_id AS recipientId
+        FROM users u1, users u2
+        WHERE u1.username = ? AND u2.username = ?
+    `;
 
     db.get(query, [data.sender, data.recipient], (err, ids) => {
       if (err) {
@@ -114,21 +114,35 @@ io.on("connection", (socket) => {
         return;
       }
 
-      if (ids) {
-        const room = [ids.senderId, ids.recipientId].sort().join("_");
-        console.log(`Server sending message to room: ${room}`);
-        console.log("Message data being sent:", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
-
-        // Log clients in the room
-        const clientsInRoom = io.sockets.adapter.rooms.get(room) || [];
-        console.log(`Clients in room (${room}) at send:`, [...clientsInRoom]);
-
-        io.to(room).emit("new_message", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
-      } else {
-        console.warn("No IDs found for sender and recipient.");
+      if (!ids) {
+        console.error("No IDs found for sender and recipient");
+        return;
       }
+
+      console.log("Fetched IDs:", ids);
+
+      const room = [ids.senderId, ids.recipientId].sort().join("_");
+      console.log(`Room determined: ${room}`);
+
+      // Emit to room
+      io.to(room).emit("new_message", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
+
+      // Save to database
+      const insertQuery = `
+            INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
+            VALUES (?, ?, ?, ?)
+        `;
+
+      db.run(insertQuery, [ids.senderId, ids.recipientId, data.message, data.sent_at], (err) => {
+        if (err) {
+          console.error("Database save error:", err);
+        } else {
+          console.log("Message successfully saved to database.");
+        }
+      });
     });
   });
+
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
