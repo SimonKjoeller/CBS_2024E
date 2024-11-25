@@ -90,8 +90,10 @@ const io = socketIo(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  const user_id = req.user.user_id;
-  console.log(user_id)
+  // Hent bruger-ID fra klientens handshake auth
+  const user_id = socket.handshake.auth.userId;
+
+  console.log("User ID from handshake:", user_id);
 
   if (user_id) {
     // Hent ulæste beskeder
