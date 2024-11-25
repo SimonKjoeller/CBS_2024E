@@ -69,7 +69,7 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
     const { recipientUsername, message } = req.body;
     const senderId = req.user.user_id;
 
-    // Først hentes recipient_id fra databasen
+    // Først: Hent recipient_id
     const getRecipientIdQuery = "SELECT user_id FROM users WHERE username = ?";
     db.get(getRecipientIdQuery, [recipientUsername], (err, row) => {
         if (err) {
@@ -83,21 +83,22 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
 
         const recipientId = row.user_id;
 
-        // Når recipient_id er hentet, så kan vi indsætte beskeden i db
-        const insertMessageQuery = `
+        // Når recipient_id er hentet, indsæt beskeden
+        const query = `
           INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
           VALUES (?, ?, ?, datetime('now'))`;
 
-        db.run(insertMessageQuery, [senderId, recipientId, message], function (err) {
+        db.run(query, [senderId, recipientId, message], function (err) {
             if (err) {
-                console.error("Error inserting message into database:", err);
-                return res.status(500).json({ error: "Error inserting message into database" });
+                console.error("Error saving message:", err);
+                return res.status(500).json({ error: err.message });
             }
 
             res.status(200).json({ chat_id: this.lastID, message: "Message sent successfully!" });
         });
     });
 });
+
 
 
 chatRoutes.get("/currentUser", checkAuth, (req, res) => {
