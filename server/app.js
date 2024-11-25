@@ -127,12 +127,16 @@ io.on("connection", (socket) => {
 
     const [userId1, userId2] = room.split("_").map(Number);
 
+    // Debug hvem der er i rummet
+    const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);
+    console.log(`Clients in room (${room}):`, clients);
+
     // Marker beskeder som leveret for det pågældende rum
     const updateQuery = `
-          UPDATE chat
-          SET delivered = 1
-          WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
-      `;
+        UPDATE chat
+        SET delivered = 1
+        WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
+    `;
     db.run(updateQuery, [userId2, userId1], (err) => {
       if (err) {
         console.error("Error updating delivered status:", err);
@@ -140,6 +144,12 @@ io.on("connection", (socket) => {
         console.log(`Marked messages as delivered for room: ${room}`);
       }
     });
+  });
+
+  socket.on("new_message", (data) => {
+    const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+    console.log(`Server: Sending message to room: ${room}`);
+    io.to(room).emit("new_message", data);
   });
 
   socket.on("disconnect", () => {
