@@ -33,6 +33,9 @@ async function fetchCurrentUserInfo() {
     }
 }
 
+// Hent brugeroplysninger og start processen
+fetchCurrentUserInfo();
+
 function initializeSocket() {
     console.log(currentUserId)
 
@@ -121,8 +124,6 @@ sendMessageButton.addEventListener("click", async () => {
     messageInput.value = ""; // Ryd beskedfeltet
 });
 
-// Hent brugeroplysninger og start processen
-fetchCurrentUserInfo();
 
 function joinRoom(recipientId) {
     const room = [currentUserId, recipientId].sort((a, b) => a - b).join("_");
