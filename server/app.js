@@ -11,6 +11,11 @@ const socketIo = require("socket.io");
 const http = require("http");
 const app = express();
 const db = require("./db");
+const { OpenAI } = require("openai");
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // API-nøglen fra .env
+});
 
 // Middleware setup
 app.use(cors());
@@ -72,6 +77,52 @@ app.post("/email", async (req, res) => {
 
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
+
+app.post("/chatbot", async (req, res) => {
+  const userMessage = req.body.message;
+
+  try {
+      const completion = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [
+              {
+                  role: "system",
+                  content: `
+                      Du er en chatbot for Joe & The Juice. Du skal hjælpe kunder med følgende spørgsmål:
+                      - Vores menu (smoothies, sandwiches, juice, shakes).
+                      - Åbningstider for Joe & The Juice.
+                      - Placering af Joe & The Juice-butikker.
+                      - Spørgsmål om allergener i vores produkter.
+
+                      Regler for dine svar:
+                      1. Hvis et spørgsmål ikke er relevant for Joe & The Juice, skal du svare: 
+                         "Jeg er kun i stand til at besvare spørgsmål relateret til Joe & The Juice, vores menu, åbningstider og placeringer."
+                      2. Du skal altid være kortfattet og præcis.
+                      3. Tilføj gerne en venlig tone og emojis, der matcher Joe & The Juice's stil.
+                      4. Ignorer irrelevante forespørgsler som personlige spørgsmål eller ting, der ikke handler om Joe & The Juice.
+
+                      Eksempelspørgsmål og -svar:
+                      - Spørgsmål: "Hvad er jeres menu?"
+                        Svar: "Vores menu indeholder lækre smoothies, sandwiches og shakes. Vil du høre mere om en specifik ret?"
+                      - Spørgsmål: "Hvad er jeres åbningstider?"
+                        Svar: "Vi har åbent hver dag fra kl. 8:00 til 20:00."
+                      - Spørgsmål: "Hvor kan jeg finde jer?"
+                        Svar: "Du kan finde os i byer over hele landet! Tjek vores hjemmeside for placeringer nær dig."
+                  `,
+              },
+              { role: "user", content: userMessage },
+          ],
+          max_tokens: 150,
+          temperature: 0.7,
+      });
+
+      const botReply = completion.choices[0].message.content.trim();
+      res.json({ response: botReply });
+  } catch (error) {
+      console.error("Fejl med OpenAI API:", error.message);
+      res.status(500).json({ response: "Der opstod en fejl. Jeg kan desværre ikke svare lige nu!" });
+  }
+});
 
 // HTTP server setup
 const server = http.createServer(app).listen(3000, () => {
