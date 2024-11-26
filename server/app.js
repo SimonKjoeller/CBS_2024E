@@ -35,6 +35,11 @@ app.get("/locations", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/locations.html"));
 });
 
+// Add a new route for shakes.html with `checkAuth` middleware
+app.get("/shakes", checkAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/pages/shakes.html"));
+});
+
 app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/login.html"));
 });
@@ -74,6 +79,7 @@ app.post("/email", async (req, res) => {
 
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
+
 
 // Start HTTP-server
 const server = http.createServer(app).listen(3000, () => {
@@ -122,24 +128,83 @@ io.on('connection', (socket) => {
   });
 });
 
- //Laver et POST /order endpoint der opretter en ny ordre i databasen
-app.post('/order', (req, res) => {
-  const { product_id, quantity } = req.body;
 
-  if (!product_id || !quantity) {
-      return res.status(400).json({ error: 'Product ID and quantity are required' });
+// Endpoint to fetch all products
+app.get('/products', (req, res) => {
+  const query = `SELECT * FROM products`;
+  db.all(query, [], (err, rows) => {
+      if (err) {
+          console.error(err);
+          res.status(500).json({ error: 'Failed to fetch products' });
+      } else {
+          res.json(rows); // Send products as JSON
+      }
+  });
+});
+
+
+// Endpoint to place an order
+app.post('/order', checkAuth, (req, res) => {
+  console.log('Incoming Order Request:', req.body);
+
+  const user_id = req.user?.userId; // Extract userId from token
+  const { items } = req.body; // Get the order items from the request body
+
+  // Validate input
+  if (!user_id) {
+      console.error('User ID is missing or invalid');
+      return res.status(400).json({ error: 'User ID is missing or invalid' });
+  }
+  if (!items || !Array.isArray(items) || items.length === 0) {
+      console.error('Invalid or empty order items');
+      return res.status(400).json({ error: 'Invalid or empty order items' });
   }
 
-  const query = `
-      INSERT INTO orders (product_id, quantity, total_price) 
-      VALUES (?, ?, (SELECT price FROM products WHERE product_id = ?) * ?)
-  `;
-
-  db.run(query, [product_id, quantity, product_id, quantity], function (err) {
+  // Start database transaction
+  db.run('BEGIN TRANSACTION', (err) => {
       if (err) {
-          console.error('Database error:', err);
-          return res.status(500).json({ error: 'Failed to create order' });
+          console.error('Error starting transaction:', err);
+          return res.status(500).json({ error: 'Database transaction error' });
       }
-      res.json({ message: 'Order created successfully', order_id: this.lastID });
+
+      // Insert a new order into the orders table
+      const insertOrderQuery = `INSERT INTO orders (user_id) VALUES (?)`;
+      db.run(insertOrderQuery, [user_id], function (err) {
+          if (err) {
+              console.error('Error creating order:', err);
+              db.run('ROLLBACK');
+              return res.status(500).json({ error: 'Failed to create order' });
+          }
+
+          const order_id = this.lastID; // Get the auto-generated order ID
+          console.log('New Order ID:', order_id);
+
+          // Insert the order items into the order_items table
+          const insertOrderItemsQuery = `
+              INSERT INTO order_items (order_id, product_id, quantity)
+              VALUES ${items.map(() => '(?, ?, ?)').join(', ')}
+          `;
+          const orderItemsParams = items.flatMap(item => [order_id, item.product_id, item.quantity]);
+
+          db.run(insertOrderItemsQuery, orderItemsParams, function (err) {
+              if (err) {
+                  console.error('Error adding order items:', err);
+                  db.run('ROLLBACK');
+                  return res.status(500).json({ error: 'Failed to add order items' });
+              }
+
+              // Commit the transaction
+              db.run('COMMIT', (err) => {
+                  if (err) {
+                      console.error('Error committing transaction:', err);
+                      return res.status(500).json({ error: 'Failed to commit transaction' });
+                  }
+
+                  // Successfully inserted order and order items
+                  console.log('Order successfully committed to database');
+                  return res.status(201).json({ message: 'Order created successfully', order_id });
+              });
+          });
+      });
   });
 });
