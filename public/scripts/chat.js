@@ -8,7 +8,13 @@ const messageInput = document.getElementById("new-message");
 let currentUserId;
 let currentUsername;
 let activeRecipientId = null; // Til at holde styr på den aktive modtager
-let socket;
+
+// Initialiser socket én gang
+const socket = io.connect('https://cbsjoe.live', {
+    auth: {
+        user_id: currentUserId, // Auth handshake
+    },
+});
 
 async function fetchCurrentUserInfo() {
     try {
@@ -27,39 +33,36 @@ async function fetchCurrentUserInfo() {
     }
 }
 
+// Hent brugeroplysninger og start processen
+fetchCurrentUserInfo();
+
 function initializeSocket() {
     console.log(currentUserId)
-    socket = io.connect('https://cbsjoe.live', {
-        auth: {
-            user_id: currentUserId, // Send userId som en del af handshake auth
-        },
-    });
 
     socket.on("connect", () => {
         console.log(`Client connected with userId: ${currentUserId}`);
     });
 
-    socket.on("new_message", (data) => {
-        console.log("Client: New message received:", data);
-
-        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
-        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
-
-        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
-
-        if (room === activeRoom) {
-            console.log("Client: Displaying message in active chat.");
-            displayMessage(data);
-        } else {
-            console.warn("Client: Message not displayed because it doesn't belong to the active room.");
-        }
-    });
-
-
     socket.on("disconnect", () => {
         console.log("Client disconnected");
     });
 }
+
+socket.on("new_message", (data) => {
+    console.log("Client: New message received:", data);
+
+    const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+    const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
+
+    console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
+
+    if (room === activeRoom) {
+        console.log("Client: Displaying message in active chat.");
+        displayMessage(data);
+    } else {
+        console.warn("Client: Message not displayed because it doesn't belong to the active room.");
+    }
+});
 
 function displayMessage(data) {
     const messageElement = document.createElement("div");
@@ -121,8 +124,6 @@ sendMessageButton.addEventListener("click", async () => {
     messageInput.value = ""; // Ryd beskedfeltet
 });
 
-// Hent brugeroplysninger og start processen
-fetchCurrentUserInfo();
 
 function joinRoom(recipientId) {
     const room = [currentUserId, recipientId].sort((a, b) => a - b).join("_");
