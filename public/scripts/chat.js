@@ -42,7 +42,6 @@ function initializeSocket() {
     socket.on("new_message", (data) => {
         console.log("Client: New message received:", data);
 
-        // Tjek om beskeden tilhører det aktive rum
         const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
