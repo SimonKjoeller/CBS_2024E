@@ -33,9 +33,6 @@ async function fetchCurrentUserInfo() {
     }
 }
 
-// Hent brugeroplysninger og start processen
-fetchCurrentUserInfo();
-
 function initializeSocket() {
     console.log(currentUserId)
 
@@ -252,3 +249,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         }
     });
 }
+
+// Hent brugeroplysninger og start processen
+fetchCurrentUserInfo();
