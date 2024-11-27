@@ -197,17 +197,10 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Send velkomstbesked fra chatbotten
-  socket.emit("new_message", {
-    sender: "Chatbot",
-    message: "Velkommen til Joe & The Juice! Hvordan kan jeg hjælpe dig? 😊",
-    type: "bot",
-  });
-
   socket.on("new_message", (data) => {
     const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
     console.log(`Server: Sending message to room: ${room}`);
-    io.to(room).emit("new_message", { ...data, type: "private" });
+    io.to(room).emit("new_message", data);
   });
 
 

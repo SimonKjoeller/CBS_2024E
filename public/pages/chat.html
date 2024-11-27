@@ -19,35 +19,17 @@
         <li style="float:right"><a href="/">Menu</a></li>
     </ul>
 
-    <div id="chat-popup" style="display: none;">
-        <div id="chat-header">
-            <span>☕ VELKOMMEN TIL JOE & THE JUICE!</span>
-            <button onclick="toggleChat()">X</button>
-        </div>
-        <div id="chatbot-messages">
-            <!-- Chatbot messages will appear here -->
-        </div>
-        <div id="chat-input-container">
-            <input id="chat-input" type="text" placeholder="Skriv din besked..." />
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-
-    <!-- Button to open chat -->
-    <button id="chat-open" onclick="toggleChat()"
-        style="position: fixed; bottom: 20px; right: 20px; padding: 15px; font-size: 20px; background: #ff66cc; color: white; border: none; border-radius: 50%; cursor: pointer; z-index: 999;">💬</button>
-
     <div class="chatContainer">
         <div class="chatSidebar">
             <input type="text" id="search" placeholder="Søg efter chat" autocomplete="off">
             <div id="search-dropdown"></div>
             <ul id="chat-list">
-                <!-- Chat users will be dynamically inserted here -->
+                <!-- Her finder vi dem vi vil chatte med -->
             </ul>
         </div>
         <div class="chatMain">
             <div id="chat-messages">
-                <!-- Private chat messages will appear here -->
+                <!-- Her er beskederne -->
             </div>
             <div class="messageInput">
                 <input type="text" id="new-message" placeholder="Skriv en ny besked">
