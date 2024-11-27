@@ -3,3 +3,6 @@
 
 # Ignorer sqlite
 server/db/sqlite.db
+
+# Ignorer node
+node_modules/

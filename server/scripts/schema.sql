@@ -21,6 +21,7 @@ CREATE TABLE chat (
     recipient_id INTEGER NOT NULL,        -- ID på modtageren af beskeden
     message TEXT NOT NULL,                -- Selve beskedens indhold
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Tidspunkt for afsendelse af beskeden
+    delivered INTEGER DEFAULT 0,          -- Indikerer om beskeden er leveret (0 = ikke leveret, 1 = leveret)
     FOREIGN KEY (sender_id) REFERENCES users(user_id),
     FOREIGN KEY (recipient_id) REFERENCES users(user_id)
 );

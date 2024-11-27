@@ -8,6 +8,8 @@
     border-right: 1px solid #ccc;
     padding: 20px;
     background-color: #f9f9f9;
+    position: relative;
+    /* Fjernet en dublet */
 }
 
 .chatSidebar input {
@@ -21,12 +23,27 @@
 #chat-list {
     list-style-type: none;
     padding: 0;
+    margin-top: 20px;
+    /* Kombineret */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* Sørger for mellemrum mellem samtalerne */
 }
 
 #chat-list li {
     padding: 10px;
     cursor: pointer;
-    border-bottom: 1px solid #ddd;
+    background-color: #f7c1d9;
+    border-radius: 5px;
+    font-weight: normal;
+    transition: background-color 0.3s ease;
+    border-bottom: none;
+    /* Fjernet tidligere border-bottom */
+}
+
+#chat-list li:hover {
+    background-color: #f09bc1;
 }
 
 #chat-list .active {
@@ -49,6 +66,10 @@
     border-radius: 5px;
     padding: 10px;
     margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* Kombineret tidligere redundans */
 }
 
 .messageInput {
@@ -71,55 +92,38 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 1em;
+    transition: background-color 0.3s ease;
+    /* Tilføjet for hover-effekt */
 }
 
 #send-message:hover {
     background-color: #f09bc1;
 }
 
-
-.message.mine {
-    background-color: #f09bc1;
-    float: right;
-    clear: both;
-}
-
-
-.message.other {
-    background-color: #f7c1d9;
-    float: left;
-    clear: both;
-}
-
-
 .message {
     display: inline-block;
     padding: 10px;
-    background-color: #f7c1d9;
     border-radius: 10px;
     margin: 5px;
     max-width: 80%;
     word-wrap: break-word;
 }
 
-
-#chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.message.mine {
+    align-self: flex-end;
+    background-color: #f09bc1;
+    color: white;
 }
 
-/* Styling til søgeresultater */
+.message.other {
+    align-self: flex-start;
+    background-color: #f7c1d9;
+    color: black;
+}
+
 #search-dropdown {
     position: absolute;
     width: calc(100% - 40px);
-    /* Tilpasser bredden, så den matcher søgefeltet */
     background-color: white;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -141,39 +145,4 @@
 
 #search-dropdown .dropdown-item:hover {
     background-color: #f09bc1;
-}
-
-/* Fjern ekstra margin og padding fra chat container */
-.chatSidebar {
-    position: relative;
-}
-
-/* Styling til chatlisten for at liste samtaler under hinanden */
-#chat-list {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    /* Sørger for, at samtaler listes under hinanden */
-    gap: 10px;
-    /* Giver mellemrum mellem samtalerne */
-}
-
-#chat-list li {
-    padding: 10px;
-    cursor: pointer;
-    background-color: #f7c1d9;
-    border-radius: 5px;
-    font-weight: normal;
-    transition: background-color 0.3s ease;
-}
-
-#chat-list li:hover {
-    background-color: #f09bc1;
-}
-
-#chat-list .active {
-    background-color: #f09bc1;
-    font-weight: bold;
 }

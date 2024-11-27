@@ -3,14 +3,19 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const checkAuth = require('./checkAuth'); // Importer korrekt checkAuth middleware
+const checkAuth = require('./checkAuth');
 const nodemailer = require("nodemailer");
 const userRoutes = require("./route/users");
 const chatRoutes = require("./route/chat");
-const socketIo = require("socket.io"); // Importer socket.io
-const http = require("http"); // Brug HTTP i stedet for HTTPS
+const socketIo = require("socket.io");
+const http = require("http");
 const app = express();
 const db = require("./db");
+const { OpenAI } = require("openai");
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // API-nøglen fra .env
+});
 
 // Middleware setup
 app.use(cors());
@@ -18,6 +23,7 @@ app.use(express.static(path.join(__dirname, "../public")));
 app.use(cookieParser());
 app.use(express.json());
 
+// Nodemailer setup
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
@@ -26,7 +32,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Opdaterede ruter med checkAuth middleware
+// Routes
 app.get("/", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/index.html"));
 });
@@ -49,12 +55,9 @@ app.get("/cookie", (req, res) => {
   res.send("Cookie set");
 });
 
-// Opgave 2: Lav et POST /email asynkront endpoint der sender en email til modtageren
 app.post("/email", async (req, res) => {
   try {
     let { email } = req.body;
-    console.log(email);
-
     const info = await transporter.sendMail({
       from: "CBSJOE <cbsjoec@gmail.com>",
       to: email,
@@ -86,40 +89,71 @@ const server = http.createServer(app).listen(3000, () => {
   console.log("HTTP Server listening on port 3000");
 });
 
-// Initialize Socket.IO server
+// Socket.IO setup
 const io = socketIo(server, {
   cors: {
-    origin: "https://cbsjoe.live", // Tillad forespørgsler fra dit domæne
+    origin: "*",
     methods: ["GET", "POST"],
   },
-  transports: ["websocket", "polling"], // Sørg for at tillade både WebSocket og polling
+  transports: ["websocket", "polling"],
 });
 
+io.on("connection", (socket) => {
+  console.log("A user connected");
 
-io.on('connection', (socket) => {
-  console.log('A user connected');
+  // Hent bruger-ID fra klientens handshake auth
+  const user_id = socket.handshake.auth.user_id;
 
-  socket.on('join_room', (room) => {
-    socket.join(room);
-    console.log(`User joined room: ${room}`);
-  });
+  console.log(`Server: User ID from handshake: ${user_id}`);
 
-  socket.on('new_message', (data) => {
-    const { sender, recipient, message, sent_at } = data;
-
-    const room = [sender, recipient].sort().join('_');
-    io.to(room).emit('new_message', data);
-
-    const query = `INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-                   VALUES ((SELECT id FROM users WHERE username = ?), 
-                           (SELECT id FROM users WHERE username = ?), ?, ?)`;
-
-    db.run(query, [sender, recipient, message, sent_at], function (err) {
+  if (user_id) {
+    // Hent ulæste beskeder
+    const query = `
+          SELECT * FROM chat
+          WHERE recipient_id = ? AND delivered = 0
+      `;
+    db.all(query, [user_id], (err, messages) => {
       if (err) {
-        console.error('Database error:', err);
+        console.error("Database error:", err);
         return;
       }
-      console.log('Message saved in DB with ID:', this.lastID);
+
+      // Send beskeder og marker dem som leveret
+      messages.forEach((msg) => {
+        socket.emit("new_message", msg);
+
+        const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
+        db.run(updateQuery, [msg.chat_id], (err) => {
+          if (err) console.error("Error updating message:", err);
+        });
+      });
+    });
+  } else {
+    console.warn("User ID is missing in handshake auth.");
+  }
+
+  socket.on("join_room", (room) => {
+    console.log(`User joined room: ${room}`);
+    socket.join(room);
+
+    const [userId1, userId2] = room.split("_").map(Number);
+
+    // Debug hvem der er i rummet
+    const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);
+    console.log(`Clients in room (${room}):`, clients);
+
+    // Marker beskeder som leveret for det pågældende rum
+    const updateQuery = `
+        UPDATE chat
+        SET delivered = 1
+        WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
+    `;
+    db.run(updateQuery, [userId2, userId1], (err) => {
+      if (err) {
+        console.error("Error updating delivered status:", err);
+      } else {
+        console.log(`Marked messages as delivered for room: ${room}`);
+      }
     });
   });
 
