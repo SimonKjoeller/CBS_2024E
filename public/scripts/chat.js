@@ -19,6 +19,8 @@ async function fetchCurrentUserInfo() {
         currentUserId = data.user_id;
         currentUsername = data.username;
 
+        console.log(`Fetched user info: currentUserId=${currentUserId}, currentUsername=${currentUsername}`);
+
         // Opret Socket.IO-forbindelsen, når brugeroplysninger er hentet
         initializeSocket();
     } catch (error) {
@@ -27,6 +29,11 @@ async function fetchCurrentUserInfo() {
 }
 
 function initializeSocket() {
+    if (!currentUserId) {
+        console.error("Socket cannot be initialized without a valid userId");
+        return;
+    }
+
     socket = io.connect('https://cbsjoe.live', {
         auth: {
             user_id: currentUserId, // Auth handshake
@@ -56,9 +63,7 @@ function initializeSocket() {
             console.warn("Client: Message not displayed because it doesn't belong to the active room.");
         }
     });
-
 }
-
 
 function displayMessage(data) {
     const messageElement = document.createElement("div");
