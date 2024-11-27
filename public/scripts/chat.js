@@ -67,10 +67,17 @@ function initializeSocket() {
 
 function displayMessage(data) {
     const messageElement = document.createElement("div");
-    messageElement.classList.add(data.senderId === data.recipientId ? "mine" : "other");
+
+    // Tjek om beskeden er fra den aktuelle bruger
+    if (data.senderId === currentUserId) {
+        messageElement.classList.add("message", "mine");
+    } else {
+        messageElement.classList.add("message", "other");
+    }
+
     messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
     chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll til bunden af chatten
 }
 
 sendMessageButton.addEventListener("click", async () => {
@@ -95,6 +102,9 @@ sendMessageButton.addEventListener("click", async () => {
     console.log(`Client: Sending message to ${recipient}: "${message}" at ${sent_at}`);
     console.log(`Client: currentUserId: ${currentUserId}, activeRecipientId: ${recipientId}`);
 
+    // Ryd beskedfeltet
+    messageInput.value = "";
+
     // Socket.IO: Send beskeden i realtid
     socket.emit("new_message", {
         senderId: currentUserId,
@@ -102,7 +112,7 @@ sendMessageButton.addEventListener("click", async () => {
         sender: currentUsername,
         recipient,
         message,
-        sent_at
+        sent_at,
     });
 
     // HTTP: Gem beskeden i databasen
@@ -121,8 +131,6 @@ sendMessageButton.addEventListener("click", async () => {
     } catch (error) {
         console.error("Client: Error saving message to database:", error);
     }
-
-    messageInput.value = ""; // Ryd beskedfeltet
 });
 
 
