@@ -237,7 +237,7 @@ app.post('/order', checkAuth, (req, res) => {
 
   console.log("est")
 
-  const user_id = req.user?.userId; // Extract userId from token
+  const user_id = req.user?.user_id; // Extract userId from token
   const { items } = req.body; // Get the order items from the request body
 
   // Validate input
