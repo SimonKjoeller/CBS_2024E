@@ -82,6 +82,7 @@ app.post("/email", async (req, res) => {
 
 app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
+app.use("/order", userRoutes);
 
 
 // Start HTTP-server
@@ -176,16 +177,13 @@ app.get('/products', (req, res) => {
   });
 });
 
-
 // Endpoint to place an order
 app.post('/order', checkAuth, (req, res) => {
   console.log('Incoming Order Request:', req.body);
 
-  console.log("est")
-
-  const user_id = req.user?.userId; // Extract userId from token
+  const user_id = req.user?.user_id; // Fix case sensitivity
   const { items } = req.body; // Get the order items from the request body
-
+  
   // Validate input
   if (!user_id) {
       console.error('User ID is missing or invalid');
