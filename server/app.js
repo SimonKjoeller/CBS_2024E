@@ -147,6 +147,8 @@ app.get('/products', (req, res) => {
 app.post('/order', checkAuth, (req, res) => {
   console.log('Incoming Order Request:', req.body);
 
+  console.log("est")
+
   const user_id = req.user?.userId; // Extract userId from token
   const { items } = req.body; // Get the order items from the request body
 
