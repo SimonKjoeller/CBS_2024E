@@ -82,12 +82,12 @@ app.post("/chatbot", async (req, res) => {
   const userMessage = req.body.message;
 
   try {
-      const completion = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
-          messages: [
-              {
-                  role: "system",
-                  content: `
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: `
                       Du er en chatbot for Joe & The Juice. Du skal hjælpe kunder med følgende spørgsmål:
                       - Vores menu (smoothies, sandwiches, juice, shakes).
                       - Åbningstider for Joe & The Juice.
@@ -109,18 +109,18 @@ app.post("/chatbot", async (req, res) => {
                       - Spørgsmål: "Hvor kan jeg finde jer?"
                         Svar: "Du kan finde os i byer over hele landet! Tjek vores hjemmeside for placeringer nær dig."
                   `,
-              },
-              { role: "user", content: userMessage },
-          ],
-          max_tokens: 150,
-          temperature: 0.7,
-      });
+        },
+        { role: "user", content: userMessage },
+      ],
+      max_tokens: 150,
+      temperature: 0.7,
+    });
 
-      const botReply = completion.choices[0].message.content.trim();
-      res.json({ response: botReply });
+    const botReply = completion.choices[0].message.content.trim();
+    res.json({ response: botReply });
   } catch (error) {
-      console.error("Fejl med OpenAI API:", error.message);
-      res.status(500).json({ response: "Der opstod en fejl. Jeg kan desværre ikke svare lige nu!" });
+    console.error("Fejl med OpenAI API:", error.message);
+    res.status(500).json({ response: "Der opstod en fejl. Jeg kan desværre ikke svare lige nu!" });
   }
 });
 
@@ -197,11 +197,19 @@ io.on("connection", (socket) => {
     });
   });
 
+  // Send velkomstbesked fra chatbotten
+  socket.emit("new_message", {
+    sender: "Chatbot",
+    message: "Velkommen til Joe & The Juice! Hvordan kan jeg hjælpe dig? 😊",
+    type: "bot",
+  });
+
   socket.on("new_message", (data) => {
     const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
     console.log(`Server: Sending message to room: ${room}`);
-    io.to(room).emit("new_message", data);
+    io.to(room).emit("new_message", { ...data, type: "private" });
   });
+
 
   socket.on("disconnect", () => {
     console.log("User disconnected");
@@ -213,12 +221,12 @@ io.on("connection", (socket) => {
 app.get('/products', (req, res) => {
   const query = `SELECT * FROM products`;
   db.all(query, [], (err, rows) => {
-      if (err) {
-          console.error(err);
-          res.status(500).json({ error: 'Failed to fetch products' });
-      } else {
-          res.json(rows); // Send products as JSON
-      }
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch products' });
+    } else {
+      res.json(rows); // Send products as JSON
+    }
   });
 });
 
@@ -234,59 +242,59 @@ app.post('/order', checkAuth, (req, res) => {
 
   // Validate input
   if (!user_id) {
-      console.error('User ID is missing or invalid');
-      return res.status(400).json({ error: 'User ID is missing or invalid' });
+    console.error('User ID is missing or invalid');
+    return res.status(400).json({ error: 'User ID is missing or invalid' });
   }
   if (!items || !Array.isArray(items) || items.length === 0) {
-      console.error('Invalid or empty order items');
-      return res.status(400).json({ error: 'Invalid or empty order items' });
+    console.error('Invalid or empty order items');
+    return res.status(400).json({ error: 'Invalid or empty order items' });
   }
 
   // Start database transaction
   db.run('BEGIN TRANSACTION', (err) => {
+    if (err) {
+      console.error('Error starting transaction:', err);
+      return res.status(500).json({ error: 'Database transaction error' });
+    }
+
+    // Insert a new order into the orders table
+    const insertOrderQuery = `INSERT INTO orders (user_id) VALUES (?)`;
+    db.run(insertOrderQuery, [user_id], function (err) {
       if (err) {
-          console.error('Error starting transaction:', err);
-          return res.status(500).json({ error: 'Database transaction error' });
+        console.error('Error creating order:', err);
+        db.run('ROLLBACK');
+        return res.status(500).json({ error: 'Failed to create order' });
       }
 
-      // Insert a new order into the orders table
-      const insertOrderQuery = `INSERT INTO orders (user_id) VALUES (?)`;
-      db.run(insertOrderQuery, [user_id], function (err) {
-          if (err) {
-              console.error('Error creating order:', err);
-              db.run('ROLLBACK');
-              return res.status(500).json({ error: 'Failed to create order' });
-          }
+      const order_id = this.lastID; // Get the auto-generated order ID
+      console.log('New Order ID:', order_id);
 
-          const order_id = this.lastID; // Get the auto-generated order ID
-          console.log('New Order ID:', order_id);
-
-          // Insert the order items into the order_items table
-          const insertOrderItemsQuery = `
+      // Insert the order items into the order_items table
+      const insertOrderItemsQuery = `
               INSERT INTO order_items (order_id, product_id, quantity)
               VALUES ${items.map(() => '(?, ?, ?)').join(', ')}
           `;
-          const orderItemsParams = items.flatMap(item => [order_id, item.product_id, item.quantity]);
+      const orderItemsParams = items.flatMap(item => [order_id, item.product_id, item.quantity]);
 
-          db.run(insertOrderItemsQuery, orderItemsParams, function (err) {
-              if (err) {
-                  console.error('Error adding order items:', err);
-                  db.run('ROLLBACK');
-                  return res.status(500).json({ error: 'Failed to add order items' });
-              }
+      db.run(insertOrderItemsQuery, orderItemsParams, function (err) {
+        if (err) {
+          console.error('Error adding order items:', err);
+          db.run('ROLLBACK');
+          return res.status(500).json({ error: 'Failed to add order items' });
+        }
 
-              // Commit the transaction
-              db.run('COMMIT', (err) => {
-                  if (err) {
-                      console.error('Error committing transaction:', err);
-                      return res.status(500).json({ error: 'Failed to commit transaction' });
-                  }
+        // Commit the transaction
+        db.run('COMMIT', (err) => {
+          if (err) {
+            console.error('Error committing transaction:', err);
+            return res.status(500).json({ error: 'Failed to commit transaction' });
+          }
 
-                  // Successfully inserted order and order items
-                  console.log('Order successfully committed to database');
-                  return res.status(201).json({ message: 'Order created successfully', order_id });
-              });
-          });
+          // Successfully inserted order and order items
+          console.log('Order successfully committed to database');
+          return res.status(201).json({ message: 'Order created successfully', order_id });
+        });
       });
+    });
   });
 });
