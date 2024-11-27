@@ -241,9 +241,11 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
     chatList.addEventListener("click", (event) => {
         const listItem = event.target.closest("li");
-
+        console.log(event)
+        console.log(listItem)
         if (listItem) {
             const recipientId = listItem.dataset.userId;
+            console.log(recipientId)
             activeRecipientId = recipientId; // Opdater den aktive modtager
             console.log("Client: Updated activeRecipientId:", activeRecipientId);
 
