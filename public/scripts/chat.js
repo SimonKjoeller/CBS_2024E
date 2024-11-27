@@ -181,6 +181,13 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
                 searchInput.value = result.username;
                 searchDropdown.style.display = "none";
                 addChatUser(result.username, result.user_id); // Tilføj user_id til chat-listen
+
+                // Opdater activeRecipientId og join rummet med det samme
+                activeRecipientId = result.user_id;
+                console.log("Client: Updated activeRecipientId:", activeRecipientId);
+                joinRoom(activeRecipientId);
+
+                // Indlæs samtalen og fremhæv brugeren
                 loadConversation(result.username);
                 highlightUser(result.username);
             };
