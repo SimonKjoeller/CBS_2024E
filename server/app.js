@@ -141,47 +141,66 @@ const io = socketIo(server, {
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("join_room", (room) => {
-    socket.join(room);
-    console.log(`User joined room: ${room}`);
-  });
+  // Hent bruger-ID fra klientens handshake auth
+  const user_id = socket.handshake.auth.user_id;
 
-  socket.on("new_message", (data) => {
-    console.log("Server received message:", data);
+  console.log(`Server: User ID from handshake: ${user_id}`);
 
+  if (user_id) {
+    // Hent ulæste beskeder
     const query = `
-        SELECT u1.user_id AS senderId, u2.user_id AS recipientId
-        FROM users u1, users u2
-        WHERE u1.username = ? AND u2.username = ?
-    `;
-
-    db.get(query, [data.sender, data.recipient], (err, ids) => {
+          SELECT * FROM chat
+          WHERE recipient_id = ? AND delivered = 0
+      `;
+    db.all(query, [user_id], (err, messages) => {
       if (err) {
-        console.error("Database query error:", err);
+        console.error("Database error:", err);
         return;
       }
 
-      if (ids) {
-        const room = [ids.senderId, ids.recipientId].sort().join("_");
-        console.log(`Server sending message to room: ${room}`);
-        io.to(room).emit("new_message", { ...data, senderId: ids.senderId, recipientId: ids.recipientId });
+      // Send beskeder og marker dem som leveret
+      messages.forEach((msg) => {
+        socket.emit("new_message", msg);
 
-        // Save message in database
-        const insertQuery = `
-          INSERT INTO chat (sender_id, recipient_id, message, sent_at) 
-          VALUES (?, ?, ?, ?)
-        `;
-        db.run(insertQuery, [ids.senderId, ids.recipientId, data.message, data.sent_at], (err) => {
-          if (err) {
-            console.error("Database save error:", err);
-          } else {
-            console.log("Message saved to database.");
-          }
+        const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
+        db.run(updateQuery, [msg.chat_id], (err) => {
+          if (err) console.error("Error updating message:", err);
         });
+      });
+    });
+  } else {
+    console.warn("User ID is missing in handshake auth.");
+  }
+
+  socket.on("join_room", (room) => {
+    console.log(`User joined room: ${room}`);
+    socket.join(room);
+
+    const [userId1, userId2] = room.split("_").map(Number);
+
+    // Debug hvem der er i rummet
+    const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);
+    console.log(`Clients in room (${room}):`, clients);
+
+    // Marker beskeder som leveret for det pågældende rum
+    const updateQuery = `
+        UPDATE chat
+        SET delivered = 1
+        WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
+    `;
+    db.run(updateQuery, [userId2, userId1], (err) => {
+      if (err) {
+        console.error("Error updating delivered status:", err);
       } else {
-        console.warn("No IDs found for sender and recipient.");
+        console.log(`Marked messages as delivered for room: ${room}`);
       }
     });
+  });
+
+  socket.on("new_message", (data) => {
+    const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+    console.log(`Server: Sending message to room: ${room}`);
+    io.to(room).emit("new_message", data);
   });
 
   socket.on("disconnect", () => {

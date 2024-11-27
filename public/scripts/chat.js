@@ -1,4 +1,3 @@
-const socket = io.connect('https://cbsjoe.live');
 const searchInput = document.getElementById("search");
 const searchDropdown = document.getElementById("search-dropdown");
 const chatList = document.getElementById("chat-list");
@@ -10,8 +9,6 @@ let currentUserId;
 let currentUsername;
 let activeRecipientId = null; // Til at holde styr på den aktive modtager
 
-
-// Hent bruger-ID og -navn fra serveren
 async function fetchCurrentUserInfo() {
     try {
         const response = await fetch("/chat/currentUser", {
@@ -19,21 +16,129 @@ async function fetchCurrentUserInfo() {
             headers: { "Content-Type": "application/json" },
         });
         const data = await response.json();
-        currentUserId = data.userId; // Antag at serveren returnerer userId
+        currentUserId = data.user_id;
         currentUsername = data.username;
+
+        console.log(`Fetched user info: currentUserId=${currentUserId}, currentUsername=${currentUsername}`);
+
+        // Opret Socket.IO-forbindelsen, når brugeroplysninger er hentet
+        initializeSocket();
     } catch (error) {
         console.error("Error fetching user info:", error);
     }
 }
 
-fetchCurrentUserInfo();
+function initializeSocket() {
+    if (!currentUserId) {
+        console.error("Socket cannot be initialized without a valid userId");
+        return;
+    }
+
+    socket = io.connect('https://cbsjoe.live', {
+        auth: {
+            user_id: currentUserId, // Auth handshake
+        },
+    });
+
+    socket.on("connect", () => {
+        console.log(`Client connected with userId: ${currentUserId}`);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected");
+    });
+
+    socket.on("new_message", (data) => {
+        console.log("Client: New message received:", data);
+
+        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
+
+        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
+
+        if (room === activeRoom) {
+            console.log("Client: Displaying message in active chat.");
+            displayMessage(data);
+        } else {
+            console.warn("Client: Message not displayed because it doesn't belong to the active room.");
+        }
+    });
+}
+
+function displayMessage(data) {
+    const messageElement = document.createElement("div");
+
+    // Tjek om beskeden er fra den aktuelle bruger
+    if (data.senderId === currentUserId) {
+        messageElement.classList.add("message", "mine");
+    } else {
+        messageElement.classList.add("message", "other");
+    }
+
+    messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll til bunden af chatten
+}
+
+sendMessageButton.addEventListener("click", async () => {
+    const activeUser = document.querySelector("#chat-list .active");
+
+    if (!activeUser) {
+        alert("Select a user from the list before sending a message.");
+        return;
+    }
+
+    const recipient = activeUser.textContent;
+    const recipientId = activeUser.dataset.userId;
+    const message = messageInput.value.trim();
+
+    if (!message) {
+        alert("Message cannot be empty.");
+        return;
+    }
+
+    const sent_at = new Date().toISOString();
+
+    console.log(`Client: Sending message to ${recipient}: "${message}" at ${sent_at}`);
+    console.log(`Client: currentUserId: ${currentUserId}, activeRecipientId: ${recipientId}`);
+
+    // Ryd beskedfeltet
+    messageInput.value = "";
+
+    // Socket.IO: Send beskeden i realtid
+    socket.emit("new_message", {
+        senderId: currentUserId,
+        recipientId: recipientId,
+        sender: currentUsername,
+        recipient,
+        message,
+        sent_at,
+    });
+
+    // HTTP: Gem beskeden i databasen
+    try {
+        const response = await fetch("/chat/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recipientUsername: recipient, message }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to save message: ${response.status}`);
+        }
+
+        console.log("Client: Message successfully saved in database.");
+    } catch (error) {
+        console.error("Client: Error saving message to database:", error);
+    }
+});
+
 
 function joinRoom(recipientId) {
     const room = [currentUserId, recipientId].sort((a, b) => a - b).join("_");
+    console.log(`Client: Joining room ${room} with recipientId ${recipientId}`);
     socket.emit("join_room", room);
-    console.log(`Joined room: ${room}`);
 }
-
 
 if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessages && messageInput) {
     let typingTimeout;
@@ -84,6 +189,13 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
                 searchInput.value = result.username;
                 searchDropdown.style.display = "none";
                 addChatUser(result.username, result.user_id); // Tilføj user_id til chat-listen
+
+                // Opdater activeRecipientId og join rummet med det samme
+                activeRecipientId = result.user_id;
+                console.log("Client: Updated activeRecipientId:", activeRecipientId);
+                joinRoom(activeRecipientId);
+
+                // Indlæs samtalen og fremhæv brugeren
                 loadConversation(result.username);
                 highlightUser(result.username);
             };
@@ -102,7 +214,6 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             chatList.appendChild(listItem);
         }
     }
-
 
     function highlightUser(username) {
         Array.from(chatList.children).forEach(user => {
@@ -145,9 +256,11 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
     chatList.addEventListener("click", (event) => {
         const listItem = event.target.closest("li");
-
+        console.log(event)
+        console.log(listItem)
         if (listItem) {
             const recipientId = listItem.dataset.userId;
+            console.log(recipientId)
             activeRecipientId = recipientId; // Opdater den aktive modtager
             console.log("Client: Updated activeRecipientId:", activeRecipientId);
 
@@ -156,60 +269,7 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             loadConversation(listItem.textContent); // Hent samtalen
         }
     });
-
-
-    sendMessageButton.addEventListener("click", () => {
-        const activeUser = document.querySelector("#chat-list .active");
-
-        if (!activeUser) {
-            alert("Select a user from the list before sending a message.");
-            return;
-        }
-
-        const recipient = activeUser.textContent;
-        const message = messageInput.value.trim();
-
-        if (!message) {
-            alert("Message cannot be empty.");
-            return;
-        }
-
-        const sent_at = new Date().toISOString();
-
-        /// Når beskeden sendes
-        console.log("Sending message:", {
-            sender: currentUsername,
-            recipient,
-            message,
-            sent_at
-        });
-
-        // Emit the message via socket
-        socket.emit("new_message", { sender: currentUsername, recipient, message, sent_at });
-
-        // Clear input field
-        messageInput.value = "";
-    });
-
-    socket.on("new_message", (data) => {
-        console.log("New message received on client:", data);
-
-        // Join room format check
-        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
-        const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
-
-        console.log(`Active room: ${activeRoom}, Incoming room: ${room}`);
-
-        if (room === activeRoom) {
-            console.log("Displaying message in active chat.");
-            const messageElement = document.createElement("div");
-            messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
-            messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        } else {
-            console.warn("Message not displayed because it doesn't belong to the active room.");
-        }
-    });
-
 }
+
+// Hent brugeroplysninger og start processen
+fetchCurrentUserInfo();
