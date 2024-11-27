@@ -67,7 +67,7 @@ function initializeSocket() {
 
 function displayMessage(data) {
     const messageElement = document.createElement("div");
-    messageElement.classList.add(data.senderId === currentUserId ? "mine" : "other");
+    messageElement.classList.add(data.sender_id === data.recipient_id ? "mine" : "other");
     messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
