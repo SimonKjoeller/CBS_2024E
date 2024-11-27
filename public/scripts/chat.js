@@ -51,7 +51,7 @@ function initializeSocket() {
     socket.on("new_message", (data) => {
         console.log("Client: New message received:", data);
 
-        const room = [data.sender_id, data.recipient_id].sort((a, b) => a - b).join("_");
+        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
         console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
@@ -67,7 +67,7 @@ function initializeSocket() {
 
 function displayMessage(data) {
     const messageElement = document.createElement("div");
-    messageElement.classList.add(data.sender_id === data.recipient_id ? "mine" : "other");
+    messageElement.classList.add(data.senderId === data.recipientId ? "mine" : "other");
     messageElement.textContent = `[${new Date(data.sent_at).toLocaleString()}] ${data.sender}: ${data.message}`;
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
