@@ -51,7 +51,7 @@ function initializeSocket() {
     socket.on("new_message", (data) => {
         console.log("Client: New message received:", data);
 
-        const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+        const room = [data.sender_id, data.recipient_id].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
 
         console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
