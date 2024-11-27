@@ -158,7 +158,7 @@ li img {
     display: block;
 }
 
-.coffee-card {
+.products-container {
     background-color: white;
     padding: 20px;
     margin: 15px 0;
@@ -171,7 +171,7 @@ li img {
     position: relative;
 }
 /* Shake card styling */
-.shake-card {
+.juice-card {
     background-color: white;
     padding: 20px;
     margin: 15px 0;
@@ -184,7 +184,7 @@ li img {
     position: relative;
 }
 
-.shake-card h3 {
+.juice-card h3 {
     color: #333;
     margin-bottom: 10px;
 }
@@ -231,5 +231,119 @@ li img {
     .dropdown-content {
         width: 100%;
         margin-top: 5px;
+    }
+}
+
+#cart-container {
+    margin: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+#cart-items {
+    list-style: none;
+    padding: 0;
+}
+
+#cart-items li {
+    margin: 10px 0;
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+#place-order-btn {
+    background-color: #f8b8c6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+#place-order-btn:hover {
+    background-color: #f194a1;
+}
+/* Product Card Styling */
+.product-card {
+    background-color: white;
+    padding: 20px;
+    margin: 15px auto;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    max-width: 400px; /* Limit width for desktop */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Product Image */
+.product-card img {
+    width: 100%; /* Full width */
+    max-height: 200px; /* Limit height for consistency */
+    object-fit: cover; /* Ensure image is scaled proportionally */
+    margin-bottom: 10px;
+    border-radius: 5px; /* Slight rounding for images */
+}
+
+/* Product Title */
+.product-card h3 {
+    color: #333;
+    font-size: 1.3em; /* Slightly larger font */
+    margin: 10px 0;
+}
+
+/* Product Price */
+.product-card p {
+    color: #555; /* Medium gray */
+    font-size: 1em; /* Consistent with other text */
+    margin: 5px 0 15px 0;
+}
+
+/* Add to Cart Button */
+.product-card button {
+    background-color: #f8b8c6; /* Light pink */
+    color: #ffffff; /* White text */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth hover transition */
+}
+
+.product-card button:hover {
+    background-color: #f194a1; /* Slightly darker pink on hover */
+    transform: scale(1.05); /* Subtle zoom effect */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Shadow effect on hover */
+}
+
+/* Responsive Design for Cards */
+@media (max-width: 768px) {
+    .product-card {
+        max-width: 100%; /* Full width for smaller screens */
+        padding: 15px; /* Reduce padding */
+    }
+
+    .product-card img {
+        max-height: 150px; /* Smaller height for images on mobile */
+    }
+
+    .product-card h3 {
+        font-size: 1.1em; /* Slightly smaller title font */
+    }
+
+    .product-card p {
+        font-size: 0.9em; /* Slightly smaller price font */
+    }
+
+    .product-card button {
+        font-size: 13px; /* Adjust button size */
+        padding: 8px 16px;
     }
 }
