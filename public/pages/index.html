@@ -8,6 +8,21 @@
   <link rel="stylesheet" href="../styles/global.css">
   <title>JOE and The Juice</title>
 </head>
+<div id="chat-popup" style="display: none;">
+  <div id="chat-header">
+      <span>☕ VELKOMMEN TIL JOE & THE JUICE!</span>
+      <button onclick="toggleChat()">X</button>
+  </div>
+  <div id="chat-messages"></div>
+  <div id="chat-input-container">
+      <input id="chat-input" type="text" placeholder="Skriv din besked..." />
+      <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<!-- Button to open chat -->
+<button id="chat-open" onclick="toggleChat()">💬</button>
+
 
 <body>
   <ul>
@@ -34,5 +49,7 @@
 
 </body>
 <script src="../scripts/index.js"></script>
+<script src="/scripts/chatbot.js" defer></script>
+
 
 </html>
