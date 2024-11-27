@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="../styles/shakes.css">
     <title>JOE and The Juice</title>
 </head>
+<body>
 <div id="chat-popup" style="display: none;">
     <div id="chat-header">
         <span>☕ VELKOMMEN TIL JOE & THE JUICE!</span>
@@ -30,138 +32,26 @@
         <li style="float:right"><a href="/chat">Chat</a></li>
         <li style="float:right"><a href="/locations">Locations</a></li>
         <li style="float:right"><a href="/">Menu</a></li>
-        <li style="float:right"><a href="/public/pages/shakes.html">The Shakes</a></li>
+        <li style="float:right"><a href="/public/pages/shakes.html">The Joe & Juice</a></li>
     </ul>
 
-    <h1>Shakes and Drinks Menu</h1>
+    <h1>Juice and Coffee Menu</h1>
 
-    <!-- Coffee Section -->
-    <div class="menu-section" id="coffee-menu">
-        <h2>The Joe's</h2>
-
-        <div class="coffee-card" id="product-1">
-            <h3>Americano</h3>
-            <button class="dropdown-btn">Show Macros</button>
-            <div class="dropdown-content">
-                <p>Calories: 15 kcal</p>
-                <p>Protein: 0g</p>
-                <p>Fat: 0g</p>
-                <p>Sugar: 0g</p>
-            </div>
-            <div>
-                <button class="order-btn" onclick="placeOrder(1)">Order Now</button>
-            </div>
-        </div>
-
-        <div class="coffee-card" id="product-2">
-            <h3>Latte</h3>
-            <button class="dropdown-btn">Show Macros</button>
-            <div class="dropdown-content">
-                <p>Calories: 150 kcal</p>
-                <p>Protein: 6g</p>
-                <p>Fat: 7g</p>
-                <p>Sugar: 14g</p>
-            </div>
-            <div>
-            <button class="order-btn" onclick="placeOrder(2)">Order Now</button>
-        </div>
-        </div>
-
-        <div class="coffee-card" id="product-3">
-            <h3>Cappuccino</h3>
-            <button class="dropdown-btn">Show Macros</button>
-            <div class="dropdown-content">
-                <p>Calories: 120 kcal</p>
-                <p>Protein: 5g</p>
-                <p>Fat: 6g</p>
-                <p>Sugar: 10g</p>
-            </div>
-            <div>
-            <button class="order-btn" onclick="placeOrder(3)">Order Now</button>
-        </div>
-        </div>
-
-        <div class="coffee-card" id="product-4">
-            <h3>Cortado</h3>
-            <button class="dropdown-btn">Show Macros</button>
-            <div class="dropdown-content">
-                <p>Calories: 50 kcal</p>
-                <p>Protein: 2g</p>
-                <p>Fat: 2g</p>
-                <p>Sugar: 4g</p>
-            </div>
-            <div>
-            <button class="order-btn" onclick="placeOrder(4)">Order Now</button>
-        </div>
-        </div>
+    <!-- Cart Section -->
+    <div id="cart-container">
+        <h3>Your Order</h3>
+        <ul id="cart-items"></ul>
+        <button id="place-order-btn" onclick="placeOrder()">Place Order</button>
     </div>
 
-    <!-- Shakes Section -->
-    <div class="menu-section" id="shakes-menu">
-        <h2>The Shakes</h2>
-
-        <div class="shake-card" id="product-5">
-            <h3>Ginger Power Shake</h3>
-            <button class="dropdown-btn">Show Macros</button>
-            <div class="dropdown-content">
-                <p>Calories: 350 kcal</p>
-                <p>Protein: 15g</p>
-                <p>Fat: 12g</p>
-                <p>Sugar: 28g</p>
-            </div>
-            <div>
-            <button class="order-btn" onclick="placeOrder(5)">Order Now</button>
-        </div>
-        </div>
-
-        <div class="shake-card" id="product-6">
-            <h3>O'Shake my Banana</h3>
-            <button class="dropdown-btn">Show Macros</button>
-            <div class="dropdown-content">
-                <p>Calories: 300 kcal</p>
-                <p>Protein: 12g</p>
-                <p>Fat: 10g</p>
-                <p>Sugar: 24g</p>
-            </div>
-            <div>
-            <button class="order-btn" onclick="placeOrder(6)">Order Now</button>
-        </div>
-        </div>
-
-        <div class="shake-card" id="product-7">
-            <h3>Straw to your berry Shake</h3>
-            <button class="dropdown-btn">Show Macros</button>
-            <div class="dropdown-content">
-                <p>Calories: 320 kcal</p>
-                <p>Protein: 10g</p>
-                <p>Fat: 8g</p>
-                <p>Sugar: 30g</p>
-            </div>
-            <div>
-            <button class="order-btn" onclick="placeOrder(7)">Order Now</button>
-            </div>
-        </div>
-
-        <div class="shake-card" id="product-8">
-            <h3>Go total cucumber</h3>
-            <button class="dropdown-btn">Show Macros</button>
-            <div class="dropdown-content">
-                <p>Calories: 280 kcal</p>
-                <p>Protein: 8g</p>
-                <p>Fat: 6g</p>
-                <p>Sugar: 26g</p>
-            </div>
-            <div>
-            <button class="order-btn" onclick="placeOrder(8)">Order Now</button>
-            </div>
-        </div>
-    <ul>
-        <li id="logo"><img src="../img/joeLogo.svg" alt="Logo"></li>
-        <li id="centered"><a href="../pages/index.html" class="active">CBS Joe</a></li>
-    </ul>
+    <!-- Products Section -->
+    <div id="products-container">
+        <!-- Products will be dynamically inserted here -->
+    </div>
 
     <script src="../scripts/shakes.js"></script>
     <script src="/scripts/chatbot.js" defer></script>
 
 </body>
+
 </html>
