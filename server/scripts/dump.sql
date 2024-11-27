@@ -39,3 +39,4 @@ INSERT INTO products
     (name, price, imgsrc)
 VALUES
     ('Cappuccino', 35,'cappuccino.jpg');
+

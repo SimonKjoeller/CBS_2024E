@@ -28,7 +28,7 @@ CREATE TABLE chat (
 
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
-    order_id INTEGER PRIMARY KEY, -- Unik ID for hver bestilling
+    order_id INTEGER PRIMARY KEY AUTOINCREMENT, -- Unik ID for hver bestilling
     user_id INTEGER NOT NULL,                   -- Reference til brugerens ID
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Tidspunkt for oprettelse
     FOREIGN KEY (user_id) REFERENCES users(user_id)  -- Relation til brugere
@@ -36,10 +36,12 @@ CREATE TABLE orders (
 
 DROP TABLE IF EXISTS order_items;
 CREATE TABLE order_items (
-    order_item_id INTEGER PRIMARY KEY , -- Unik ID for hver post
+    order_item_id INTEGER PRIMARY KEY AUTOINCREMENT , -- Unik ID for hver post
     order_id INTEGER NOT NULL,                       -- Reference til en ordre
     product_id INTEGER NOT NULL,                     -- Reference til et produkt
     quantity INTEGER NOT NULL,                       -- Antal af produktet
     FOREIGN KEY (order_id) REFERENCES orders(order_id), -- Relation til ordre
     FOREIGN KEY (product_id) REFERENCES products(product_id) -- Relation til produkt
 );
+
+
