@@ -8,10 +8,11 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
 
 async function createText() {
+  r
   const message = await client.messages.create({
     from: "+1 985 297 5619",
     to: modtager,
-    body: "Hej, det er din rige onkel, Alfredo, der skriver til dig. \nJeg har vundet i lotto, så jeg vil gerne give dig 1.000.000 kr. \nDu skal blot klikke på dette link https://www.youtube.com/watch?v=4v8ek9TEeOU.",
+    body: "Din engangsadgangskode til cbsjoe er",
   });
 
   console.log(message);

@@ -3,10 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/global.css">
-    <title>JOE and The Juice</title>
+    <title>Signup</title>
 </head>
 
 <body class="login-page">
@@ -15,17 +14,45 @@
         <li id="centered"><a href="/" class="active">CBS Joe</a></li>
     </ul>
 
-    <div class="login-wrapper"> <!-- Ny wrapper-div -->
-        <div id="loginBox">
-            <h2>Log in</h2>
+    <div class="login-wrapper">
+        <div id="signupBox">
+            <h2>Signup</h2>
             <label for="email">Email:</label>
-            <input type="text" id="emailInput" name="email"><br><br>
+            <input type="text" id="emailInput" name="email">
+            <label for="username">Username:</label>
+            <input type="text" id="usernameInput" name="username">
             <label for="password">Password:</label>
-            <input type="password" id="passwordInput" name="password"><br><br>
-            <button type="submit" id="loginButton" onclick="login()">Log in</button>
+            <input type="password" id="passwordInput" name="password">
+            <div class="phone-container">
+                <div class="country-select">
+                    <select id="countryInput" name="country">
+                        <option value="45">Danmark (+45)</option>
+                        <option value="1">USA (+1)</option>
+                        <option value="46">Sverige (+46)</option>
+                        <option value="47">Norge (+47)</option>
+                        <option value="49">Tyskland (+49)</option>
+                    </select>
+                </div>
+                <div class="phone-input">
+                    <input type="text" id="phoneInput" name="phone" placeholder="Skriv dit telefonnummer"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+                </div>
+            </div>
+
+
+
+            <button id="signupButton" onclick="signup()">Sign up</button>
+        </div>
+
+        <div id="otpBox" style="display: none;">
+            <h2>Verify Phone</h2>
+            <label for="otp">OTP Code:</label>
+            <input type="text" id="otpInput" name="otp">
+            <button id="verifyButton" onclick="verify()">Verify</button>
         </div>
     </div>
+
+    <script src="../scripts/signup.js"></script>
 </body>
-<script src="../scripts/index.js"></script>
 
 </html>

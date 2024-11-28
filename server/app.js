@@ -45,6 +45,10 @@ app.get("/login", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/login.html"));
 });
 
+app.get("/signup", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/pages/signup.html"));
+});
+
 app.get("/cookie", (req, res) => {
   res.cookie("taste", "chocolate");
   res.send("Cookie set");
