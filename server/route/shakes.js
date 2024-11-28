@@ -92,3 +92,5 @@ shakeRoutes.post('/order', checkAuth, (req, res) => {
         });
     });
 });
+
+module.exports = shakeRoutes;
