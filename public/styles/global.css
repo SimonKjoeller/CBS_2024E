@@ -84,6 +84,21 @@ li a:hover {
   background-color: #555;
 }
 
+.login-link {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.login-link a {
+  color: #f09bc1;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
 /* De andre CSS-regler */
 .center {
   padding-top: 50px;
@@ -373,31 +388,70 @@ select {
 
 .phone-container {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
   margin-bottom: 20px;
 }
 
-#countryInput {
-  width: 35%;
-  /* Sørger for, at landekoden fylder mere */
-  height: 48px;
-  /* Matcher højden af telefoninput og andre felter */
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
+.country-select {
+  position: relative;
+  margin-bottom: 10px;
 }
 
-#phoneInput {
-  flex: 1;
-  /* Fylder resten af pladsen */
-  height: 48px;
-  /* Matcher højden af de andre felter */
+.country-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.flag-icon {
+  width: 20px;
+  height: 15px;
+  margin-right: 10px;
+}
+
+.arrow {
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.country-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  z-index: 1000;
+  display: none;
+  /* Hidden by default */
+}
+
+.country-option {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.country-option:hover {
+  background-color: #f0f0f0;
+}
+
+/* Vis dropdown, når den ikke er skjult */
+.country-dropdown.show {
+  display: block;
+}
+
+.phone-input input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }

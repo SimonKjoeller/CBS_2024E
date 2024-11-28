@@ -5,6 +5,22 @@ const phoneInput = document.getElementById('phoneInput');
 const otpInput = document.getElementById('otpInput');
 const signupBox = document.getElementById('signupBox');
 const otpBox = document.getElementById('otpBox');
+const countryButton = document.getElementById('countryButton');
+const countryDropdown = document.getElementById('countryDropdown');
+
+countryButton.addEventListener('click', () => {
+    countryDropdown.classList.toggle('show');
+});
+
+document.querySelectorAll('.country-option').forEach((option) => {
+    option.addEventListener('click', (e) => {
+        const selectedText = e.target.textContent.trim();
+        countryButton.querySelector('span').textContent = selectedText;
+
+        // Luk dropdown
+        countryDropdown.classList.remove('show');
+    });
+});
 
 function validatePhoneNumberByCountry(countryCode, phoneNumber) {
     // Rens nummeret
