@@ -8,7 +8,8 @@ CREATE TABLE users (
     otp TEXT,
     otp_expiration DATETIME,
     verified INTEGER DEFAULT 0,
-    subscribed_newsletter INTEGER DEFAULT 0
+    subscribed_newsletter INTEGER DEFAULT 0,
+    img_url TEXT
 );
 
 
