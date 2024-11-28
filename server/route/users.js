@@ -8,6 +8,7 @@ const db = require("../db");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
+const fsPromises = require("fs").promises;
 require('dotenv').config();
 
 userRoutes.use(express.json());
