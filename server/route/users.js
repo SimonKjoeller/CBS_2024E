@@ -77,7 +77,7 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
     try {
         const { email, username, password, phone, newsletter } = req.body;
 
-        console.log(email, username, phone, newsletter);
+        console.log(email, username, password, phone, newsletter);
 
         // Hash password
         const hashedPassword = bcrypt.hashSync(password, 10);
@@ -123,7 +123,7 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
             INSERT INTO users (email, username, password, phone, otp, otp_expiration, verified, subscribed_newsletter, img_url)
             VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
         `;
-
+        console.log(imgUrl)
         db.run(query, [
             email,
             username,
