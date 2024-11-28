@@ -3,55 +3,54 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/global.css">
     <link rel="stylesheet" href="../styles/shakes.css">
-    <title>JOE and The Juice</title>
+    <title>Juice and Coffee Menu</title>
 </head>
+
 <body>
-<div id="chat-popup" style="display: none;">
-    <div id="chat-header">
-        <span>☕ VELKOMMEN TIL JOE & THE JUICE!</span>
-        <button onclick="toggleChat()">X</button>
-    </div>
-    <div id="chat-messages"></div>
-    <div id="chat-input-container">
-        <input id="chat-input" type="text" placeholder="Skriv din besked..." />
-        <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-  
-  <!-- Button to open chat -->
-  <button id="chat-open" onclick="toggleChat()">💬</button>
-  
-<button id="chat-open" onclick="toggleChat()" style="position: fixed; bottom: 20px; right: 20px; padding: 15px; font-size: 20px; background: #007bff; color: white; border: none; border-radius: 50%; cursor: pointer; z-index: 999;">💬</button>
-  <body>
     <ul>
         <li><img src="../img/joeLogo.svg" alt="Logo"></li>
         <li><a href="/" class="active">Home</a></li>
         <li style="float:right"><a href="/chat">Chat</a></li>
         <li style="float:right"><a href="/locations">Locations</a></li>
-        <li style="float:right"><a href="/">Menu</a></li>
-        <li style="float:right"><a href="/public/pages/shakes.html">The Joe & Juice</a></li>
+        <li style="float:right"><a href="/shakes">Menu</a></li>
     </ul>
 
-    <h1>Juice and Coffee Menu</h1>
-
-    <!-- Cart Section -->
-    <div id="cart-container">
-        <h3>Your Order</h3>
-        <ul id="cart-items"></ul>
-        <button id="place-order-btn" onclick="placeOrder()">Place Order</button>
+    <div id="chat-popup" style="display: none;">
+        <div id="chat-header">
+            <span>☕ VELKOMMEN TIL JOE & THE JUICE!</span>
+            <button onclick="toggleChat()">X</button>
+        </div>
+        <div id="chat-messages"></div>
+        <div id="chat-input-container">
+            <input id="chat-input" type="text" placeholder="Skriv din besked..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
     </div>
 
-    <!-- Products Section -->
-    <div id="products-container">
-        <!-- Products will be dynamically inserted here -->
+    <!-- Chat button -->
+    <button id="chat-open" onclick="toggleChat()">💬</button>
+
+    <div class="content">
+        <h1>Juice and Coffee Menu</h1>
+
+        <!-- Cart Section -->
+        <div id="cart-container">
+            <h3>Your Order</h3>
+            <ul id="cart-items"></ul>
+            <button id="place-order-btn" onclick="placeOrder()">Place Order</button>
+        </div>
+
+        <!-- Products Section -->
+        <div id="products-container">
+            <!-- Products will be dynamically inserted here -->
+        </div>
     </div>
 
     <script src="../scripts/shakes.js"></script>
     <script src="/scripts/chatbot.js" defer></script>
-
 </body>
 
 </html>

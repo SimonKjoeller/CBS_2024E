@@ -4,7 +4,7 @@ const dropdownButtons = document.querySelectorAll('.dropdown-btn');
 // Fetch products from the server and render them
 // Fetch products from the /products endpoint
 function loadProducts() {
-    fetch('/products') // Relative URL, works with the same origin
+    fetch('/shakes/products') // Relative URL, works with the same origin
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Failed to fetch products: ${response.status}`);
@@ -80,10 +80,10 @@ function placeOrder() {
         product_id: item.productId,
         quantity: item.quantity,
     }));
-    
+
     console.log('Order Items to Send:', items); // Debugging
 
-    fetch('/order', {
+    fetch('/shakes/order', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
