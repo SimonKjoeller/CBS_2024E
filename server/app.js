@@ -42,8 +42,12 @@ app.get("/signup", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/signup.html"));
 });
 
-app.get("/shakes", (req, res) => {
+app.get("/shakes", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/shakes.html"));
+});
+
+chatRoutes.get("/", checkAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "../../public/pages/chat.html"));
 });
 
 app.get("/cookie", (req, res) => {

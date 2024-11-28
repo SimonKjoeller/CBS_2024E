@@ -3,6 +3,7 @@ const shakeRoutes = express.Router();
 const cookieParser = require("cookie-parser");
 const db = require("../db");
 require('dotenv').config();
+const checkAuth = require("../checkAuth");
 
 shakeRoutes.use(express.json());
 shakeRoutes.use(cookieParser());
@@ -11,7 +12,7 @@ const secretKey = process.env.JWT_SECRET; // Bruger miljøvariabel til sikkerhed
 
 
 // Endpoint to fetch all products
-shakeRoutes.get('/products', (req, res) => {
+shakeRoutes.get('/products', checkAuth, (req, res) => {
     const query = `SELECT * FROM products`;
     db.all(query, [], (err, rows) => {
         if (err) {
