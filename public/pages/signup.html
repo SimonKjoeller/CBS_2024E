@@ -25,23 +25,39 @@
             <input type="password" id="passwordInput" name="password">
             <div class="phone-container">
                 <div class="country-select">
-                    <select id="countryInput" name="country">
-                        <option value="45">Danmark (+45)</option>
-                        <option value="1">USA (+1)</option>
-                        <option value="46">Sverige (+46)</option>
-                        <option value="47">Norge (+47)</option>
-                        <option value="49">Tyskland (+49)</option>
-                    </select>
+                    <button class="country-button" id="countryButton">
+                        <img src="../img/dk.png" alt="DK flag" class="flag-icon" />
+                        <span>Denmark, DK, +45</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="country-dropdown hidden" id="countryDropdown">
+                        <!-- Dropdown med lande -->
+                        <div class="country-option" onclick="selectCountry('Denmark, DK, +45', '../img/dk.png')">
+                            <img src="../img/dk.png" alt="DK flag" class="flag-icon" />
+                            Denmark, DK, +45
+                        </div>
+                        <div class="country-option" onclick="selectCountry('USA, US, +1', '../img/us.png')">
+                            <img src="../img/us.png" alt="US flag" class="flag-icon" />
+                            USA, US, +1
+                        </div>
+                        <div class="country-option" onclick="selectCountry('Norway, NO, +47', '../img/no.png')">
+                            <img src="../img/no.png" alt="NO flag" class="flag-icon" />
+                            Norway, NO, +47
+                        </div>
+                        <div class="country-option" onclick="selectCountry('Sweden, SE, +46', '../img/se.png')">
+                            <img src="../img/se.png" alt="SE flag" class="flag-icon" />
+                            Sweden, SE, +46
+                        </div>
+                    </div>
                 </div>
                 <div class="phone-input">
-                    <input type="text" id="phoneInput" name="phone" placeholder="Skriv dit telefonnummer"
-                        oninput="this.value = this.value.replace(/[^0-9]/g, '');" />
+                    <input type="text" id="phoneInput" name="phone" placeholder="Phone number*" />
                 </div>
             </div>
-
-
-
             <button id="signupButton" onclick="signup()">Sign up</button>
+            <div class="login-link">
+                <p>Already have an account? <a href="/login">Login here</a></p>
+            </div>
         </div>
 
         <div id="otpBox" style="display: none;">
