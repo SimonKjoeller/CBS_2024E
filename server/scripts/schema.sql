@@ -1,10 +1,10 @@
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     user_id INTEGER PRIMARY KEY,
-    email TEXT UNIQUE NOT NULL,
+    email TEXT NOT NULL,
     username TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    phone TEXT UNIQUE NOT NULL,
+    phone TEXT NOT NULL,
     otp TEXT,
     otp_expiration DATETIME,
     verified INTEGER DEFAULT 0,
