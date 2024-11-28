@@ -89,12 +89,16 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
         // Upload profilbillede til Cloudinary
         let imgUrl = null;
         if (req.file) {
-            const tmpFilePath = `../../public/img/${req.file.originalname}`;
-
-            // Lav en midlertidig billedfil
-            await fsPromises.writeFile(tmpFilePath, req.file.buffer);
+            const tmpDir = './public/img'; // Midlertidig mappe
+            const tmpFilePath = `${tmpDir}/${req.file.originalname}`;
 
             try {
+                // Tjek og opret midlertidig mappe, hvis den ikke eksisterer
+                await fsPromises.mkdir(tmpDir, { recursive: true });
+
+                // Gem den midlertidige billedfil
+                await fsPromises.writeFile(tmpFilePath, req.file.buffer);
+
                 const uploadOptions = {
                     public_id: `profile_pictures/${req.file.originalname.split('.')[0]}`,
                     resource_type: 'auto',
@@ -103,13 +107,13 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
                 // Upload til Cloudinary
                 const result = await cloudinary.uploader.upload(tmpFilePath, uploadOptions);
 
-                // Fjern midlertidig fil
+                // Slet den midlertidige fil
                 await fsPromises.unlink(tmpFilePath);
 
                 // Gem billed-URL
                 imgUrl = result.secure_url;
             } catch (uploadError) {
-                console.error('Fejl ved upload til Cloudinary:', uploadError);
+                console.error('Fejl ved upload til Cloudinary eller gemning af fil:', uploadError);
                 return res.status(500).json({ error: 'Kunne ikke uploade profilbillede.' });
             }
         }
@@ -150,7 +154,6 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
         res.status(500).json({ error: 'Signup fejlede.' });
     }
 });
-
 
 
 // Nyhedsbrev (SMTP) og twilio verificering
