@@ -150,7 +150,7 @@ userRoutes.post('/verify', (req, res) => {
                         html: `<div style="font-family: Arial, sans-serif; color: #333;">
                             <h1>Velkommen til Joe & The Juice</h1>
                             <p>Tak for at verificere din konto. Du er nu tilmeldt vores nyhedsbrev!</p>
-                            <img src="../img/joeLogo.svg" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+                            <img src="/img/joeLogo.svg" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
                             <footer style="font-size: 12px; color: #888;">
                                 <p>Joe & The Juice</p>
                                 <p>Adresse: Se web</p>
