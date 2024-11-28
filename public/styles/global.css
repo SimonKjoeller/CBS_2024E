@@ -40,76 +40,12 @@ li a:hover {
 }
 
 .login-wrapper {
-  max-width: 400px;
-  /* Reducer bredde */
-  margin: auto;
-  padding: 20px;
-  /* Reducer padding for mindre top/bund */
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  margin-bottom: 10px;
-  /* Mindre margin mellem overskrift og inputs */
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-  /* Mindre mellemrum over inputs */
-  font-weight: bold;
-}
-
-input,
-select,
-button {
-  width: 100%;
-  margin-bottom: 10px;
-  /* Reduceret mellemrum mellem felter */
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-button {
-  background-color: #000;
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  padding: 10px 0;
-}
-
-button:hover {
-  background-color: #333;
-}
-
-.login-link {
-  text-align: center;
-  margin-top: 10px;
-  /* Mindre mellemrum over linket */
-  font-size: 0.9em;
-}
-
-.country-select {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  justify-content: center;
+  /* Centrér login-boksen horisontalt */
+  padding-top: 50px;
+  /* Plads ovenfor login-boksen */
 }
-
-.newsletter-option {
-  margin-top: 10px;
-}
-
-img.flag-icon {
-  height: 20px;
-  width: auto;
-  margin-right: 10px;
-}
-
 
 #loginBox {
   background-color: white;
@@ -512,6 +448,11 @@ select {
 
 .country-option:hover {
   background-color: #f0f0f0;
+}
+
+/* Vis dropdown, når den ikke er skjult */
+.country-dropdown.show {
+  display: block;
 }
 
 .phone-input input {
