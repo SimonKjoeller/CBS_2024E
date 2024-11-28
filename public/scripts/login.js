@@ -18,7 +18,7 @@ async function login() {
         // Succes - redirect til hovedsiden
         if (response.ok) {
             const data = await response.json();
-            window.location.href = `https://cbsjoe.live/`; // Redirect efter login
+            window.location.href = `https://cbsjoe.live/shakes`; // Redirect efter login
             console.log(data);
         }
     } catch (error) {
