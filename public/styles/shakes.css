@@ -1,11 +1,3 @@
-/* Reset margins */
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4; /* Light gray background */
-    padding: 20px; /* Add some spacing around the content */
-}
-
 li {
     float: left;
 }
@@ -23,10 +15,6 @@ li img {
     width: 65px;
 }
 
-.active {
-    background-color: #f09bc1;
-    font-weight: bolder;
-}
 
 li a:hover {
     background-color: #f088b7;
@@ -35,22 +23,37 @@ li a:hover {
 
 /* Header styling: Make h1 like h2 */
 h1 {
-    color: #f09bc1; /* Light pink */
-    font-size: 2em; /* Same size as h2 */
-    border-bottom: 2px solid #f09bc1; /* Add the border */
-    display: inline-block; /* Fit content */
-    margin-bottom: 10px; /* Same margin as h2 */
-    text-align: center; /* Center alignment */
-    width: 100%; /* Full width */
+    color: #f09bc1;
+    /* Light pink */
+    font-size: 2em;
+    /* Same size as h2 */
+    border-bottom: 2px solid #f09bc1;
+    /* Add the border */
+    display: inline-block;
+    /* Fit content */
+    margin-bottom: 10px;
+    /* Same margin as h2 */
+    text-align: center;
+    /* Center alignment */
+    width: 100%;
+    /* Full width */
 }
+
 h2 {
-    color: #f27db2; /* Light pink */
-    font-size: 20px; /* Same size as h2 */
-    border-bottom: 2px solid #f09bc1; /* Add the border */
-    display: inline-block; /* Fit content */
-    margin-bottom: 10px; /* Same margin as h2 */
-    text-align: center; /* Center alignment */
-    width: 100%; /* Full width */
+    color: #f27db2;
+    /* Light pink */
+    font-size: 20px;
+    /* Same size as h2 */
+    border-bottom: 2px solid #f09bc1;
+    /* Add the border */
+    display: inline-block;
+    /* Fit content */
+    margin-bottom: 10px;
+    /* Same margin as h2 */
+    text-align: center;
+    /* Center alignment */
+    width: 100%;
+    /* Full width */
 }
 
 
@@ -62,60 +65,21 @@ h2 {
 .menu-item {
     margin: 10px 0;
     font-size: 1.2em;
-    color: #555; /* Medium gray */
+    color: #555;
+    /* Medium gray */
     padding: 5px;
 }
 
 /* Highlight menu items on hover */
 .menu-item:hover {
-    background-color: #f7c1d9; /* Light pink */
+    background-color: #f7c1d9;
+    /* Light pink */
     border-radius: 5px;
     padding-left: 10px;
     transition: 0.3s ease-in-out;
 }
 
-/* Navigation list styling */
-ul {
-    font-family: Calibri, sans-serif;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #f7c1d9; /* Pink background */
-    font-size: 1.2em;
-    text-align: center;
-    border-radius: 8px;
-}
 
-li {
-    display: inline-block;
-    margin: 10px;
-}
-
-li a {
-    color: #292929; /* Dark text color */
-    text-decoration: none;
-    padding: 10px 15px;
-    display: inline-block;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-li a:hover {
-    background-color: #f09bc1; /* Slightly darker pink on hover */
-}
-
-li img {
-    display: inline-block;
-    width: 50px;
-    vertical-align: middle;
-}
-
-.active {
-    background-color: #f09bc1;
-    font-weight: bold;
-    border-radius: 5px;
-}
 
 /* Dropdown button for macros */
 .dropdown-btn {
@@ -136,7 +100,8 @@ li img {
 
 /* Dropdown content */
 .dropdown-content {
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
     background-color: white;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -145,7 +110,8 @@ li img {
     text-align: left;
     font-size: 0.9em;
     color: #555;
-    width: 100%; /* Full width within card */
+    width: 100%;
+    /* Full width within card */
     position: relative;
 }
 
@@ -170,6 +136,7 @@ li img {
     text-align: center;
     position: relative;
 }
+
 /* Shake card styling */
 .juice-card {
     background-color: white;
@@ -190,8 +157,10 @@ li img {
 }
 
 .order-btn {
-    background-color: #f8b8c6; /* Light pink background */
-    color: #ffffff; /* White text */
+    background-color: #f8b8c6;
+    /* Light pink background */
+    color: #ffffff;
+    /* White text */
     border: none;
     border-radius: 5px;
     padding: 10px 20px;
@@ -200,13 +169,17 @@ li img {
     cursor: pointer;
     margin-top: 10px;
     transition: all 0.3s ease;
-    display: inline-block; /* Makes it align neatly */
+    display: inline-block;
+    /* Makes it align neatly */
 }
 
 .order-btn:hover {
-    background-color: #f194a1; /* Slightly darker pink on hover */
-    transform: scale(1.05); /* Subtle zoom effect */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    background-color: #f194a1;
+    /* Slightly darker pink on hover */
+    transform: scale(1.05);
+    /* Subtle zoom effect */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    /* Shadow effect */
 }
 
 
@@ -217,7 +190,8 @@ li img {
     }
 
     h1 {
-        font-size: 1.5em; /* Adjust size for smaller screens */
+        font-size: 1.5em;
+        /* Adjust size for smaller screens */
     }
 
     ul {
@@ -267,14 +241,17 @@ li img {
 #place-order-btn:hover {
     background-color: #f194a1;
 }
+
 /* Product Card Styling */
 .product-card {
     background-color: white;
     padding: 20px;
     margin: 15px auto;
     border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    max-width: 400px; /* Limit width for desktop */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow */
+    max-width: 400px;
+    /* Limit width for desktop */
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -283,67 +260,86 @@ li img {
 
 /* Product Image */
 .product-card img {
-    width: 100%; /* Full width */
-    max-height: 200px; /* Limit height for consistency */
-    object-fit: cover; /* Ensure image is scaled proportionally */
+    width: 100%;
+    /* Full width */
+    max-height: 200px;
+    /* Limit height for consistency */
+    object-fit: cover;
+    /* Ensure image is scaled proportionally */
     margin-bottom: 10px;
-    border-radius: 5px; /* Slight rounding for images */
+    border-radius: 5px;
+    /* Slight rounding for images */
 }
 
 /* Product Title */
 .product-card h3 {
     color: #333;
-    font-size: 1.3em; /* Slightly larger font */
+    font-size: 1.3em;
+    /* Slightly larger font */
     margin: 10px 0;
 }
 
 /* Product Price */
 .product-card p {
-    color: #555; /* Medium gray */
-    font-size: 1em; /* Consistent with other text */
+    color: #555;
+    /* Medium gray */
+    font-size: 1em;
+    /* Consistent with other text */
     margin: 5px 0 15px 0;
 }
 
 /* Add to Cart Button */
 .product-card button {
-    background-color: #f8b8c6; /* Light pink */
-    color: #ffffff; /* White text */
+    background-color: #f8b8c6;
+    /* Light pink */
+    color: #ffffff;
+    /* White text */
     border: none;
     border-radius: 5px;
     padding: 10px 20px;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s ease; /* Smooth hover transition */
+    transition: all 0.3s ease;
+    /* Smooth hover transition */
 }
 
 .product-card button:hover {
-    background-color: #f194a1; /* Slightly darker pink on hover */
-    transform: scale(1.05); /* Subtle zoom effect */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Shadow effect on hover */
+    background-color: #f194a1;
+    /* Slightly darker pink on hover */
+    transform: scale(1.05);
+    /* Subtle zoom effect */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    /* Shadow effect on hover */
 }
 
 /* Responsive Design for Cards */
 @media (max-width: 768px) {
     .product-card {
-        max-width: 100%; /* Full width for smaller screens */
-        padding: 15px; /* Reduce padding */
+        max-width: 100%;
+        /* Full width for smaller screens */
+        padding: 15px;
+        /* Reduce padding */
     }
 
     .product-card img {
-        max-height: 150px; /* Smaller height for images on mobile */
+        max-height: 150px;
+        /* Smaller height for images on mobile */
     }
 
     .product-card h3 {
-        font-size: 1.1em; /* Slightly smaller title font */
+        font-size: 1.1em;
+        /* Slightly smaller title font */
     }
 
     .product-card p {
-        font-size: 0.9em; /* Slightly smaller price font */
+        font-size: 0.9em;
+        /* Slightly smaller price font */
     }
 
     .product-card button {
-        font-size: 13px; /* Adjust button size */
+        font-size: 13px;
+        /* Adjust button size */
         padding: 8px 16px;
     }
 }

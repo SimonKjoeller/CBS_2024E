@@ -131,7 +131,7 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
             phone,
             otp,
             otpExpiry,
-            newsletter || 0, // Standardværdi for nyhedsbrev
+            newsletter || 0,
             imgUrl,
         ], (err) => {
             if (err) {
