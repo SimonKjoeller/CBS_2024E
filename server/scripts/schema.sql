@@ -7,7 +7,8 @@ CREATE TABLE users (
     phone TEXT UNIQUE NOT NULL,
     otp TEXT,
     otp_expiration DATETIME,
-    verified INTEGER DEFAULT 0
+    verified INTEGER DEFAULT 0,
+    subscribed_newsletter INTEGER DEFAULT 0
 );
 
 
