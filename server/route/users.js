@@ -124,7 +124,7 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
             VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
         `;
 
-        await runQuery(query, [
+        db.run(query, [
             email,
             username,
             hashedPassword,
@@ -133,27 +133,31 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
             otpExpiry,
             newsletter || 0, // Standardværdi for nyhedsbrev
             imgUrl,
-        ]);
+        ], (err) => {
+            if (err) {
+                console.error('Fejl ved oprettelse af bruger:', err);
+                return res.status(500).json({ error: 'Kunne ikke oprette bruger.' });
+            }
 
-        // Send engangskode med Twilio
-        try {
-            await client.messages.create({
+            // Send engangskode med Twilio
+            client.messages.create({
                 from: process.env.TWILIO_PHONE_NUMBER,
                 to: `+${phone}`,
                 body: `Din engangskode er ${otp}. Den udløber om 5 minutter.`,
+            }).then(() => {
+                console.log('OTP sendt!');
+                res.status(200).json({ message: 'Signup lykkedes. Verificer dit telefonnummer.' });
+            }).catch((twilioError) => {
+                console.error('Fejl ved sending af OTP:', twilioError);
+                res.status(500).json({ error: 'Kunne ikke sende OTP.' });
             });
-
-            console.log('OTP sendt!');
-            res.status(200).json({ message: 'Signup lykkedes. Verificer dit telefonnummer.' });
-        } catch (twilioError) {
-            console.error('Fejl ved sending af OTP:', twilioError);
-            res.status(500).json({ error: 'Kunne ikke sende OTP.' });
-        }
+        });
     } catch (error) {
         console.error('Fejl under signup:', error.message);
         res.status(500).json({ error: 'Signup fejlede.' });
     }
 });
+
 
 
 // Nyhedsbrev (SMTP) og twilio verificering
