@@ -26,10 +26,6 @@ app.use(express.json());
 
 
 // Routes
-app.get("/", checkAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/pages/index.html"));
-});
-
 app.get("/locations", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/locations.html"));
 });
@@ -46,8 +42,8 @@ app.get("/shakes", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/shakes.html"));
 });
 
-chatRoutes.get("/", checkAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "../../public/pages/chat.html"));
+chatRoutes.get("/chat", checkAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/pages/chat.html"));
 });
 
 app.get("/cookie", (req, res) => {
