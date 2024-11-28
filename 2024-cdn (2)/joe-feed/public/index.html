@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./static/styles/global.css">
+  <title>JOE and The Juice</title>
+</head>
+
+<body>
+  <ul>
+    <li><img src="./static/img/joeLogo.svg" alt="Logo"></li>
+  </ul>
+  <div class="center">
+    <h2>JOE Feed</h2>
+
+    <form method="post" action="/api/upload" id="form" enctype="multipart/form-data">
+      <input type="file" name="image" /><br />
+      <input type="text" name="caption" placeholder="Caption">
+      <button type="submit" name="upload">Upload</button><br /><br />
+    </form>
+    <div class="feed">
+      <h2>Uploads</h2>
+      <div id="uploads">
+      </div>
+    </div>
+
+  </div>
+
+  <div class="center">
+    <p id="responseTimeValue"></p>
+  </div>
+
+</body>
+<script src="./static/scripts/index.js"></script>
+
+</html>

@@ -41,32 +41,26 @@ function validatePhoneNumberByCountry(countryCode, phoneNumber) {
 
 async function signup() {
     try {
-        console.log("test");
-        const countryCode = parseInt(document.getElementById('countryInput').value, 10); // Hent landekoden
+        const countryCode = parseInt(document.getElementById('countryInput').value, 10);
         const phoneNumber = phoneInput.value;
-        const subscribedNewsletter = document.getElementById('newsletterCheckbox').checked ? 1 : 0; // Hent checkbox-værdi
+        const subscribedNewsletter = document.getElementById('newsletterCheckbox').checked ? 1 : 0;
 
-        console.log("Landekode:", countryCode);
-        console.log("Telefonnummer:", phoneNumber);
-        console.log("Tilmeldt nyhedsbrev:", subscribedNewsletter);
+        // Hent profilbillede
+        const profilePicture = document.getElementById('profilePicture').files[0];
 
-        // Validér telefonnummeret
-        if (!validatePhoneNumberByCountry(countryCode, phoneNumber)) {
-            alert('Telefonnummeret er ikke gyldigt for det valgte land!');
-            return; // Stop signup-processen
-        }
+        // Opret FormData til at inkludere filen
+        const formData = new FormData();
+        formData.append('email', emailInput.value);
+        formData.append('username', usernameInput.value);
+        formData.append('password', passwordInput.value);
+        formData.append('phone', `${countryCode}${phoneNumber}`);
+        formData.append('newsletter', subscribedNewsletter);
+        formData.append('profilePicture', profilePicture); // Tilføj billede
 
         // Send data til serveren
         const response = await fetch('/users/signup', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: emailInput.value,
-                username: usernameInput.value,
-                password: passwordInput.value,
-                phone: `${countryCode}${phoneNumber}`, // Kombinér landekode og nummer
-                newsletter: subscribedNewsletter, // Send værdien af checkbox
-            }),
+            body: formData, // Brug FormData som body
         });
 
         if (!response.ok) throw new Error('Signup failed');
@@ -81,6 +75,7 @@ async function signup() {
         console.error(error.message);
     }
 }
+
 
 
 
