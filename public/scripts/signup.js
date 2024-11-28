@@ -44,9 +44,11 @@ async function signup() {
         console.log("test");
         const countryCode = parseInt(document.getElementById('countryInput').value, 10); // Hent landekoden
         const phoneNumber = phoneInput.value;
+        const subscribedNewsletter = document.getElementById('newsletterCheckbox').checked ? 1 : 0; // Hent checkbox-værdi
 
         console.log("Landekode:", countryCode);
         console.log("Telefonnummer:", phoneNumber);
+        console.log("Tilmeldt nyhedsbrev:", subscribedNewsletter);
 
         // Validér telefonnummeret
         if (!validatePhoneNumberByCountry(countryCode, phoneNumber)) {
@@ -63,6 +65,7 @@ async function signup() {
                 username: usernameInput.value,
                 password: passwordInput.value,
                 phone: `${countryCode}${phoneNumber}`, // Kombinér landekode og nummer
+                newsletter: subscribedNewsletter, // Send værdien af checkbox
             }),
         });
 
@@ -78,6 +81,7 @@ async function signup() {
         console.error(error.message);
     }
 }
+
 
 
 async function verify() {

@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const twilio = require("twilio");
 const bcrypt = require("bcrypt");
 const db = require("../db");
+const nodemailer = require("nodemailer");
 require('dotenv').config();
 
 userRoutes.use(express.json());
@@ -54,11 +55,10 @@ const client = twilio(accountSid, authToken);
 const SALT_ROUNDS = 10;
 
 
-// Signup med engangskode
 userRoutes.post('/signup', (req, res) => {
-    const { email, username, password, phone } = req.body;
+    const { email, username, password, phone, newsletter } = req.body;
 
-    console.log(email, username, password, phone);
+    console.log(email, username, password, phone, newsletter);
 
     // Hash password
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -69,11 +69,11 @@ userRoutes.post('/signup', (req, res) => {
 
     // Gem i databasen
     const query = `
-        INSERT INTO users (email, username, password, phone, otp, otp_expiration, verified)
-        VALUES (?, ?, ?, ?, ?, ?, 0)
+        INSERT INTO users (email, username, password, phone, otp, otp_expiration, verified, subscribed_newsletter)
+        VALUES (?, ?, ?, ?, ?, ?, 0, ?)
     `;
 
-    db.run(query, [email, username, hashedPassword, phone, otp, otpExpiry], (err) => {
+    db.run(query, [email, username, hashedPassword, phone, otp, otpExpiry, newsletter], (err) => {
         if (err) {
             console.error('Fejl ved oprettelse af bruger:', err);
             return res.status(500).json({ error: 'Kunne ikke oprette bruger.' });
@@ -97,13 +97,24 @@ userRoutes.post('/signup', (req, res) => {
     });
 });
 
-// Verifikation af engangskode
+
+// Nyhedsbrev (SMTP) og twilio verificering
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+        user: "cbsjoec@gmail.com",
+        pass: "ozyurwjboabzrqek",
+    },
+});
+
+
+
 userRoutes.post('/verify', (req, res) => {
     const { email, otp } = req.body;
 
-
-    console.log(email, otp)
-    console.log(req.body)
+    console.log(email, otp);
+    console.log(req.body);
     if (!email || !otp) {
         return res.status(400).json({ message: 'Email og OTP er påkrævet.' });
     }
@@ -123,17 +134,40 @@ userRoutes.post('/verify', (req, res) => {
         const updateQuery = `
             UPDATE users SET verified = 1, otp = NULL, otp_expiration = NULL WHERE email = ?
         `;
-        db.run(updateQuery, [email], (updateErr) => {
+        db.run(updateQuery, [email], async (updateErr) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }
+
+            // Tjek om brugeren har valgt at tilmelde sig nyhedsbrevet
+            if (user.subscribed_newsletter === 1) {
+                try {
+                    // Send nyhedsbrev
+                    const info = await transporter.sendMail({
+                        from: "CBSJOE <cbsjoec@gmail.com>",
+                        to: email,
+                        subject: 'Velkommen til Joe & The Juice!',
+                        html: `<div style="font-family: Arial, sans-serif; color: #333;">
+                            <h1>Velkommen til Joe & The Juice</h1>
+                            <p>Tak for at verificere din konto. Du er nu tilmeldt vores nyhedsbrev!</p>
+                            <img src="https://seeklogo.com/images/J/joe-and-the-juice-logo-8D32BBD87A-seeklogo.com.png" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+                            <footer style="font-size: 12px; color: #888;">
+                                <p>Joe & The Juice</p>
+                                <p>Adresse: Se web</p>
+                                <p>Afmeld nyhedsbrevet <a href="https://joeandthejuice.com/unsubscribe">her</a></p>
+                            </footer>
+                        </div>`,
+                    });
+                    console.log(`Nyhedsbrev sendt til ${email}:`, info.messageId);
+                } catch (error) {
+                    console.error(`Fejl ved afsendelse af nyhedsbrev til ${email}:`, error);
+                }
+            }
+
+            // Send succes-respons
             res.status(200).json({ message: 'Bruger verificeret succesfuldt.' });
         });
     });
 });
-
-
-
-
 
 module.exports = userRoutes;
