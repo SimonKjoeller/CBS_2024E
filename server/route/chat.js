@@ -2,15 +2,10 @@ const express = require("express");
 const chatRoutes = express.Router();
 const cookieParser = require("cookie-parser");
 const db = require("../db");
-const path = require("path");
 const checkAuth = require("../checkAuth");
 
 chatRoutes.use(express.json());
 chatRoutes.use(cookieParser());
-
-chatRoutes.get("/", checkAuth, (req, res) => {
-    res.sendFile(path.join(__dirname, "../../public/pages/chat.html"));
-});
 
 chatRoutes.post("/recipient", checkAuth, (req, res) => {
     const { username } = req.body;
