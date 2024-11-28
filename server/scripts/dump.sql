@@ -1,16 +1,16 @@
 -- Customers table
 INSERT INTO users
-    (username, email, password, phone)
+    (username, email, password, phone, verified)
 VALUES
-    ('anders', 'anders@gmail.com', 'anders123', 1);
+    ('anders', 'anders@gmail.com', '$2b$10$pXQSGfwSRTFt40i6Oziz2uEdiy5iqor9O0IKZvXzrD/mmx7A7EA.W', 1, 1);
 INSERT INTO users
-    (username, email, password, phone)
+    (username, email, password, phone, verified)
 VALUES
-    ('hjalte', 'hjalte@gmail.com', 'hjalte123', 2);
+    ('hjalte', 'hjalte@gmail.com', '$2b$10$qOVztOwrJ8dyUXwQpOL8EOmHLVbvUHOm1HEptDNUL5tEwZzucQ4Py', 2, 1);
 INSERT INTO users
-    (username, email, password, phone)
+    (username, email, password, phone, verified)
 VALUES
-    ('simon', 'simon@gmail.com', 'simon123', 3);
+    ('simon', 'simon@gmail.com', '$2b$10$L1zB6LDc9KnkVjxUGUp55OzCun.IDDrlKcV3Fsl/SeG.Xo91NZvvC', 3, 1);
 
 
 

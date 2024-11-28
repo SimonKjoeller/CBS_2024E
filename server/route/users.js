@@ -13,35 +13,40 @@ userRoutes.use(cookieParser());
 const secretKey = process.env.JWT_SECRET; // Bruger miljøvariabel til sikkerhed
 
 
-// Login delen
 userRoutes.post("/login", (req, res) => {
-    const { identifier, password } = req.body; // Kan være enten email eller username
+    const { email, password } = req.body;
+
     const query = `
-        SELECT * FROM users WHERE (email = ? OR username = ?) AND verified = 1
+        SELECT * FROM users WHERE email = ? AND verified = 1
     `;
 
-    db.get(query, [identifier, identifier], async (err, user) => {
+    db.get(query, [email], async (err, user) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        if (user && await bcrypt.compare(password, user.password)) {
-            // Generer JWT token
-            const token = jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '1h' });
-            res.cookie("authToken", token, { httpOnly: true, secure: true, sameSite: "None" })
-                .status(200)
-                .json({ message: "Du er logget ind!" });
+
+        if (user) {
+            const passwordMatch = await bcrypt.compare(password, user.password);
+
+            if (passwordMatch) {
+                // Generer JWT token
+                const token = jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '1h' });
+                res.cookie("authToken", token, { httpOnly: true, secure: true, sameSite: "None" })
+                    .status(200)
+                    .json({ message: "Du er logget ind!" });
+            } else {
+                res.status(401).json({ message: "Forkert adgangskode." });
+            }
         } else {
-            res.status(401).json({ message: "Forkert brugernavn, email eller adgangskode." });
+            res.status(401).json({ message: "Bruger ikke fundet eller ikke verificeret." });
         }
     });
 });
 
+
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
-
-
-
 
 // Singup delen herunder
 

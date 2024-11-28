@@ -41,9 +41,12 @@ function validatePhoneNumberByCountry(countryCode, phoneNumber) {
 
 async function signup() {
     try {
-        // Hent landekode fra dropdown
-        const countryCode = parseInt(document.getElementById('countryInput').value, 10);
+        console.log("test");
+        const countryCode = parseInt(document.getElementById('countryInput').value, 10); // Hent landekoden
         const phoneNumber = phoneInput.value;
+
+        console.log("Landekode:", countryCode);
+        console.log("Telefonnummer:", phoneNumber);
 
         // Validér telefonnummeret
         if (!validatePhoneNumberByCountry(countryCode, phoneNumber)) {
@@ -100,7 +103,7 @@ async function verify() {
     }
 }
 
-function selectCountry(countryText, flagSrc) {
+function selectCountry(countryText, flagSrc, countryCode) {
     // Find country-button og opdater dens indhold
     const countryButton = document.getElementById('countryButton');
     const flagIcon = countryButton.querySelector('img');
@@ -110,9 +113,14 @@ function selectCountry(countryText, flagSrc) {
     flagIcon.src = flagSrc;
     countryLabel.textContent = countryText;
 
+    // Opdater skjult input med landekoden
+    document.getElementById('countryInput').value = countryCode;
+
     // Skjul dropdown-menuen
     toggleDropdown();
 }
+
+
 
 function toggleDropdown() {
     const dropdown = document.getElementById('countryDropdown');
