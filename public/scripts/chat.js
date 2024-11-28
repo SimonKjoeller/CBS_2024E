@@ -9,6 +9,29 @@ let currentUserId;
 let currentUsername;
 let activeRecipientId = null; // Til at holde styr på den aktive modtager
 
+function renderChatList(users) {
+    const chatList = document.getElementById("chat-list");
+    chatList.innerHTML = ""; // Tøm eksisterende liste
+
+    users.forEach(user => {
+        const li = document.createElement("li");
+        li.className = "chat-user";
+
+        li.innerHTML = `
+            <img src="${user.img_url || '/img/no-pb.png'}" alt="${user.username}" class="user-avatar">
+            <span>${user.username}</span>
+        `;
+        li.dataset.userId = user.user_id; // Gem user_id som data-attribut
+        li.onclick = () => {
+            activeRecipientId = user.user_id; // Opdater activeRecipientId
+            highlightUser(user.username);
+            joinRoom(user.user_id);
+            loadConversation(user.username);
+        };
+        chatList.appendChild(li);
+    });
+}
+
 async function fetchCurrentUserInfo() {
     try {
         const response = await fetch("/chat/currentUser", {
@@ -18,6 +41,8 @@ async function fetchCurrentUserInfo() {
         const data = await response.json();
         currentUserId = data.user_id;
         currentUsername = data.username;
+
+        console.log(data)
 
         // Opret Socket.IO-forbindelsen, når brugeroplysninger er hentet
         initializeSocket();
@@ -199,7 +224,9 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
             searchDropdown.appendChild(item);
         });
 
-        searchDropdown.style.display = "block";
+        renderChatList(results);
+
+        searchDropdown.style.display = "none";
     }
 
     function addChatUser(username, userId) {

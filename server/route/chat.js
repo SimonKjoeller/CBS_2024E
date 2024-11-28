@@ -15,7 +15,7 @@ chatRoutes.get("/", checkAuth, (req, res) => {
 chatRoutes.post("/recipient", checkAuth, (req, res) => {
     const { username } = req.body;
 
-    const query = "SELECT user_id, username FROM users WHERE username LIKE ? LIMIT 4";
+    const query = "SELECT user_id, username, img_url FROM users WHERE username LIKE ? LIMIT 4";
     db.all(query, [`%${username}%`], (err, users) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -102,8 +102,9 @@ chatRoutes.post("/send", checkAuth, (req, res) => {
 
 
 chatRoutes.get("/currentUser", checkAuth, (req, res) => {
-    const user_id = req.user.user_id;
     console.log(req.user);
+    const user_id = req.user.user_id;
+    console.log(user_id)
 
     const query = "SELECT username, user_id FROM users WHERE user_id = ? LIMIT 1";
     db.get(query, [user_id], (err, row) => {

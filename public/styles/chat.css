@@ -146,3 +146,25 @@
 #search-dropdown .dropdown-item:hover {
     background-color: #f09bc1;
 }
+
+.chat-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background-color: #f7c1d9;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.chat-user:hover {
+    background-color: #f09bc1;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
