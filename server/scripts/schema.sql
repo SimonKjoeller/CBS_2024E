@@ -1,10 +1,15 @@
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
-    user_id INTEGER PRIMARY KEY,  -- Unikt ID for hver bruger, autoincrementerer automatisk
-    username TEXT, 
-    email TEXT,
-    password TEXT
+    user_id INTEGER PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    phone TEXT UNIQUE NOT NULL,
+    otp TEXT,
+    otp_expiration DATETIME,
+    verified INTEGER DEFAULT 0
 );
+
 
 DROP TABLE IF EXISTS products;
         CREATE TABLE products (

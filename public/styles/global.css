@@ -306,3 +306,98 @@ select {
     transform: scale(1);
   }
 }
+
+/* Styling for signup box */
+#signupBox {
+  background-color: white;
+  max-width: 300px;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid #f09bc1;
+}
+
+/* Styling for inputs and buttons in signup box */
+#signupBox input[type="text"],
+#signupBox input[type="password"],
+#signupBox button {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+#signupBox button {
+  background-color: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#signupBox button:hover {
+  background-color: #555;
+}
+
+/* Styling for OTP verification box */
+#otpBox {
+  background-color: white;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid #f09bc1;
+}
+
+/* Inputs and buttons in OTP verification */
+#otpBox input[type="text"],
+#otpBox button {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#otpBox button {
+  background-color: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#otpBox button:hover {
+  background-color: #555;
+}
+
+.phone-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#countryInput {
+  width: 35%;
+  /* Sørger for, at landekoden fylder mere */
+  height: 48px;
+  /* Matcher højden af telefoninput og andre felter */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+#phoneInput {
+  flex: 1;
+  /* Fylder resten af pladsen */
+  height: 48px;
+  /* Matcher højden af de andre felter */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}

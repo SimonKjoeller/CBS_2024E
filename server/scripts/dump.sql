@@ -1,16 +1,16 @@
 -- Customers table
 INSERT INTO users
-    (username, email, password)
+    (username, email, password, phone)
 VALUES
-    ('anders', 'anders@gmail.com', 'anders123');
+    ('anders', 'anders@gmail.com', 'anders123', 1);
 INSERT INTO users
-    (username, email, password)
+    (username, email, password, phone)
 VALUES
-    ('hjalte', 'hjalte@gmail.com', 'hjalte123');
+    ('hjalte', 'hjalte@gmail.com', 'hjalte123', 2);
 INSERT INTO users
-    (username, email, password)
+    (username, email, password, phone)
 VALUES
-    ('simon', 'simon@gmail.com', 'simon123');
+    ('simon', 'simon@gmail.com', 'simon123', 3);
 
 
 
