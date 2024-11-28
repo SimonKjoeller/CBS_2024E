@@ -421,6 +421,8 @@ select {
 }
 
 .country-dropdown {
+  display: none;
+  /* Skjul som standard */
   position: absolute;
   top: 100%;
   left: 0;
@@ -429,9 +431,13 @@ select {
   border-radius: 4px;
   background-color: #fff;
   z-index: 1000;
-  display: none;
-  /* Hidden by default */
 }
+
+.country-dropdown.show {
+  display: block;
+  /* Vis dropdown, når 'show' tilføjes */
+}
+
 
 .country-option {
   display: flex;
@@ -442,11 +448,6 @@ select {
 
 .country-option:hover {
   background-color: #f0f0f0;
-}
-
-/* Vis dropdown, når den ikke er skjult */
-.country-dropdown.show {
-  display: block;
 }
 
 .phone-input input {

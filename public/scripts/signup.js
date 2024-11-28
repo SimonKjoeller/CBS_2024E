@@ -99,3 +99,33 @@ async function verify() {
         console.error(error.message);
     }
 }
+
+function selectCountry(countryText, flagSrc) {
+    // Find country-button og opdater dens indhold
+    const countryButton = document.getElementById('countryButton');
+    const flagIcon = countryButton.querySelector('img');
+    const countryLabel = countryButton.querySelector('span:nth-child(2)');
+
+    // Opdater flag-ikonet og teksten
+    flagIcon.src = flagSrc;
+    countryLabel.textContent = countryText;
+
+    // Skjul dropdown-menuen
+    toggleDropdown();
+}
+
+function toggleDropdown() {
+    const dropdown = document.getElementById('countryDropdown');
+    dropdown.classList.toggle('show'); // Skifter mellem at vise/skjule dropdown
+}
+
+// Event listener for at lukke dropdown, hvis brugeren klikker udenfor
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('countryDropdown');
+    const countryButton = document.getElementById('countryButton');
+
+    if (!dropdown.contains(e.target) && !countryButton.contains(e.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+
