@@ -89,7 +89,7 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
         // Upload profilbillede til Cloudinary
         let imgUrl = null;
         if (req.file) {
-            const tmpFilePath = `./public/img/${req.file.originalname}`;
+            const tmpFilePath = `../../public/img/${req.file.originalname}`;
 
             // Lav en midlertidig billedfil
             await fsPromises.writeFile(tmpFilePath, req.file.buffer);
