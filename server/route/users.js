@@ -6,6 +6,8 @@ const twilio = require("twilio");
 const bcrypt = require("bcrypt");
 const db = require("../db");
 const nodemailer = require("nodemailer");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
 require('dotenv').config();
 
 userRoutes.use(express.json());
@@ -45,57 +47,109 @@ userRoutes.post("/login", (req, res) => {
 });
 
 
+// Singup delen herunder
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = twilio(accountSid, authToken);
 
-// Singup delen herunder
+// Opsæt multer til at midlertidigt opbevare billedfiler inden de uploades til Cloudinary
+// Link: https://www.npmjs.com/package/multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+
+// Konfigurer Cloudinary nøgler
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME, // cloud_name
+    api_key: process.env.CLOUDINARY_API_KEY, // api_key
+    api_secret: process.env.CLOUDINARY_API_SECRET, // api_secret
+    secure: true,
+});
+
+
 
 // Hashing konfiguration
 const SALT_ROUNDS = 10;
 
 
-userRoutes.post('/signup', (req, res) => {
-    const { email, username, password, phone, newsletter } = req.body;
+userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => {
+    try {
+        const { email, username, password, phone, newsletter } = req.body;
 
-    console.log(email, username, password, phone, newsletter);
+        console.log(email, username, phone, newsletter);
 
-    // Hash password
-    const hashedPassword = bcrypt.hashSync(password, 10);
+        // Hash password
+        const hashedPassword = bcrypt.hashSync(password, 10);
 
-    // Generer engangskode
-    const otp = Math.floor(1000 + Math.random() * 9000); // Firecifret kode
-    const otpExpiry = Date.now() + 5 * 60 * 1000; // 5 minutters udløbstid
+        // Generer engangskode
+        const otp = Math.floor(1000 + Math.random() * 9000);
+        const otpExpiry = Date.now() + 5 * 60 * 1000;
 
-    // Gem i databasen
-    const query = `
-        INSERT INTO users (email, username, password, phone, otp, otp_expiration, verified, subscribed_newsletter)
-        VALUES (?, ?, ?, ?, ?, ?, 0, ?)
-    `;
+        // Upload profilbillede til Cloudinary
+        let imgUrl = null;
+        if (req.file) {
+            const tmpFilePath = `./public/tmp/${req.file.originalname}`;
 
-    db.run(query, [email, username, hashedPassword, phone, otp, otpExpiry, newsletter], (err) => {
-        if (err) {
-            console.error('Fejl ved oprettelse af bruger:', err);
-            return res.status(500).json({ error: 'Kunne ikke oprette bruger.' });
+            // Lav en midlertidig billedfil
+            await fsPromises.writeFile(tmpFilePath, req.file.buffer);
+
+            try {
+                const uploadOptions = {
+                    public_id: `profile_pictures/${req.file.originalname.split('.')[0]}`,
+                    resource_type: 'auto',
+                };
+
+                // Upload til Cloudinary
+                const result = await cloudinary.uploader.upload(tmpFilePath, uploadOptions);
+
+                // Fjern midlertidig fil
+                await fsPromises.unlink(tmpFilePath);
+
+                // Gem billed-URL
+                imgUrl = result.secure_url;
+            } catch (uploadError) {
+                console.error('Fejl ved upload til Cloudinary:', uploadError);
+                return res.status(500).json({ error: 'Kunne ikke uploade profilbillede.' });
+            }
         }
 
+        // Gem bruger i databasen
+        const query = `
+            INSERT INTO users (email, username, password, phone, otp, otp_expiration, verified, subscribed_newsletter, img_url)
+            VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
+        `;
+
+        await runQuery(query, [
+            email,
+            username,
+            hashedPassword,
+            phone,
+            otp,
+            otpExpiry,
+            newsletter || 0, // Standardværdi for nyhedsbrev
+            imgUrl,
+        ]);
+
         // Send engangskode med Twilio
-        client.messages
-            .create({
+        try {
+            await client.messages.create({
                 from: process.env.TWILIO_PHONE_NUMBER,
-                to: `+${phone}`, // Hele telefonnummeret med landekode
+                to: `+${phone}`,
                 body: `Din engangskode er ${otp}. Den udløber om 5 minutter.`,
-            })
-            .then(() => {
-                console.log('OTP sendt!');
-                res.status(200).json({ message: 'Signup lykkedes. Verificer dit telefonnummer.' });
-            })
-            .catch((error) => {
-                console.error('Fejl ved sending af OTP:', error);
-                res.status(500).json({ error: 'Kunne ikke sende OTP.' });
             });
-    });
+
+            console.log('OTP sendt!');
+            res.status(200).json({ message: 'Signup lykkedes. Verificer dit telefonnummer.' });
+        } catch (twilioError) {
+            console.error('Fejl ved sending af OTP:', twilioError);
+            res.status(500).json({ error: 'Kunne ikke sende OTP.' });
+        }
+    } catch (error) {
+        console.error('Fejl under signup:', error.message);
+        res.status(500).json({ error: 'Signup fejlede.' });
+    }
 });
+
 
 
 // Nyhedsbrev (SMTP) og twilio verificering
@@ -150,7 +204,7 @@ userRoutes.post('/verify', (req, res) => {
                         html: `<div style="font-family: Arial, sans-serif; color: #333;">
                             <h1>Velkommen til Joe & The Juice</h1>
                             <p>Tak for at verificere din konto. Du er nu tilmeldt vores nyhedsbrev!</p>
-                            <img src="/img/joeLogo.svg" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+                            <img src="https://seeklogo.com/images/J/joe-and-the-juice-logo-8D32BBD87A-seeklogo.com.png" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
                             <footer style="font-size: 12px; color: #888;">
                                 <p>Joe & The Juice</p>
                                 <p>Adresse: Se web</p>
