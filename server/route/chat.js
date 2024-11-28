@@ -25,53 +25,43 @@ chatRoutes.post("/recipient", checkAuth, (req, res) => {
 });
 
 
-chatRoutes.get("/conversation/:recipient", checkAuth, (req, res) => {
-    const recipientUsername = req.params.recipient;
+chatRoutes.get("/conversation/:recipientId", checkAuth, (req, res) => {
+    const recipientId = parseInt(req.params.recipientId, 10);
     const senderId = req.user.user_id;
 
-    // Først: Hent recipient_id fra databasen baseret på recipientUsername
-    const getRecipientIdQuery = "SELECT user_id FROM users WHERE username = ?";
-    db.get(getRecipientIdQuery, [recipientUsername], (err, row) => {
+    if (isNaN(recipientId)) {
+        return res.status(400).json({ error: "Invalid recipient ID" });
+    }
+
+    const query = `
+        SELECT c.message, c.sent_at, u1.username AS sender, u2.username AS recipient
+        FROM chat c
+        JOIN users u1 ON c.sender_id = u1.user_id
+        JOIN users u2 ON c.recipient_id = u2.user_id
+        WHERE 
+            (c.sender_id = ? AND c.recipient_id = ?) OR 
+            (c.sender_id = ? AND c.recipient_id = ?)
+        ORDER BY c.sent_at ASC`;
+
+    db.all(query, [senderId, recipientId, recipientId, senderId], (err, rows) => {
         if (err) {
-            console.error("Error fetching recipient ID:", err);
-            return res.status(500).json({ error: "Error fetching recipient ID" });
+            console.error("Error fetching conversation:", err);
+            return res.status(500).json({ error: "Error fetching conversation" });
         }
-
-        if (!row) {
-            return res.status(404).json({ error: "Recipient not found" });
-        }
-
-        const recipientId = row.user_id;
-
-        // Når recipient_id er hentet, udfør SELECT-forespørgslen for at hente samtalen
-        const query = `
-          SELECT c.message, c.sent_at, u1.username AS sender, u2.username AS recipient
-          FROM chat c
-          JOIN users u1 ON c.sender_id = u1.user_id
-          JOIN users u2 ON c.recipient_id = u2.user_id
-          WHERE 
-              (c.sender_id = ? AND c.recipient_id = ?) OR 
-              (c.sender_id = ? AND c.recipient_id = ?)
-          ORDER BY c.sent_at ASC`;
-
-        db.all(query, [senderId, recipientId, recipientId, senderId], (err, rows) => {
-            if (err) {
-                console.error("Error fetching conversation:", err);
-                return res.status(500).json({ error: "Error fetching conversation" });
-            }
-            res.status(200).json(rows);
-        });
+        res.status(200).json(rows);
     });
 });
 
 
+
 chatRoutes.post("/send", checkAuth, (req, res) => {
-    const { recipientUsername, message } = req.body;
+    const { recipientId, message } = req.body;
     const senderId = req.user.user_id;
 
+    console.log(recipientId)
     // Først: Hent recipient_id
-    const getRecipientIdQuery = "SELECT user_id FROM users WHERE username = ?";
-    db.get(getRecipientIdQuery, [recipientUsername], (err, row) => {
+    const getRecipientIdQuery = "SELECT user_id FROM users WHERE user_id = ?";
+    db.get(getRecipientIdQuery, [recipientId], (err, row) => {
         if (err) {
             console.error("Error fetching recipient ID:", err);
             return res.status(500).json({ error: "Error fetching recipient ID" });
