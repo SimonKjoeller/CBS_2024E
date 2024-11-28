@@ -26,7 +26,7 @@ function renderChatList(users) {
             activeRecipientId = user.user_id; // Opdater activeRecipientId
             highlightUser(user.username);
             joinRoom(user.user_id);
-            loadConversation(user.username);
+            loadConversation(activeRecipientId);
         };
         chatList.appendChild(li);
     });
@@ -42,14 +42,43 @@ async function fetchCurrentUserInfo() {
         currentUserId = data.user_id;
         currentUsername = data.username;
 
-        console.log(data)
-
         // Opret Socket.IO-forbindelsen, når brugeroplysninger er hentet
         initializeSocket();
     } catch (error) {
         console.error("Error fetching user info:", error);
     }
 }
+
+async function loadConversation(recipientId) {
+    try {
+        const response = await fetch(`/chat/conversation/${recipientId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const messages = await response.json();
+        chatMessages.innerHTML = "";
+
+        messages.forEach(msg => {
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+
+            if (msg.sender === currentUsername) {
+                messageElement.classList.add("mine");
+            } else {
+                messageElement.classList.add("other");
+            }
+
+            messageElement.textContent = `[${new Date(msg.sent_at).toLocaleString()}] ${msg.sender}: ${msg.message}`;
+            chatMessages.appendChild(messageElement);
+        });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    } catch (error) {
+        console.error("Error loading conversation:", error);
+    }
+}
+
 
 function initializeSocket() {
     if (!currentUserId) {
@@ -75,8 +104,6 @@ function initializeSocket() {
 
         const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
         const activeRoom = [currentUserId, activeRecipientId].sort((a, b) => a - b).join("_");
-
-        console.log(`Client: Active room: ${activeRoom}, Incoming room: ${room}`);
 
         if (room === activeRoom) {
             displayMessage(data);
@@ -121,9 +148,6 @@ sendMessageButton.addEventListener("click", async () => {
 
     const sent_at = new Date().toISOString();
 
-    console.log(`Client: Sending message to ${recipient}: "${message}" at ${sent_at}`);
-    console.log(`Client: currentUserId: ${currentUserId}, activeRecipientId: ${recipientId}`);
-
     // Ryd beskedfeltet
     messageInput.value = "";
 
@@ -142,7 +166,7 @@ sendMessageButton.addEventListener("click", async () => {
         const response = await fetch("/chat/send", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ recipientUsername: recipient, message }),
+            body: JSON.stringify({ recipientId: recipientId, message }),
         });
 
         if (!response.ok) {
@@ -158,7 +182,6 @@ sendMessageButton.addEventListener("click", async () => {
 
 function joinRoom(recipientId) {
     const room = [currentUserId, recipientId].sort((a, b) => a - b).join("_");
-    console.log(`Client: Joining room ${room} with recipientId ${recipientId}`);
     socket.emit("join_room", room);
 }
 
@@ -214,11 +237,10 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
                 // Opdater activeRecipientId og join rummet med det samme
                 activeRecipientId = result.user_id;
-                console.log("Client: Updated activeRecipientId:", activeRecipientId);
                 joinRoom(activeRecipientId);
 
                 // Indlæs samtalen og fremhæv brugeren
-                loadConversation(result.username);
+                loadConversation(activeRecipientId);
                 highlightUser(result.username);
             };
             searchDropdown.appendChild(item);
@@ -245,52 +267,18 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
         });
     }
 
-    async function loadConversation(recipient) {
-        const room = [currentUsername, recipient].sort().join('_');
-        socket.emit('join_room', room);
-
-        try {
-            const response = await fetch(`/chat/conversation/${recipient}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            const messages = await response.json();
-            chatMessages.innerHTML = "";
-
-            messages.forEach(msg => {
-                const messageElement = document.createElement("div");
-                messageElement.classList.add("message");
-
-                if (msg.sender === currentUsername) {
-                    messageElement.classList.add("mine");
-                } else {
-                    messageElement.classList.add("other");
-                }
-
-                messageElement.textContent = `[${new Date(msg.sent_at).toLocaleString()}] ${msg.sender}: ${msg.message}`;
-                chatMessages.appendChild(messageElement);
-            });
-
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        } catch (error) {
-            console.error("Error loading conversation:", error);
-        }
-    }
-
     chatList.addEventListener("click", (event) => {
         const listItem = event.target.closest("li");
-        console.log(event)
-        console.log(listItem)
+
+        console.log(listItem.dataset.userId)
         if (listItem) {
             const recipientId = listItem.dataset.userId;
-            console.log(recipientId)
+
             activeRecipientId = recipientId; // Opdater den aktive modtager
-            console.log("Client: Updated activeRecipientId:", activeRecipientId);
 
             highlightUser(listItem.textContent);
             joinRoom(recipientId); // Brug recipientId til at oprette rummet
-            loadConversation(listItem.textContent); // Hent samtalen
+            loadConversation(recipientId); // Hent samtalen
         }
     });
 }
