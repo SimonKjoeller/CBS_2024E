@@ -150,7 +150,7 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
         // Gem bruger i databasen
         const query = `
             INSERT INTO users (email, email_iv, username, password, phone, otp, otp_expiration, verified, subscribed_newsletter, img_url)
-            VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
         `;
         console.log(imgUrl)
         db.run(query, [
