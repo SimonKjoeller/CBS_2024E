@@ -36,10 +36,14 @@ function decrypt(encryptedData, iv) {
     const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
+    console.log(encryptedData)
+    console.log(decrypted)
     return decrypted;
 }
 
 userRoutes.post("/login", (req, res) => {
+    console.log('email_iv:', user.email_iv);
+
     const { email, password } = req.body;
 
     const query = `SELECT * FROM users WHERE verified = 1`;
@@ -52,6 +56,9 @@ userRoutes.post("/login", (req, res) => {
         // Dekrypter e-mails og find match
         const user = users.find((user) => {
             const decryptedEmail = decrypt(user.email, user.email_iv);
+            console.log(user.email)
+            console.log(user.email_iv)
+            console.log(decryptedEmail)
             return decryptedEmail === email;
         });
 
