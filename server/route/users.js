@@ -42,7 +42,6 @@ function decrypt(encryptedData, iv) {
 }
 
 userRoutes.post("/login", (req, res) => {
-    console.log('email_iv:', user.email_iv);
 
     const { email, password } = req.body;
 
