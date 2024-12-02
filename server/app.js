@@ -57,6 +57,17 @@ app.use("/users", userRoutes);
 app.use("/chat", chatRoutes);
 app.use("/shakes", shakeRoutes);
 
+// Google Maps API
+app.get('/api/maps-key', (req, res) => {
+  const mapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (mapsApiKey) {
+    res.json({ apiKey: mapsApiKey });
+  } else {
+    res.status(500).json({ error: "API-nøgle ikke fundet i .env" });
+  }
+});
+
+
 app.post("/chatbot", async (req, res) => {
   const userMessage = req.body.message;
 

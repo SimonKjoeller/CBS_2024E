@@ -438,3 +438,21 @@ select {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+
+/* Kort */
+/* Styling specifikt for locations siden */
+#map-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+#map {
+  height: 500px;
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
