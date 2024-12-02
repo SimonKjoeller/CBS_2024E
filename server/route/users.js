@@ -9,43 +9,69 @@ const nodemailer = require("nodemailer");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const fsPromises = require("fs").promises;
+const crypto = require('crypto');
 require('dotenv').config();
 
 userRoutes.use(express.json());
 userRoutes.use(cookieParser());
 
+
+// Symmetrisk kryptering
+const algorithm = 'aes-256-cbc';
+const key = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
+const iv = crypto.randomBytes(16); // Initialiseringsvektor
+
 const secretKey = process.env.JWT_SECRET; // Bruger miljøvariabel til sikkerhed
 
+// Funktion til at kryptere data
+function encrypt(text) {
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return { encryptedData: encrypted, iv: iv.toString('hex') };
+}
+
+// Funktion til at dekryptere data
+function decrypt(encryptedData, iv) {
+    const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
+    let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
 
 userRoutes.post("/login", (req, res) => {
     const { email, password } = req.body;
 
-    const query = `
-        SELECT * FROM users WHERE email = ? AND verified = 1
-    `;
+    const query = `SELECT * FROM users WHERE verified = 1`;
 
-    db.get(query, [email], async (err, user) => {
+    db.all(query, [], async (err, users) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
 
-        if (user) {
-            const passwordMatch = await bcrypt.compare(password, user.password);
+        // Dekrypter e-mails og find match
+        const user = users.find((user) => {
+            const decryptedEmail = decrypt(user.email, user.email_iv);
+            return decryptedEmail === email;
+        });
 
-            if (passwordMatch) {
-                // Generer JWT token
-                const token = jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '1h' });
-                res.cookie("authToken", token, { httpOnly: true, secure: true, sameSite: "None" })
-                    .status(200)
-                    .json({ message: "Du er logget ind!" });
-            } else {
-                res.status(401).json({ message: "Forkert adgangskode." });
-            }
+        if (!user) {
+            return res.status(401).json({ message: "Bruger ikke fundet eller ikke verificeret." });
+        }
+
+        const passwordMatch = await bcrypt.compare(password, user.password);
+
+        if (passwordMatch) {
+            const token = jwt.sign({ user_id: user.user_id, username: user.username }, secretKey, { expiresIn: '1h' });
+            res.cookie("authToken", token, { httpOnly: true, secure: true, sameSite: "None" })
+                .status(200)
+                .json({ message: "Du er logget ind!" });
         } else {
-            res.status(401).json({ message: "Bruger ikke fundet eller ikke verificeret." });
+            res.status(401).json({ message: "Forkert adgangskode." });
         }
     });
 });
+
 
 
 // Singup delen herunder
@@ -78,6 +104,9 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
         const { email, username, password, phone, newsletter } = req.body;
 
         console.log(email, username, password, phone, newsletter);
+
+        // Krypter email
+        const { encryptedData, iv: ivHex } = encrypt(email);
 
         // Hash password
         const hashedPassword = bcrypt.hashSync(password, 10);
@@ -125,7 +154,8 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
         `;
         console.log(imgUrl)
         db.run(query, [
-            email,
+            encryptedData,
+            ivHex,
             username,
             hashedPassword,
             phone,
@@ -175,36 +205,35 @@ const transporter = nodemailer.createTransport({
 userRoutes.post('/verify', (req, res) => {
     const { email, otp } = req.body;
 
-    console.log(email, otp);
-    console.log(req.body);
     if (!email || !otp) {
         return res.status(400).json({ message: 'Email og OTP er påkrævet.' });
     }
 
-    const query = `
-        SELECT * FROM users WHERE email = ? AND otp = ? AND otp_expiration >= ?
-    `;
-    db.get(query, [email, otp, Date.now()], (err, user) => {
+    const query = `SELECT * FROM users WHERE otp = ? AND otp_expiration >= ?`;
+
+    db.get(query, [otp, Date.now()], (err, user) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
+
         if (!user) {
             return res.status(401).json({ message: 'Ugyldig eller udløbet OTP.' });
         }
 
-        // Marker brugeren som verificeret
-        const updateQuery = `
-            UPDATE users SET verified = 1, otp = NULL, otp_expiration = NULL WHERE email = ?
-        `;
-        db.run(updateQuery, [email], async (updateErr) => {
+        // Dekrypter e-mail for validering
+        const decryptedEmail = decrypt(user.email, user.email_iv);
+        if (decryptedEmail !== email) {
+            return res.status(401).json({ message: 'E-mail matcher ikke.' });
+        }
+
+        const updateQuery = `UPDATE users SET verified = 1, otp = NULL, otp_expiration = NULL WHERE email = ?`;
+        db.run(updateQuery, [user.email], async (updateErr) => {
             if (updateErr) {
                 return res.status(500).json({ error: updateErr.message });
             }
 
-            // Tjek om brugeren har valgt at tilmelde sig nyhedsbrevet
             if (user.subscribed_newsletter === 1) {
                 try {
-                    // Send nyhedsbrev
                     const info = await transporter.sendMail({
                         from: "CBSJOE <cbsjoec@gmail.com>",
                         to: email,
@@ -221,14 +250,14 @@ userRoutes.post('/verify', (req, res) => {
                     });
                     console.log(`Nyhedsbrev sendt til ${email}:`, info.messageId);
                 } catch (error) {
-                    console.error(`Fejl ved afsendelse af nyhedsbrev til ${email}:`, error);
+                    console.error(`Fejl ved afsendelse af nyhedsbrev:`, error);
                 }
             }
 
-            // Send succes-respons
             res.status(200).json({ message: 'Bruger verificeret succesfuldt.' });
         });
     });
 });
+
 
 module.exports = userRoutes;

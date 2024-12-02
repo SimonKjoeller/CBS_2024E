@@ -158,6 +158,7 @@ select {
   bottom: 20px;
   right: 20px;
   width: 350px;
+  height: 500px; /* Fast højde */
   background: #fff;
   border-radius: 15px;
   box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
@@ -190,6 +191,8 @@ select {
   flex-direction: column;
   gap: 10px;
   background: #f9f9f9;
+  max-height: 400px; /* Fast højde */
+  box-sizing: border-box;
 }
 
 /* User and chatbot messages */
@@ -281,46 +284,20 @@ select {
   transform: scale(1.1);
 }
 
-/* Typing indicator */
-.typing-dots {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.typing-dots span {
+/* Scrollbar tilpasset styling */
+#chat-messages::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
-  margin: 0 3px;
-  background-color: #ec6bab;
-  border-radius: 50%;
-  animation: blink 1.4s infinite ease-in-out both;
 }
 
-.typing-dots span:nth-child(1) {
-  animation-delay: -0.32s;
+#chat-messages::-webkit-scrollbar-thumb {
+  background: #ec6bab;
+  border-radius: 4px;
 }
 
-.typing-dots span:nth-child(2) {
-  animation-delay: -0.16s;
+#chat-messages::-webkit-scrollbar-track {
+  background: #f9f9f9;
 }
 
-.typing-dots span:nth-child(3) {
-  animation-delay: 0;
-}
-
-@keyframes blink {
-
-  0%,
-  80%,
-  100% {
-    transform: scale(0);
-  }
-
-  40% {
-    transform: scale(1);
-  }
-}
 
 /* Styling for signup box */
 #signupBox {
