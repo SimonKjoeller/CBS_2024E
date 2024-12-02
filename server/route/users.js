@@ -28,12 +28,20 @@ function encrypt(text) {
     const cipher = crypto.createCipheriv(algorithm, key, iv);
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    console.log(encrypted)
+    console.log('Encrypted Data:', encrypted);
+    console.log('IV:', iv.toString('hex'));
     return { encryptedData: encrypted, iv: iv.toString('hex') };
 }
-encrypt("anders@gmail.com")
-encrypt("hjalte@gmail.com")
-encrypt("simon@gmail.com")
+
+// Krypter e-mails
+const emails = ['anders@gmail.com', 'hjalte@gmail.com', 'simon@gmail.com'];
+emails.forEach((email) => {
+    const { encryptedData, iv } = encrypt(email);
+    console.log(`Email: ${email}`);
+    console.log(`Encrypted: ${encryptedData}`);
+    console.log(`IV: ${iv}`);
+});
+
 // Funktion til at dekryptere data
 function decrypt(encryptedData, iv) {
     if (!iv || typeof iv !== 'string' || iv.length !== 32) {
