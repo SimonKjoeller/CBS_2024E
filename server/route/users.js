@@ -33,11 +33,15 @@ function encrypt(text) {
 
 // Funktion til at dekryptere data
 function decrypt(encryptedData, iv) {
+    if (!iv || typeof iv !== 'string' || iv.length !== 32) {
+        throw new Error('Ugyldig IV: Skal være en 32-tegn lang hex-streng');
+    }
     const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return decrypted;
 }
+
 
 userRoutes.post("/login", (req, res) => {
 
@@ -50,12 +54,18 @@ userRoutes.post("/login", (req, res) => {
             return res.status(500).json({ error: err.message });
         }
 
-        // Dekrypter e-mails og find match
         const user = users.find((user) => {
+            console.log("email:", user.email);
+            console.log("email_iv:", user.email_iv);
+
+            // Valider `email_iv`
+            if (!user.email_iv || typeof user.email_iv !== 'string' || user.email_iv.length !== 32) {
+                console.error("Ugyldig `email_iv` for bruger:", user);
+                return false; // Ekskluder denne bruger fra matchet
+            }
+
             const decryptedEmail = decrypt(user.email, user.email_iv);
-            console.log("email:" + user.email)
-            console.log("email_iv:" + user.email_iv)
-            console.log("decrypted:" + decryptedEmail)
+            console.log("decrypted:", decryptedEmail);
             return decryptedEmail === email;
         });
 
