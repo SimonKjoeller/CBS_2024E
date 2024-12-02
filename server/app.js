@@ -65,7 +65,7 @@ app.post("/chatbot", async (req, res) => {
       model: "gpt-3.5-turbo",
       messages: [
         {
-          role: "system"/*,
+          role: "system",
           content: `
                       Du er en chatbot for Joe & The Juice. Du skal hjælpe kunder med følgende spørgsmål:
                       - Vores menu (smoothies, sandwiches, juice, shakes).
@@ -87,9 +87,9 @@ app.post("/chatbot", async (req, res) => {
                         Svar: "Vi har åbent hver dag fra kl. 8:00 til 20:00."
                       - Spørgsmål: "Hvor kan jeg finde jer?"
                         Svar: "Du kan finde os i byer over hele landet! Tjek vores hjemmeside for placeringer nær dig."
-                  `,*/
+                  `,
         },
-        { role: "user"/*, content: userMessage*/ },
+        { role: "user", content: userMessage },
       ],
       max_tokens: 150,
       temperature: 0.7,
