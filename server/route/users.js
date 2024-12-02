@@ -28,8 +28,6 @@ function encrypt(text) {
     const cipher = crypto.createCipheriv(algorithm, key, iv);
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
-    console.log('Encrypted Data:', encrypted);
-    console.log('IV:', iv.toString('hex'));
     return { encryptedData: encrypted, iv: iv.toString('hex') };
 }
 
