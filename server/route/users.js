@@ -36,8 +36,6 @@ function decrypt(encryptedData, iv) {
     const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'hex'));
     let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-    console.log(encryptedData)
-    console.log(decrypted)
     return decrypted;
 }
 
@@ -55,9 +53,9 @@ userRoutes.post("/login", (req, res) => {
         // Dekrypter e-mails og find match
         const user = users.find((user) => {
             const decryptedEmail = decrypt(user.email, user.email_iv);
-            console.log(user.email)
-            console.log(user.email_iv)
-            console.log(decryptedEmail)
+            console.log("email:" + user.email)
+            console.log("email_iv:" + user.email_iv)
+            console.log("decrypted:" + decryptedEmail)
             return decryptedEmail === email;
         });
 
