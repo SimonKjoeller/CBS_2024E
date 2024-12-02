@@ -89,7 +89,7 @@ app.post("/chatbot", async (req, res) => {
                         Svar: "Du kan finde os i byer over hele landet! Tjek vores hjemmeside for placeringer nær dig."
                   `,*/
         },
-        { role: "user", content: userMessage },
+        { role: "user"/*, content: userMessage*/ },
       ],
       max_tokens: 150,
       temperature: 0.7,
