@@ -28,9 +28,12 @@ function encrypt(text) {
     const cipher = crypto.createCipheriv(algorithm, key, iv);
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
+    console.log(encrypted)
     return { encryptedData: encrypted, iv: iv.toString('hex') };
 }
-
+encrypt("anders@gmail.com")
+encrypt("hjalte@gmail.com")
+encrypt("simon@gmail.com")
 // Funktion til at dekryptere data
 function decrypt(encryptedData, iv) {
     if (!iv || typeof iv !== 'string' || iv.length !== 32) {
