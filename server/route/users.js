@@ -33,15 +33,6 @@ function encrypt(text) {
     return { encryptedData: encrypted, iv: iv.toString('hex') };
 }
 
-// Krypter e-mails
-const emails = ['anders@gmail.com', 'hjalte@gmail.com', 'simon@gmail.com'];
-emails.forEach((email) => {
-    const { encryptedData, iv } = encrypt(email);
-    console.log(`Email: ${email}`);
-    console.log(`Encrypted: ${encryptedData}`);
-    console.log(`IV: ${iv}`);
-});
-
 // Funktion til at dekryptere data
 function decrypt(encryptedData, iv) {
     if (!iv || typeof iv !== 'string' || iv.length !== 32) {
