@@ -1,0 +1,186 @@
+/* Hero Section */
+.hero {
+    height: 90vh;
+    background-image: url('/img/joes.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+}
+
+/* Hero text container styling */
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent sort baggrund */
+    padding: 20px 30px;
+    border-radius: 10px; /* Runde hjørner */
+}
+
+/* Hovedoverskrift styling */
+.hero-content h1 {
+    font-size: 2.8rem;
+    font-weight: bold;
+    color: white; /* Kontrastfarve */
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Dynamisk tekst styling */
+.dynamic-text {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ff5075; /* Pink tekst */
+    margin-top: 10px;
+    font-family: 'Arial', sans-serif;
+}
+
+
+.cursor {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #ff7096;
+    animation: blink 0.7s step-start infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Features Section */
+.features {
+    display: flex;
+    justify-content: space-around;
+    padding: 50px 20px;
+}
+
+.feature {
+    text-align: center;
+    max-width: 300px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Newsletter Section */
+.newsletter {
+    padding: 50px 20px;
+    background-color: #fcd7e6;
+    text-align: center;
+}
+
+.newsletter .center {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.newsletter input {
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 300px;
+}
+
+.newsletter button {
+    padding: 10px 20px;
+    background-color: #ff7096;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.newsletter button:hover {
+    background-color: #ff5075;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+}
+
+.info-section {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 50px 0;
+    background-color: #ffe6f1;
+}
+
+/* Individual card styling */
+.section-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 300px;
+    transition: all 0.3s ease-in-out;
+}
+
+.section-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon styling */
+.card-icon {
+    width: 50px;
+    margin-bottom: 20px;
+}
+
+/* Title styling */
+.section-card h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #ff5075;
+}
+
+/* Paragraph styling */
+.section-card p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* CTA button styling */
+.cta-button {
+    display: inline-block;
+    background-color: #ff5075;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+
+.cta-button:hover {
+    background-color: #f088b7;
+    transform: scale(1.1);
+}

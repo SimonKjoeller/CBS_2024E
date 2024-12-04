@@ -39,6 +39,10 @@ app.get("/signup", (req, res) => {
 });
 
 app.get("/", checkAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/pages/index.html"));
+});
+
+app.get("/menu", checkAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "../public/pages/shakes.html"));
 });
 

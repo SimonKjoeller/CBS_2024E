@@ -160,3 +160,43 @@ async function sendEmail() {
 
 
 
+
+// styling //
+document.addEventListener("DOMContentLoaded", () => {
+  const phrases = [
+      "Fresh Juices for Every Mood",
+      "Handcrafted Coffee, Always",
+      "Vibes You’ll Remember",
+      "Good Energy, Great Food",
+  ];
+
+  let phraseIndex = 0;
+  let charIndex = 0;
+  const typingSpeed = 100;
+  const delayBetweenPhrases = 2000;
+
+  const dynamicText = document.querySelector(".dynamic-text");
+
+  function type() {
+      if (charIndex < phrases[phraseIndex].length) {
+          dynamicText.textContent += phrases[phraseIndex].charAt(charIndex);
+          charIndex++;
+          setTimeout(type, typingSpeed);
+      } else {
+          setTimeout(deletePhrase, delayBetweenPhrases);
+      }
+  }
+
+  function deletePhrase() {
+      if (charIndex > 0) {
+          dynamicText.textContent = phrases[phraseIndex].substring(0, charIndex - 1);
+          charIndex--;
+          setTimeout(deletePhrase, typingSpeed);
+      } else {
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+          setTimeout(type, typingSpeed);
+      }
+  }
+
+  type();
+});
