@@ -440,29 +440,74 @@ select {
 }
 
 
-/* Kort */
-/* Styling specifikt for locations siden */
-#map-container {
-  margin-top: 20px;
+
+
+
+/* Locations Page Layout */
+/* Locations Page Layout */
+#locations-page {
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  gap: 20px;
+  padding: 0;
+  height: 100vh; /* Fylder hele højden af skærmen */
+}
+
+#locations-list {
+  width: 30%;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Tilføjer scrollbar hvis nødvendigt */
+}
+
+#locations-list h2 {
+  color: #ff66a3;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+#search-box {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+#location-results {
+  max-height: calc(100vh - 150px); /* For at passe ind i skærmhøjden */
+  overflow-y: auto; /* Tilføjer scrollbar for listen */
+}
+
+#location-results .location-item {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#location-results .location-item:hover {
+  background-color: #ffe6f2;
+}
+
+.location-item .location-distance {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Map Styling */
+#map-container {
+  width: 70%;
+  height: 100%; /* Fylder hele højden af sektionen */
 }
 
 #map {
-  height: 500px;
   width: 100%;
-  max-width: 800px;
-  border: 1px solid #ccc;
+  height: 100%; /* Fylder hele højden af containeren */
   border-radius: 8px;
 }
-
-
-
-
-
-
-
-/* Styling specifikt for locations siden */
-
-
-

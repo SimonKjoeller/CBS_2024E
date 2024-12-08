@@ -31,13 +31,23 @@
     <li style="float:right" class="active"><a href="/locations">Locations</a></li>
     <li style="float:right"><a href="/menu">Menu</a></li>
 </ul>
-
-  <main>
-    <h1>Find Joe & the Juice Near You</h1>
-    <div id="map-container">
-        <div id="map"></div>
+ 
+<main>
+  <div id="locations-page">
+    <div id="locations-list">
+      <h2>Find a Joe Near You</h2>
+      <input type="text" id="search-box" oninput="filterLocations()" placeholder="Search for a location...">
+      <div id="location-results">
+        <!-- Lokationer indlæses dynamisk her -->
+      </div>
     </div>
+    <div id="map-container">
+      <div id="map"></div>
+    </div>
+  </div>
+  
 </main>
+
 </body>
 
 <script src="../scripts/index.js"></script>

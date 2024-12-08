@@ -158,9 +158,6 @@ async function sendEmail() {
 }
 
 
-
-
-
 // styling //
 document.addEventListener("DOMContentLoaded", () => {
   const phrases = [
