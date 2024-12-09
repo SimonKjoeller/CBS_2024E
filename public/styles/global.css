@@ -442,7 +442,6 @@ select {
 
 
 
-
 /* Locations Page Layout */
 /* Locations Page Layout */
 #locations-page {
@@ -450,7 +449,7 @@ select {
   flex-direction: row;
   gap: 20px;
   padding: 0;
-  height: 100vh; /* Fylder hele højden af skærmen */
+  height: 100vh; /* Fylder hele hÃ¸jden af skÃ¦rmen */
 }
 
 #locations-list {
@@ -459,11 +458,11 @@ select {
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  overflow-y: auto; /* Tilføjer scrollbar hvis nødvendigt */
+  overflow-y: auto; /* TilfÃ¸jer scrollbar hvis nÃ¸dvendigt */
 }
 
 #locations-list h2 {
-  color: #ff66a3;
+  color: #000000;
   font-size: 1.5em;
   margin-bottom: 10px;
 }
@@ -477,8 +476,8 @@ select {
 }
 
 #location-results {
-  max-height: calc(100vh - 150px); /* For at passe ind i skærmhøjden */
-  overflow-y: auto; /* Tilføjer scrollbar for listen */
+  max-height: calc(100vh - 150px); /* For at passe ind i skÃ¦rmhÃ¸jden */
+  overflow-y: auto; /* TilfÃ¸jer scrollbar for listen */
 }
 
 #location-results .location-item {
@@ -503,11 +502,11 @@ select {
 /* Map Styling */
 #map-container {
   width: 70%;
-  height: 100%; /* Fylder hele højden af sektionen */
+  height: 100%; /* Fylder hele hÃ¸jden af sektionen */
 }
 
 #map {
   width: 100%;
-  height: 100%; /* Fylder hele højden af containeren */
+  height: 100%; /* Fylder hele hÃ¸jden af containeren */
   border-radius: 8px;
 }
