@@ -10,10 +10,15 @@ const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const fsPromises = require("fs").promises;
 const crypto = require('crypto');
+const cors = require("cors");
 require('dotenv').config();
 
 userRoutes.use(express.json());
 userRoutes.use(cookieParser());
+userRoutes.use(cors({
+    origin: "https://cbsjoe.live",
+    credentials: true,
+}));
 
 
 // Symmetrisk kryptering
@@ -85,6 +90,20 @@ userRoutes.post("/login", (req, res) => {
         }
     });
 });
+
+userRoutes.post("/logout", (req, res) => {
+    // Sæt cookien til at udløbe ved at sætte dens maxAge til 0
+    res.cookie("authToken", "", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        maxAge: 0, // Fjern cookien
+    });
+
+    // Returner en succesmeddelelse
+    res.status(200).json({ message: "Du er logget ud!" });
+});
+
 
 
 

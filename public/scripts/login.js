@@ -19,9 +19,9 @@ async function login() {
         if (response.ok) {
             const data = await response.json();
             window.location.href = `https://cbsjoe.live/`; // Redirect efter login
-            console.log(data);
         }
     } catch (error) {
         console.log(error);
+        alert('Wrong password. Try again!');
     }
 }
