@@ -26,9 +26,17 @@ async function login() {
     }
 }
 
-document.getElementById('loginForm').addEventListener('keydown', (event) => {
+// Lyt efter 'Enter'-tasten
+emailInputDom.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
-        event.preventDefault(); // Forhindre standard submit-opførsel
-        login(); // Kald login-funktionen
+        event.preventDefault();
+        login();
     }
 });
+
+passwordInputDom.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // 
+        login();
+    }
+}); s
