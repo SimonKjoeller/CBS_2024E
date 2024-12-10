@@ -118,10 +118,21 @@ app.post("/chatbot", async (req, res) => {
   }
 });
 
-// HTTP server setup
-const server = http.createServer(app).listen(3000, () => {
-  console.log("HTTP Server listening on port 3000");
+// Liste over porte, som vi ønsker at starte serverne på. Dette bruges til vores Load Balancer i NGINX
+const ports = [
+  process.env.PORT1 || 3001,
+  process.env.PORT2 || 3002,
+  process.env.PORT3 || 3003,
+  process.env.PORT4 || 3004
+];
+
+// Start en server for hver port
+ports.forEach(port => {
+  http.createServer(app).listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
 });
+
 
 // Socket.IO setup
 const io = socketIo(server, {
