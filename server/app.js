@@ -1,191 +1,199 @@
-require('dotenv').config();
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const checkAuth = require('./checkAuth');
-const userRoutes = require("./route/users");
-const chatRoutes = require("./route/chat");
-const shakeRoutes = require("./route/shakes");
-const socketIo = require("socket.io");
-const http = require("http");
-const app = express();
-const db = require("./db");
-const { OpenAI } = require("openai");
+const cluster = require('cluster');
+const os = require('os');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // API-nøglen fra .env
-});
+if (cluster.isPrimary) {
+  const numCPUs = os.cpus().length;
 
-// Middleware setup
-app.use(cors());
-app.use(express.static(path.join(__dirname, "../public")));
-app.use(cookieParser());
-app.use(express.json());
+  console.log(`Primary process is running with PID: ${process.pid}`);
+  console.log(`Forking ${numCPUs} workers...`);
 
-
-
-// Routes
-app.get("/locations", checkAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/pages/locations.html"));
-});
-
-app.get("/login", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/pages/login.html"));
-});
-
-app.get("/signup", (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/pages/signup.html"));
-});
-
-app.get("/", checkAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/pages/shakes.html"));
-});
-
-chatRoutes.get("/chat", checkAuth, (req, res) => {
-  res.sendFile(path.join(__dirname, "../public/pages/chat.html"));
-});
-
-app.get("/cookie", (req, res) => {
-  res.cookie("taste", "chocolate");
-  res.send("Cookie set");
-});
-
-
-
-app.use("/users", userRoutes);
-app.use("/chat", chatRoutes);
-app.use("/shakes", shakeRoutes);
-
-app.post("/chatbot", async (req, res) => {
-  const userMessage = req.body.message;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: `
-                      Du er en chatbot for Joe & The Juice. Du skal hjælpe kunder med følgende spørgsmål:
-                      - Vores menu (smoothies, sandwiches, juice, shakes).
-                      - Åbningstider for Joe & The Juice.
-                      - Placering af Joe & The Juice-butikker.
-                      - Spørgsmål om allergener i vores produkter.
-
-                      Regler for dine svar:
-                      1. Hvis et spørgsmål ikke er relevant for Joe & The Juice, skal du svare: 
-                         "Jeg er kun i stand til at besvare spørgsmål relateret til Joe & The Juice, vores menu, åbningstider og placeringer."
-                      2. Du skal altid være kortfattet og præcis.
-                      3. Tilføj gerne en venlig tone og emojis, der matcher Joe & The Juice's stil.
-                      4. Ignorer irrelevante forespørgsler som personlige spørgsmål eller ting, der ikke handler om Joe & The Juice.
-
-                      Eksempelspørgsmål og -svar:
-                      - Spørgsmål: "Hvad er jeres menu?"
-                        Svar: "Vores menu indeholder lækre smoothies, sandwiches og shakes. Vil du høre mere om en specifik ret?"
-                      - Spørgsmål: "Hvad er jeres åbningstider?"
-                        Svar: "Vi har åbent hver dag fra kl. 8:00 til 20:00."
-                      - Spørgsmål: "Hvor kan jeg finde jer?"
-                        Svar: "Du kan finde os i byer over hele landet! Tjek vores hjemmeside for placeringer nær dig."
-                  `,
-        },
-        { role: "user", content: userMessage },
-      ],
-      max_tokens: 150,
-      temperature: 0.7,
-    });
-
-    const botReply = completion.choices[0].message.content.trim();
-    res.json({ response: botReply });
-  } catch (error) {
-    console.error("Fejl med OpenAI API:", error.message);
-    res.status(500).json({ response: "Der opstod en fejl. Jeg kan desværre ikke svare lige nu!" });
+  // Opret en worker for hver CPU-kerne
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
   }
-});
 
-// HTTP server setup
-const server = http.createServer(app).listen(3000, () => {
-  console.log("HTTP Server listening on port 3000");
-});
+  // Hvis en worker crasher, start en ny
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`Worker ${worker.process.pid} died. Starting a new one...`);
+    cluster.fork();
+  });
+} else {
+  // Inderammer resten af vores kode hos en worker
 
-// Socket.IO setup
-const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-  transports: ["websocket", "polling"],
-});
+  require('dotenv').config();
+  const express = require("express");
+  const cors = require("cors");
+  const path = require("path");
+  const cookieParser = require("cookie-parser");
+  const checkAuth = require('./checkAuth');
+  const userRoutes = require("./route/users");
+  const chatRoutes = require("./route/chat");
+  const shakeRoutes = require("./route/shakes");
+  const socketIo = require("socket.io");
+  const http = require("http");
+  const app = express();
+  const db = require("./db");
+  const { OpenAI } = require("openai");
 
-io.on("connection", (socket) => {
-  console.log("A user connected");
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
 
-  // Hent bruger-ID fra klientens handshake auth
-  const user_id = socket.handshake.auth.user_id;
+  // Middleware setup
+  app.use(cors());
+  app.use(express.static(path.join(__dirname, "../public")));
+  app.use(cookieParser());
+  app.use(express.json());
 
-  console.log(`Server: User ID from handshake: ${user_id}`);
+  // Routes
+  app.get("/locations", checkAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/pages/locations.html"));
+  });
 
-  if (user_id) {
-    // Hent ulæste beskeder
-    const query = `
-          SELECT * FROM chat
-          WHERE recipient_id = ? AND delivered = 0
-      `;
-    db.all(query, [user_id], (err, messages) => {
-      if (err) {
-        console.error("Database error:", err);
-        return;
-      }
+  app.get("/login", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/pages/login.html"));
+  });
 
-      // Send beskeder og marker dem som leveret
-      messages.forEach((msg) => {
-        socket.emit("new_message", msg);
+  app.get("/signup", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/pages/signup.html"));
+  });
 
-        const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
-        db.run(updateQuery, [msg.chat_id], (err) => {
-          if (err) console.error("Error updating message:", err);
+  app.get("/", checkAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/pages/shakes.html"));
+  });
+
+  chatRoutes.get("/chat", checkAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/pages/chat.html"));
+  });
+
+  app.get("/cookie", (req, res) => {
+    res.cookie("taste", "chocolate");
+    res.send("Cookie set");
+  });
+
+  app.use("/users", userRoutes);
+  app.use("/chat", chatRoutes);
+  app.use("/shakes", shakeRoutes);
+
+  app.post("/chatbot", async (req, res) => {
+    const userMessage = req.body.message;
+
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: `
+              Du er en chatbot for Joe & The Juice. Du skal hjælpe kunder med følgende spørgsmål:
+              - Vores menu (smoothies, sandwiches, juice, shakes).
+              - Åbningstider for Joe & The Juice.
+              - Placering af Joe & The Juice-butikker.
+              - Spørgsmål om allergener i vores produkter.
+
+              Regler for dine svar:
+              1. Hvis et spørgsmål ikke er relevant for Joe & The Juice, skal du svare: 
+                 "Jeg er kun i stand til at besvare spørgsmål relateret til Joe & The Juice, vores menu, åbningstider og placeringer."
+              2. Du skal altid være kortfattet og præcis.
+              3. Tilføj gerne en venlig tone og emojis, der matcher Joe & The Juice's stil.
+              4. Ignorer irrelevante forespørgsler som personlige spørgsmål eller ting, der ikke handler om Joe & The Juice.
+
+              Eksempelspørgsmål og -svar:
+              - Spørgsmål: "Hvad er jeres menu?"
+                Svar: "Vores menu indeholder lækre smoothies, sandwiches og shakes. Vil du høre mere om en specifik ret?"
+              - Spørgsmål: "Hvad er jeres åbningstider?"
+                Svar: "Vi har åbent hver dag fra kl. 8:00 til 20:00."
+              - Spørgsmål: "Hvor kan jeg finde jer?"
+                Svar: "Du kan finde os i byer over hele landet! Tjek vores hjemmeside for placeringer nær dig."
+            `,
+          },
+          { role: "user", content: userMessage },
+        ],
+        max_tokens: 150,
+        temperature: 0.7,
+      });
+
+      const botReply = completion.choices[0].message.content.trim();
+      res.json({ response: botReply });
+    } catch (error) {
+      console.error("Fejl med OpenAI API:", error.message);
+      res.status(500).json({ response: "Der opstod en fejl. Jeg kan desværre ikke svare lige nu!" });
+    }
+  });
+
+  // HTTP server setup
+  const server = http.createServer(app).listen(3000, () => {
+    console.log(`Worker ${process.pid} listening on port 3000`);
+  });
+
+  // Socket.IO setup
+  const io = socketIo(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+    transports: ["websocket", "polling"],
+  });
+
+  io.on("connection", (socket) => {
+    console.log("A user connected");
+
+    // Hent bruger-ID fra klientens handshake auth
+    const user_id = socket.handshake.auth.user_id;
+
+    console.log(`Server: User ID from handshake: ${user_id}`);
+
+    if (user_id) {
+      const query = `
+            SELECT * FROM chat
+            WHERE recipient_id = ? AND delivered = 0
+        `;
+      db.all(query, [user_id], (err, messages) => {
+        if (err) {
+          console.error("Database error:", err);
+          return;
+        }
+
+        messages.forEach((msg) => {
+          socket.emit("new_message", msg);
+
+          const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
+          db.run(updateQuery, [msg.chat_id], (err) => {
+            if (err) console.error("Error updating message:", err);
+          });
         });
       });
+    } else {
+      console.warn("User ID is missing in handshake auth.");
+    }
+
+    socket.on("join_room", (room) => {
+      console.log(`User joined room: ${room}`);
+      socket.join(room);
+
+      const [userId1, userId2] = room.split("_").map(Number);
+
+      const updateQuery = `
+          UPDATE chat
+          SET delivered = 1
+          WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
+      `;
+      db.run(updateQuery, [userId2, userId1], (err) => {
+        if (err) {
+          console.error("Error updating delivered status:", err);
+        } else {
+          console.log(`Marked messages as delivered for room: ${room}`);
+        }
+      });
     });
-  } else {
-    console.warn("User ID is missing in handshake auth.");
-  }
 
-  socket.on("join_room", (room) => {
-    console.log(`User joined room: ${room}`);
-    socket.join(room);
+    socket.on("new_message", (data) => {
+      const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+      io.to(room).emit("new_message", data);
+    });
 
-    const [userId1, userId2] = room.split("_").map(Number);
-
-    // Debug hvem der er i rummet
-    const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);
-    console.log(`Clients in room (${room}):`, clients);
-
-    // Marker beskeder som leveret for det pågældende rum
-    const updateQuery = `
-        UPDATE chat
-        SET delivered = 1
-        WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
-    `;
-    db.run(updateQuery, [userId2, userId1], (err) => {
-      if (err) {
-        console.error("Error updating delivered status:", err);
-      } else {
-        console.log(`Marked messages as delivered for room: ${room}`);
-      }
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
     });
   });
-
-  socket.on("new_message", (data) => {
-    const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
-    console.log(`Server: Sending message to room: ${room}`);
-    io.to(room).emit("new_message", data);
-  });
-
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
-
-
+}
