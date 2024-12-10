@@ -33,21 +33,52 @@
     <!-- Chat button -->
     <button id="chat-open" onclick="toggleChat()">💬</button>
 
-    <div class="content">
-        <h1>Juice and Coffee Menu</h1>
-
-        <!-- Cart Section -->
-        <div id="cart-container">
-            <h3>Your Order</h3>
-            <ul id="cart-items"></ul>
-            <button id="place-order-btn" onclick="placeOrder()">Place Order</button>
-        </div>
-
-        <!-- Products Section -->
-        <div id="products-container">
-            <!-- Products will be dynamically inserted here -->
+    <div class="banner" style="background-image: url('/img/shakes.png');">
+        <div class="banner-text">
+            <h1>Welcome to Joe & The Juice</h1>
+            <p>Your favorite juices and coffee, now at your fingertips!</p>
         </div>
     </div>
+    
+    <div class="navigation">
+        <button class="category-btn active" onclick="filterCategory('all')">
+            All
+        </button>
+        <button class="category-btn" onclick="filterCategory('juice')">
+            <img src="/img/juicemenu.png" alt="Juice Icon"> Juices
+        </button>
+        <button class="category-btn" onclick="filterCategory('coffee')">
+            <img src="/img/kaffe.png" alt="Coffee Icon"> Coffee
+        </button>
+    </div>
+    
+    
+    <div class="main-layout">
+        <!-- Produkter -->
+        <div class="products-container">
+            <h2></h2>
+            <div id="products-grid" class="products-grid">
+                <!-- Produkter genereres dynamisk her -->
+            </div>
+        </div>
+    
+        <!-- Kurv -->
+        <div class="basket-container">
+            <h2>Your Basket</h2>
+            <ul id="cart-items">
+                <!-- Dynamisk kurv -->
+            </ul>
+            <button id="checkout-btn" onclick="placeOrder()">Checkout</button>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2024 Joe & The Juice | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+        </div>
+    </footer>
+    
+
 
     <script src="../scripts/shakes.js"></script>
     <script src="/scripts/chatbot.js" defer></script>
