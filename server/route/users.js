@@ -21,7 +21,7 @@ const algorithm = 'aes-256-cbc';
 const key = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
 const iv = crypto.randomBytes(16); // Initialiseringsvektor
 
-const secretKey = process.env.JWT_SECRET; // Henter fra .env
+const secretKey = process.env.JWT_SECRET; // Bruger miljøvariabel til sikkerhed
 
 // Funktion til at kryptere data
 function encrypt(text) {
@@ -106,6 +106,12 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET, // api_secret
     secure: true,
 });
+
+
+
+// Hashing konfiguration
+const SALT_ROUNDS = 10;
+
 
 userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => {
     try {
