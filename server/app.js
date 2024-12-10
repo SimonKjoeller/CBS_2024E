@@ -128,90 +128,91 @@ const ports = [
 
 // Start en server for hver port
 ports.forEach(port => {
-  http.createServer(app).listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  const server = http.createServer(app);
+
+  // Socket.IO setup
+  const io = socketIo(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"],
+      transports: ["websocket", "polling"]
+    },
   });
-});
 
+  io.on("connection", (socket) => {
+    console.log("A user connected");
 
-// Socket.IO setup
-const io = socketIo(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-  transports: ["websocket", "polling"],
-});
+    // Hent bruger-ID fra klientens handshake auth
+    const user_id = socket.handshake.auth.user_id;
 
-io.on("connection", (socket) => {
-  console.log("A user connected");
+    console.log(`Server: User ID from handshake: ${user_id}`);
 
-  // Hent bruger-ID fra klientens handshake auth
-  const user_id = socket.handshake.auth.user_id;
-
-  console.log(`Server: User ID from handshake: ${user_id}`);
-
-  if (user_id) {
-    // Hent ulæste beskeder
-    const query = `
+    if (user_id) {
+      // Hent ulæste beskeder
+      const query = `
           SELECT * FROM chat
           WHERE recipient_id = ? AND delivered = 0
       `;
-    db.all(query, [user_id], (err, messages) => {
-      if (err) {
-        console.error("Database error:", err);
-        return;
-      }
+      db.all(query, [user_id], (err, messages) => {
+        if (err) {
+          console.error("Database error:", err);
+          return;
+        }
 
-      // Send beskeder og marker dem som leveret
-      messages.forEach((msg) => {
-        socket.emit("new_message", msg);
+        // Send beskeder og marker dem som leveret
+        messages.forEach((msg) => {
+          socket.emit("new_message", msg);
 
-        const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
-        db.run(updateQuery, [msg.chat_id], (err) => {
-          if (err) console.error("Error updating message:", err);
+          const updateQuery = "UPDATE chat SET delivered = 1 WHERE chat_id = ?";
+          db.run(updateQuery, [msg.chat_id], (err) => {
+            if (err) console.error("Error updating message:", err);
+          });
         });
       });
-    });
-  } else {
-    console.warn("User ID is missing in handshake auth.");
-  }
+    } else {
+      console.warn("User ID is missing in handshake auth.");
+    }
 
-  socket.on("join_room", (room) => {
-    console.log(`User joined room: ${room}`);
-    socket.join(room);
+    socket.on("join_room", (room) => {
+      console.log(`User joined room: ${room}`);
+      socket.join(room);
 
-    const [userId1, userId2] = room.split("_").map(Number);
+      const [userId1, userId2] = room.split("_").map(Number);
 
-    // Debug hvem der er i rummet
-    const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);
-    console.log(`Clients in room (${room}):`, clients);
+      // Debug hvem der er i rummet
+      const clients = Array.from(io.sockets.adapter.rooms.get(room) || []);
+      console.log(`Clients in room (${room}):`, clients);
 
-    // Marker beskeder som leveret for det pågældende rum
-    const updateQuery = `
+      // Marker beskeder som leveret for det pågældende rum
+      const updateQuery = `
         UPDATE chat
         SET delivered = 1
         WHERE recipient_id = ? AND sender_id = ? AND delivered = 0
     `;
-    db.run(updateQuery, [userId2, userId1], (err) => {
-      if (err) {
-        console.error("Error updating delivered status:", err);
-      } else {
-        console.log(`Marked messages as delivered for room: ${room}`);
-      }
+      db.run(updateQuery, [userId2, userId1], (err) => {
+        if (err) {
+          console.error("Error updating delivered status:", err);
+        } else {
+          console.log(`Marked messages as delivered for room: ${room}`);
+        }
+      });
+    });
+
+    socket.on("new_message", (data) => {
+      const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
+      console.log(`Server: Sending message to room: ${room}`);
+      io.to(room).emit("new_message", data);
+    });
+
+
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
     });
   });
 
-  socket.on("new_message", (data) => {
-    const room = [data.senderId, data.recipientId].sort((a, b) => a - b).join("_");
-    console.log(`Server: Sending message to room: ${room}`);
-    io.to(room).emit("new_message", data);
+  // Start serveren på den angivne port
+  server.listen(port, () => {
+    console.log(`Server running on port ${port}`);
   });
 
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
 });
-
-
