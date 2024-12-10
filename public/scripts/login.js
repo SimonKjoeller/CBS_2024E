@@ -18,7 +18,9 @@ async function login() {
         // Succes - redirect til hovedsiden
         if (response.ok) {
             const data = await response.json();
-            window.location.href = `https://cbsjoe.live/`; // Redirect efter login
+            if (data.message === "Du er logget ind!") {
+                window.location.href = `https://cbsjoe.live/`; // Redirect efter login
+            }
         }
     } catch (error) {
         console.log(error);
@@ -39,4 +41,4 @@ passwordInputDom.addEventListener('keydown', (event) => {
         event.preventDefault(); // 
         login();
     }
-}); s
+});
