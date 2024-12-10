@@ -60,8 +60,6 @@ userRoutes.post("/login", (req, res) => {
         }
 
         const user = users.find((user) => {
-            console.log("email:", user.email);
-            console.log("email_iv:", user.email_iv);
 
             // Valider `email_iv`
             if (!user.email_iv || typeof user.email_iv !== 'string' || user.email_iv.length !== 32) {
@@ -70,7 +68,6 @@ userRoutes.post("/login", (req, res) => {
             }
 
             const decryptedEmail = decrypt(user.email, user.email_iv);
-            console.log("decrypted:", decryptedEmail);
             return decryptedEmail === email;
         });
 
@@ -136,8 +133,6 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
     try {
         const { email, username, password, phone, newsletter } = req.body;
 
-        console.log(email, username, password, phone, newsletter);
-
         // Krypter email
         const { encryptedData, iv: ivHex } = encrypt(email);
 
@@ -185,7 +180,7 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
             INSERT INTO users (email, email_iv, username, password, phone, otp, otp_expiration, verified, subscribed_newsletter, img_url)
             VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
         `;
-        console.log(imgUrl)
+
         db.run(query, [
             encryptedData,
             ivHex,
