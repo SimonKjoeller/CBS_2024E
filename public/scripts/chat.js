@@ -129,8 +129,7 @@ function displayMessage(data) {
     chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll til bunden af chatten
 }
 
-
-async function sendMessage() {
+sendMessageButton.addEventListener("click", async () => {
     const activeUser = document.querySelector("#chat-list .active");
 
     if (!activeUser) {
@@ -178,7 +177,7 @@ async function sendMessage() {
     } catch (error) {
         console.error("Client: Error saving message to database:", error);
     }
-};
+});
 
 
 function joinRoom(recipientId) {
@@ -286,16 +285,3 @@ if (searchInput && searchDropdown && chatList && sendMessageButton && chatMessag
 
 // Hent brugeroplysninger og start processen
 fetchCurrentUserInfo();
-
-// Sender beskende ved klik
-sendMessageButton.addEventListener("click", () => {
-    sendMessage()
-});
-
-// Sender beskeden ved enter
-messageInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-        event.preventDefault();
-        sendMessage();
-    }
-});
