@@ -13,9 +13,10 @@
     <ul>
         <li><img src="/img/joeLogo.svg" alt="Logo"></li>
         <li><a href="/">Home</a></li>
+        <li style="float:right"><a href="#" id="logOut">Log out</a></li>
         <li style="float:right"><a href="/chat">Chat</a></li>
         <li style="float:right"><a href="/locations">Locations</a></li>
-        <li style="float:right"class="active"><a href="/menu">Menu</a></li>
+        <li style="float:right" class="active"><a href="/menu">Menu</a></li>
     </ul>
 
     <div id="chat-popup" style="display: none;">
@@ -39,7 +40,7 @@
             <p>Your favorite juices and coffee, now at your fingertips!</p>
         </div>
     </div>
-    
+
     <div class="navigation">
         <button class="category-btn active" onclick="filterCategory('all')">
             All
@@ -51,8 +52,8 @@
             <img src="/img/kaffe.png" alt="Coffee Icon"> Coffee
         </button>
     </div>
-    
-    
+
+
     <div class="main-layout">
         <!-- Produkter -->
         <div class="products-container">
@@ -61,7 +62,7 @@
                 <!-- Produkter genereres dynamisk her -->
             </div>
         </div>
-    
+
         <!-- Kurv -->
         <div class="basket-container">
             <h2>Your Basket</h2>
@@ -71,16 +72,17 @@
             <button id="checkout-btn" onclick="placeOrder()">Checkout</button>
         </div>
     </div>
-    
+
     <footer class="footer">
         <div class="footer-content">
             <p>© 2024 Joe & The Juice | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
         </div>
     </footer>
-    
+
 
 
     <script src="../scripts/shakes.js"></script>
+    <script src="../scripts/logout.js"></script>
     <script src="/scripts/chatbot.js" defer></script>
 </body>
 

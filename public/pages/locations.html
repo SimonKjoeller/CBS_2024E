@@ -27,31 +27,33 @@
   <ul>
     <li><img src="/img/joeLogo.svg" alt="Logo"></li>
     <li><a href="/">Home</a></li>
+    <li style="float:right"><a href="#" id="logOut">Log out</a></li>
     <li style="float:right"><a href="/chat">Chat</a></li>
     <li style="float:right" class="active"><a href="/locations">Locations</a></li>
     <li style="float:right"><a href="/menu">Menu</a></li>
-</ul>
-<main>
-  <div id="locations-page">
-    <!-- Venstre sektion: Liste -->
-    <div id="locations-list">
-      <h2>Find a Joe Near You</h2>
-      <input id="search-box" type="text" placeholder="Search for a location..." oninput="filterLocations()" />
-      <div id="location-results">
-        <!-- Resultater fra Google Maps dynamisk -->
+  </ul>
+  <main>
+    <div id="locations-page">
+      <!-- Venstre sektion: Liste -->
+      <div id="locations-list">
+        <h2>Find a Joe Near You</h2>
+        <input id="search-box" type="text" placeholder="Search for a location..." oninput="filterLocations()" />
+        <div id="location-results">
+          <!-- Resultater fra Google Maps dynamisk -->
+        </div>
+      </div>
+
+      <!-- Højre sektion: Kort -->
+      <div id="map-container">
+        <div id="map"></div>
       </div>
     </div>
-
-    <!-- Højre sektion: Kort -->
-    <div id="map-container">
-      <div id="map"></div>
-    </div>
-  </div>
-</main>
+  </main>
 
 </body>
 
 <script src="../scripts/index.js"></script>
+<script src="../scripts/logout.js"></script>
 <script src="/scripts/chatbot.js" defer></script>
 <script src="/scripts/locations.js"></script>
 
