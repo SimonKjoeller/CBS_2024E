@@ -1,45 +1,77 @@
-// Select all dropdown buttons
-const dropdownButtons = document.querySelectorAll('.dropdown-btn');
+// Produktkategorier
+const productCategories = {
+    "Orange Juice": "juice",
+    "Apple Juice": "juice",
+    "Grape Juice": "juice",
+    "Pineapple Juice": "juice",
+    "Espresso": "coffee",
+    "Cappuccino": "coffee",
+};
 
-// Fetch products from the server and render them
-// Fetch products from the /products endpoint
+// Produktbeskrivelser
+const productDescriptions = {
+    "Orange Juice": "Freshly squeezed oranges with a hint of sunshine.",
+    "Apple Juice": "Crisp and sweet apples in every sip.",
+    "Grape Juice": "Rich grape flavor straight from the vine.",
+    "Pineapple Juice": "Tropical sweetness to brighten your day.",
+    "Espresso": "Strong and bold for the perfect start.",
+    "Cappuccino": "A creamy delight with a shot of espresso."
+};
+
+// Funktion til at hente og indlæse produkter
 function loadProducts() {
-    fetch('/shakes/products') // Relative URL, works with the same origin
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Failed to fetch products: ${response.status}`);
-            }
-            return response.json();
-        })
+    fetch('/shakes/products')
+        .then(response => response.json())
         .then(products => {
-            const productsContainer = document.getElementById('products-container');
-            productsContainer.innerHTML = ''; // Clear existing content
+            const productsContainer = document.getElementById('products-grid');
+            productsContainer.innerHTML = '';
 
             products.forEach(product => {
-                // Create product card dynamically
+                const productCategory = productCategories[product.name] || 'unknown';
+                const productDescription = productDescriptions[product.name] || '';
+
                 const productCard = document.createElement('div');
                 productCard.className = 'product-card';
-                productCard.id = `product-${product.product_id}`;
-                productCard.dataset.price = product.price;
+                productCard.setAttribute('data-category', productCategory); // Tilføj kategori
 
                 productCard.innerHTML = `
-                    <img src="../img/${product.imgsrc}" alt="${product.name}" />
-                    <h3>${product.name}</h3>
-                    <p>Price: ${product.price} DKK</p>
-                    <button onclick="addToCart(${product.product_id}, '${product.name}', ${product.price})">Add to Cart</button>
+                    <img src="/img/${product.imgsrc}" alt="${product.name}">
+                    <div class="product-card-content">
+                        <h3>${product.name}</h3>
+                        <p>${productDescription}</p>
+                        <p><strong>${product.price} DKK</strong></p>
+                        <button onclick="addToCart(${product.product_id}, '${product.name}', ${product.price})">Add to Cart</button>
+                    </div>
                 `;
-
                 productsContainer.appendChild(productCard);
             });
         })
         .catch(error => console.error('Error fetching products:', error));
 }
+function filterCategory(category) {
+    const allProducts = document.querySelectorAll('.product-card');
+    const productsContainer = document.getElementById('products-grid');
+    
+    // Sørg for, at containeren ikke ryddes (vi ændrer kun visningen af elementer)
+    allProducts.forEach(product => {
+        const productCategory = product.getAttribute('data-category');
+        if (category === 'all' || productCategory === category) {
+            product.style.display = 'flex'; // Gør produktet synligt
+        } else {
+            product.style.display = 'none'; // Skjul produktet
+        }
+    });
 
+    // Opdater aktive knapper
+    const buttons = document.querySelectorAll('.category-btn');
+    buttons.forEach(button => button.classList.remove('active'));
+    document.querySelector(`[onclick="filterCategory('${category}')"]`).classList.add('active');
+}2
 
-// Cart array to store added items
+// Kurv-array til at gemme tilføjede varer
 let cart = [];
 
-// Function to add products to the cart
+// Funktion til at tilføje produkter til kurven
 function addToCart(productId, productName, price) {
     const existingProduct = cart.find(item => item.productId === productId);
     if (existingProduct) {
@@ -51,7 +83,7 @@ function addToCart(productId, productName, price) {
     alert(`${productName} added to cart!`);
 }
 
-// Function to update the cart UI
+// Funktion til at opdatere kurvens UI
 function updateCartUI() {
     const cartItems = document.getElementById('cart-items');
     cartItems.innerHTML = '';
@@ -69,7 +101,7 @@ function updateCartUI() {
     cartItems.appendChild(totalItem);
 }
 
-// Function to place the order
+// Funktion til at gennemføre en ordre
 function placeOrder() {
     if (cart.length === 0) {
         alert('Your cart is empty. Add some items before placing an order!');
@@ -80,8 +112,6 @@ function placeOrder() {
         product_id: item.productId,
         quantity: item.quantity,
     }));
-
-    console.log('Order Items to Send:', items); // Debugging
 
     fetch('/shakes/order', {
         method: 'POST',
@@ -109,14 +139,5 @@ function placeOrder() {
         .catch(error => console.error('Error placing order:', error));
 }
 
-// Load products when the page loads
+// Indlæs produkter, når siden indlæses
 document.addEventListener('DOMContentLoaded', loadProducts);
-
-// Close dropdowns when clicking outside
-window.addEventListener('click', function (event) {
-    if (!event.target.matches('.dropdown-btn')) {
-        document.querySelectorAll('.dropdown-content').forEach(content => {
-            content.classList.remove('show');
-        });
-    }
-});

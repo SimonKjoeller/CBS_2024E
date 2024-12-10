@@ -6,6 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../styles/global.css">
+  <link rel="stylesheet" href="../styles/home.css">
   <title>JOE and The Juice</title>
 </head>
 <div id="chat-popup" style="display: none;">
@@ -23,32 +24,72 @@
 <!-- Button to open chat -->
 <button id="chat-open" onclick="toggleChat()">💬</button>
 
-
 <body>
   <ul>
     <li><img src="/img/joeLogo.svg" alt="Logo"></li>
     <li><a href="/" class="active">Home</a></li>
     <li style="float:right"><a href="/chat">Chat</a></li>
     <li style="float:right"><a href="/locations">Locations</a></li>
-    <li style="float:right"><a href="/">Menu</a></li>
-  </ul>
-  <div class="center">
-    <button onclick="getResponse()">Press me</button>
-    <p id="response"></p>
+    <li style="float:right"><a href="/menu">Menu</a></li>
+</ul>
+  
+
+<!-- Hero Section -->
+<section class="parallax hero">
+  <div class="hero-content">
+      <h1>Joe and the Juice</h1>
+      <p id="typed-text">
+          <span class="dynamic-text"></span>
+          <span class="cursor">|</span>
+      </p>
   </div>
-  <div class="center">
-    <button onclick="setCookie()">Set cookie</button>
-    <p id="cookie"></p>
-  </div>
-  <div class="center">
-    <input type="email" id="emailInput" placeholder="Indtast email">
-    <!--onclick="sendMail()"-->
-    <button onclick="sendEmail()">Tilmeld nyhedsbrev</button>
-    <p id="email"></p>
+</section>
+
+<!-- Features Section -->
+<div class="info-section">
+  <div class="section-card">
+    <img src="/img/menu.png" alt="Menu Icon" class="card-icon">
+    <h2>Our Menu</h2>
+    <p>Discover fresh juices, handcrafted coffee, and healthy shakes.</p>
+    <a href="/menu" class="cta-button">See Menu</a>
   </div>
 
+  <div class="section-card">
+    <img src="/img/location.png" alt="Location Icon" class="card-icon">
+    <h2>Locations</h2>
+    <p>Find a Joe and the Juice store near you.</p>
+    <a href="/locations" class="cta-button">Find Locations</a>
+  </div>
+
+  <div class="section-card">
+    <img src="/img/chat.png" alt="Chat Icon" class="card-icon">
+    <h2>Chat with Us</h2>
+    <p>Start a conversation with your friends.</p>
+    <a href="/chat" class="cta-button">Start Chat</a>
+  </div>
+</div>
+
+
+<!-- Newsletter Section -->
+<section class="newsletter">
+  <h2>Sign Up for Our Newsletter</h2>
+  <p>Stay updated with the latest news, promotions, and special offers.</p>
+  <div class="center">
+      <input type="email" id="emailInput" placeholder="Enter your email">
+      <button onclick="sendEmail()">Subscribe</button>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>&copy; 2024 Joe and the Juice. All rights reserved.</p>
+</footer>
+
+
+
+
 </body>
-<script src="../scripts/index.js"></script>
+<script src="/scripts/index.js"></script>
 <script src="/scripts/chatbot.js" defer></script>
 
 
