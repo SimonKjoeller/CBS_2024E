@@ -25,3 +25,10 @@ async function login() {
         alert('Wrong password. Try again!');
     }
 }
+
+document.getElementById('loginForm').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Forhindre standard submit-opførsel
+        login(); // Kald login-funktionen
+    }
+});
