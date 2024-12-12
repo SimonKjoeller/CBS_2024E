@@ -198,25 +198,20 @@ document.addEventListener("DOMContentLoaded", () => {
   type();
 });
 
-async function sendEmail() {
-  const emailInputDom = document.getElementById("emailInput");
-  const emailDom = document.getElementById("email");
-
+async function subscribeNewsletter() {
   try {
-    const response = await fetch('/email', {
+    // Send POST-anmodning til /email
+    const response = await fetch('/users/email', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email: emailInputDom.value }),
+      credentials: 'include', // Send cookies med anmodningen
     });
 
+    // Hvis alt går godt, vis en besked
     const data = await response.json();
-
-    // Vis besked til brugeren
-    emailDom.innerHTML = `<p>${data.message}</p>`;
+    alert(data.message);
   } catch (error) {
-    console.error("Fejl ved tilmelding:", error);
-    emailDom.innerHTML = `<p>Der opstod en fejl: ${error.message}</p>`;
+    console.error("Fejl:", error);
+    alert("Der opstod en fejl ved tilmeldingen til nyhedsbrevet.");
   }
 }
+
