@@ -161,10 +161,10 @@ async function sendEmail() {
 // styling //
 document.addEventListener("DOMContentLoaded", () => {
   const phrases = [
-      "Fresh Juices for Every Mood",
-      "Handcrafted Coffee, Always",
-      "Vibes You’ll Remember",
-      "Good Energy, Great Food",
+    "Fresh Juices for Every Mood",
+    "Handcrafted Coffee, Always",
+    "Vibes You’ll Remember",
+    "Good Energy, Great Food",
   ];
 
   let phraseIndex = 0;
@@ -175,25 +175,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const dynamicText = document.querySelector(".dynamic-text");
 
   function type() {
-      if (charIndex < phrases[phraseIndex].length) {
-          dynamicText.textContent += phrases[phraseIndex].charAt(charIndex);
-          charIndex++;
-          setTimeout(type, typingSpeed);
-      } else {
-          setTimeout(deletePhrase, delayBetweenPhrases);
-      }
+    if (charIndex < phrases[phraseIndex].length) {
+      dynamicText.textContent += phrases[phraseIndex].charAt(charIndex);
+      charIndex++;
+      setTimeout(type, typingSpeed);
+    } else {
+      setTimeout(deletePhrase, delayBetweenPhrases);
+    }
   }
 
   function deletePhrase() {
-      if (charIndex > 0) {
-          dynamicText.textContent = phrases[phraseIndex].substring(0, charIndex - 1);
-          charIndex--;
-          setTimeout(deletePhrase, typingSpeed);
-      } else {
-          phraseIndex = (phraseIndex + 1) % phrases.length;
-          setTimeout(type, typingSpeed);
-      }
+    if (charIndex > 0) {
+      dynamicText.textContent = phrases[phraseIndex].substring(0, charIndex - 1);
+      charIndex--;
+      setTimeout(deletePhrase, typingSpeed);
+    } else {
+      phraseIndex = (phraseIndex + 1) % phrases.length;
+      setTimeout(type, typingSpeed);
+    }
   }
 
   type();
 });
+
+async function sendEmail() {
+  const emailInputDom = document.getElementById("emailInput");
+  const emailDom = document.getElementById("email");
+
+  try {
+    const response = await fetch('/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: emailInputDom.value }),
+    });
+
+    const data = await response.json();
+
+    // Vis besked til brugeren
+    emailDom.innerHTML = `<p>${data.message}</p>`;
+  } catch (error) {
+    console.error("Fejl ved tilmelding:", error);
+    emailDom.innerHTML = `<p>Der opstod en fejl: ${error.message}</p>`;
+  }
+}
