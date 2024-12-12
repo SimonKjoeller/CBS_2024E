@@ -10,20 +10,14 @@ Dette projekt er en Node.js-applikation til Joe & The Juice med funktioner som c
 ## Opsætning
 
 ### Krav
-- *Node.js* (v14+)
-- *npm*
-- *SQLite3*
+1. Skift directory til server mappen (cd server)
 
-### Installation
+2. rm -rf node_modules
 
-1. *Klon repoet*
-   ```bash
-   git clone <repository-url>
-   cd <repository-folder>
+3. npm install
 
-2. *Indstaller afhængigheder*
-    npm install
+4. Opret .env fil i server mappen
 
-3.  *Start Server*
-    node app.js
-    Adgang Åbn http://localhost:3001 i din browser.
+5. Indsæt information fra .env i opgaven
+
+6. node app.js
