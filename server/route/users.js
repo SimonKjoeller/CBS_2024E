@@ -12,6 +12,7 @@ const fsPromises = require("fs").promises;
 const crypto = require('crypto');
 const cors = require("cors");
 require('dotenv').config();
+const checkAuth = require("../checkAuth");
 
 userRoutes.use(express.json());
 userRoutes.use(cookieParser());
@@ -122,9 +123,6 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET, // api_secret
     secure: true,
 });
-
-
-
 
 
 userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => {
@@ -285,57 +283,80 @@ userRoutes.post('/verify', (req, res) => {
     });
 });
 
-userRoutes.post('/email', async (req, res) => {
-    const { email } = req.body;
+userRoutes.post('/email', checkAuth, async (req, res) => {
+    const token = req.cookies.authToken; // Hent authToken fra cookies
 
-    if (!email) {
-        return res.status(400).json({ message: "Email er påkrævet." });
+    if (!token) {
+        return res.status(401).json({ message: "Du skal være logget ind for at tilmelde dig nyhedsbrevet." });
     }
 
     try {
-        // Tjek om brugeren allerede findes i databasen
-        const query = `SELECT * FROM users WHERE email = ?`;
-        db.get(query, [email], async (err, user) => {
+        // Verificér token for at få bruger-ID
+        const decoded = jwt.verify(token, secretKey);
+        const userId = decoded.user_id;
+
+        // Tjek brugerens nuværende status
+        const query = `SELECT * FROM users WHERE user_id = ?`;
+        db.get(query, [userId], async (err, user) => {
             if (err) {
                 console.error("Fejl ved databaseforespørgsel:", err);
                 return res.status(500).json({ error: "Kunne ikke hente bruger." });
             }
 
-            // Hvis brugeren eksisterer og er tilmeldt nyhedsbrevet
-            if (user) {
-                if (user.subscribed_newsletter === 1) {
-                    return res.status(200).json({ message: "Bruger er allerede tilmeldt nyhedsbrevet." });
+            if (!user) {
+                return res.status(404).json({ message: "Bruger ikke fundet." });
+            }
+
+            // Dekrypter e-mailen
+            const decryptedEmail = decrypt(user.email, user.email_iv);
+
+            if (!decryptedEmail) {
+                return res.status(500).json({ error: "Kunne ikke dekryptere brugerens e-mail." });
+            }
+
+            // Hvis brugeren allerede er tilmeldt
+            if (user.subscribed_newsletter === 1) {
+                return res.status(200).json({ message: "Du er allerede tilmeldt nyhedsbrevet." });
+            }
+
+            // Opdater status til tilmeldt
+            const updateQuery = `UPDATE users SET subscribed_newsletter = 1 WHERE user_id = ?`;
+            db.run(updateQuery, [userId], async (updateErr) => {
+                if (updateErr) {
+                    console.error("Fejl ved opdatering:", updateErr);
+                    return res.status(500).json({ error: "Kunne ikke opdatere nyhedsbrevstilmelding." });
                 }
 
-                // Opdater status til tilmeldt
-                const updateQuery = `UPDATE users SET subscribed_newsletter = 1 WHERE email = ?`;
-                db.run(updateQuery, [email], (updateErr) => {
-                    if (updateErr) {
-                        console.error("Fejl ved opdatering:", updateErr);
-                        return res.status(500).json({ error: "Kunne ikke opdatere bruger." });
-                    }
+                // Send e-mailen
+                try {
+                    const info = await transporter.sendMail({
+                        from: "CBSJOE <cbsjoec@gmail.com>",
+                        to: decryptedEmail, // Brug dekrypteret e-mail
+                        subject: 'Velkommen til Joe & The Juice!',
+                        html: `<div style="font-family: Arial, sans-serif; color: #333;">
+                            <h1>Velkommen til Joe & The Juice</h1>
+                            <p>Tak for at verificere din konto. Du er nu tilmeldt vores nyhedsbrev!</p>
+                            <img src="https://seeklogo.com/images/J/joe-and-the-juice-logo-8D32BBD87A-seeklogo.com.png" alt="Joe & The Juice logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+                            <footer style="font-size: 12px; color: #888;">
+                                <p>Joe & The Juice</p>
+                                <p>Adresse: Se web</p>
+                            </footer>
+                        </div>`,
+                    });
 
-                    res.status(200).json({ message: "Du er nu tilmeldt nyhedsbrevet!" });
-                });
-            } else {
-                // Hvis brugeren ikke findes, opret en ny
-                const insertQuery = `INSERT INTO users (email, subscribed_newsletter) VALUES (?, 1)`;
-                db.run(insertQuery, [email], (insertErr) => {
-                    if (insertErr) {
-                        console.error("Fejl ved oprettelse af bruger:", insertErr);
-                        return res.status(500).json({ error: "Kunne ikke oprette bruger." });
-                    }
-
-                    res.status(201).json({ message: "Du er nu tilmeldt nyhedsbrevet!" });
-                });
-            }
+                    console.log(`Nyhedsbrev sendt til ${decryptedEmail}:`, info.messageId);
+                    return res.status(200).json({ message: "Du er nu tilmeldt nyhedsbrevet!" });
+                } catch (mailError) {
+                    console.error("Fejl ved afsendelse af nyhedsbrev:", mailError);
+                    return res.status(500).json({ error: "Kunne ikke sende e-mail." });
+                }
+            });
         });
     } catch (error) {
         console.error("Fejl:", error);
-        res.status(500).json({ error: "Intern serverfejl." });
+        res.status(401).json({ message: "Ugyldig eller udløbet token." });
     }
 });
-
 
 
 
