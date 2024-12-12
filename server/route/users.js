@@ -125,8 +125,6 @@ cloudinary.config({
 
 
 
-// Hashing konfiguration
-const SALT_ROUNDS = 10;
 
 
 userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => {
