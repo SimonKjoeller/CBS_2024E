@@ -285,5 +285,58 @@ userRoutes.post('/verify', (req, res) => {
     });
 });
 
+userRoutes.post('/email', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ message: "Email er påkrævet." });
+    }
+
+    try {
+        // Tjek om brugeren allerede findes i databasen
+        const query = `SELECT * FROM users WHERE email = ?`;
+        db.get(query, [email], async (err, user) => {
+            if (err) {
+                console.error("Fejl ved databaseforespørgsel:", err);
+                return res.status(500).json({ error: "Kunne ikke hente bruger." });
+            }
+
+            // Hvis brugeren eksisterer og er tilmeldt nyhedsbrevet
+            if (user) {
+                if (user.subscribed_newsletter === 1) {
+                    return res.status(200).json({ message: "Bruger er allerede tilmeldt nyhedsbrevet." });
+                }
+
+                // Opdater status til tilmeldt
+                const updateQuery = `UPDATE users SET subscribed_newsletter = 1 WHERE email = ?`;
+                db.run(updateQuery, [email], (updateErr) => {
+                    if (updateErr) {
+                        console.error("Fejl ved opdatering:", updateErr);
+                        return res.status(500).json({ error: "Kunne ikke opdatere bruger." });
+                    }
+
+                    res.status(200).json({ message: "Du er nu tilmeldt nyhedsbrevet!" });
+                });
+            } else {
+                // Hvis brugeren ikke findes, opret en ny
+                const insertQuery = `INSERT INTO users (email, subscribed_newsletter) VALUES (?, 1)`;
+                db.run(insertQuery, [email], (insertErr) => {
+                    if (insertErr) {
+                        console.error("Fejl ved oprettelse af bruger:", insertErr);
+                        return res.status(500).json({ error: "Kunne ikke oprette bruger." });
+                    }
+
+                    res.status(201).json({ message: "Du er nu tilmeldt nyhedsbrevet!" });
+                });
+            }
+        });
+    } catch (error) {
+        console.error("Fejl:", error);
+        res.status(500).json({ error: "Intern serverfejl." });
+    }
+});
+
+
+
 
 module.exports = userRoutes;

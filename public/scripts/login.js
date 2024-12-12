@@ -10,12 +10,12 @@ async function login() {
             body: JSON.stringify({ email: emailInputDom.value, password: passwordInputDom.value }),
         });
 
-        // Hvis responsen ikke er OK, kast en fejl
+        // Hvis responsen ikke er ok, så sender vi en fejl
         if (!response.ok) {
             throw new Error(`HTTP status code ${response.status}`);
         }
 
-        // Succes - redirect til hovedsiden
+        // VEd sucess så redirecter vi til main siden
         if (response.ok) {
             const data = await response.json();
             if (data.message === "Du er logget ind!") {
