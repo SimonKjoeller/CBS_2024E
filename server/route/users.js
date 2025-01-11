@@ -141,32 +141,27 @@ userRoutes.post('/signup', upload.single('profilePicture'), async (req, res) => 
 
         // Upload profilbillede til Cloudinary
         let imgUrl = null;
-        if (req.file) {
-            const tmpDir = './public/img'; // Midlertidig mappe
-            const tmpFilePath = `${tmpDir}/${req.file.originalname}`;
-
+        if (req.file) { // Tjekker om der er en fil i requesten (uploadet via 'profilePicture')
             try {
-                // Tjek og opret midlertidig mappe, hvis den ikke eksisterer
-                await fsPromises.mkdir(tmpDir, { recursive: true });
+                // Uploader filen direkte til Cloudinary som en buffer via upload_stream
+                const result = await cloudinary.uploader.upload_stream(
+                    {
+                        public_id: `profile_pictures/${req.file.originalname.split('.')[0]}`, // Angiver et unikt ID baseret på filens navn (uden filtypen)
+                        resource_type: 'auto', // Lader Cloudinary automatisk genkende filtypen (billede, video osv.)
+                    },
+                    (error, result) => {
+                        if (error) throw error; // Hvis der opstår en fejl, smider vi en undtagelse
+                        return result; // Returnerer resultatet af uploaden, som indeholder metadata fra Cloudinary
+                    }
+                ).end(req.file.buffer); // Sender filens buffer (indholdet) direkte til Cloudinary via stream
 
-                // Gem den midlertidige billedfil
-                await fsPromises.writeFile(tmpFilePath, req.file.buffer);
-
-                const uploadOptions = {
-                    public_id: `profile_pictures/${req.file.originalname.split('.')[0]}`,
-                    resource_type: 'auto',
-                };
-
-                // Upload til Cloudinary
-                const result = await cloudinary.uploader.upload(tmpFilePath, uploadOptions);
-
-                // Slet den midlertidige fil
-                await fsPromises.unlink(tmpFilePath);
-
-                // Gem billed-URL
-                imgUrl = result.secure_url;
+                // Gemmer URL'en til det uploadede billede fra Cloudinary
+                imgUrl = result.secure_url; // Cloudinary returnerer en sikker URL, som vi gemmer til brug i applikationen
             } catch (uploadError) {
-                console.error('Fejl ved upload til Cloudinary eller gemning af fil:', uploadError);
+                // Logger fejlen, hvis noget går galt under upload til Cloudinary
+                console.error('Fejl ved upload til Cloudinary:', uploadError);
+
+                // Returnerer en fejlmeddelelse til klienten
                 return res.status(500).json({ error: 'Kunne ikke uploade profilbillede.' });
             }
         }
